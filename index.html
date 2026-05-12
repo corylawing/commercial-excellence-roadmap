@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roadmap · RevOps</title>
+<title>Commercial Excellence · Revenue Operations Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -88,12 +88,6 @@
   .btn-danger:hover { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
   .btn-sm { height: 28px; padding: 0 10px; font-size: 12px; }
 
-  .toggle { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); cursor: pointer; transition: all .12s; }
-  .toggle:hover { border-color: var(--border-strong); }
-  .toggle.on { background: var(--accent); color: white; border-color: var(--accent); }
-  .toggle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-4); }
-  .toggle.on .toggle-dot { background: var(--success); }
-
   .container { max-width: 1440px; margin: 0 auto; padding: 32px 24px 80px; }
   .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
   .page-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
@@ -159,7 +153,9 @@
   .workload-bar-seg.s-complete    { background: var(--info); }
   .workload-bar-seg.s-on_track    { background: var(--success); }
   .workload-bar-seg.s-at_risk     { background: var(--warning); }
+  .workload-bar-seg.s-blocked     { background: #BE185D; }
   .workload-bar-seg.s-not_started { background: var(--neutral); }
+  .workload-bar-seg.s-killed      { background: #737373; opacity: .6; }
   .workload-count { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
   .workload-legend { display: flex; gap: 16px; padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
   .wl-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); }
@@ -171,18 +167,21 @@
   .badge-warning { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-border); }
   .badge-neutral { color: var(--neutral); background: var(--neutral-bg); border-color: var(--neutral-border); }
   .badge-info    { color: var(--info);    background: var(--info-bg);    border-color: var(--info-border); }
+  .badge-blocked { color: #BE185D; background: #FDF2F8; border-color: #FBCFE8; }
+  .badge-killed  { color: #737373; background: #E5E5E5; border-color: #D4D4D8; }
   .tag { display: inline-flex; align-items: center; height: 22px; padding: 0 7px; font-size: 12px; font-weight: 500; border-radius: var(--r); background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
   .tag-mono { font-family: 'Geist Mono', monospace; font-size: 11px; }
   .avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); color: var(--text-2); font-size: 10px; font-weight: 600; display: inline-grid; place-items: center; border: 1px solid var(--border); text-transform: uppercase; font-family: 'Geist Mono', monospace; }
 
   .timeline { padding: 0; overflow-x: auto; }
-  .tl-grid { min-width: 980px; position: relative; }
-  .tl-header { display: grid; grid-template-columns: 320px repeat(4, 1fr); background: var(--surface-2); border-bottom: 1px solid var(--border); }
-  .tl-header-cell { padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text-2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tl-grid { min-width: 1400px; position: relative; }
+  .tl-header { display: grid; grid-template-columns: 280px repeat(8, 1fr); background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .tl-header-cell { padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text-2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .tl-header-cell:last-child { border-right: none; }
   .tl-header-cell.first { color: var(--text-3); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tl-header-cell.tl-year-divider { border-left: 2px solid var(--border-strong); }
   .tl-q-range { font-size: 11px; color: var(--text-3); font-weight: 500; font-family: 'Geist Mono', monospace; }
-  .tl-ws-row { display: grid; grid-template-columns: 320px 1fr; background: var(--surface-2); border-bottom: 1px solid var(--border); border-top: 1px solid var(--border); }
+  .tl-ws-row { display: grid; grid-template-columns: 280px 1fr; background: var(--surface-2); border-bottom: 1px solid var(--border); border-top: 1px solid var(--border); }
   .tl-ws-row:first-of-type { border-top: none; }
   .tl-ws-cell { padding: 8px 14px; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--border); }
   .tl-ws-cell:last-child { border-right: none; }
@@ -192,13 +191,13 @@
   .tl-ws-summary { padding: 8px 14px; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-3); flex-wrap: wrap; }
   .tl-ws-summary-stat { display: inline-flex; align-items: center; gap: 4px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; }
   .tl-ws-summary-stat strong { color: var(--text); font-weight: 600; }
-  .tl-row { display: grid; grid-template-columns: 320px repeat(4, 1fr); border-bottom: 1px solid var(--border); transition: background .1s; position: relative; min-height: 48px; }
+  .tl-row { display: grid; grid-template-columns: 280px repeat(8, 1fr); border-bottom: 1px solid var(--border); transition: background .1s; position: relative; min-height: 48px; }
   .tl-row:hover { background: var(--surface-hover); }
-  .tl-row-label { padding: 10px 14px; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .tl-row-label { padding: 10px 12px; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
   .tl-row-code { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-3); background: var(--surface-2); padding: 2px 6px; border-radius: var(--r-sm); flex-shrink: 0; }
   .tl-row-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; }
-  .tl-row-track { grid-column: 2 / -1; position: relative; display: grid; grid-template-columns: repeat(4, 1fr); }
-  .tl-row-track::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(50% - .5px), var(--border) calc(50% - .5px), var(--border) calc(50% + .5px), transparent calc(50% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px)); pointer-events: none; }
+  .tl-row-track { grid-column: 2 / -1; position: relative; display: grid; grid-template-columns: repeat(8, 1fr); }
+  .tl-row-track::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, transparent calc(12.5% - .5px), var(--border) calc(12.5% - .5px), var(--border) calc(12.5% + .5px), transparent calc(12.5% + .5px), transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(37.5% - .5px), var(--border) calc(37.5% - .5px), var(--border) calc(37.5% + .5px), transparent calc(37.5% + .5px), transparent calc(50% - 1px), var(--border-strong) calc(50% - 1px), var(--border-strong) calc(50% + 1px), transparent calc(50% + 1px), transparent calc(62.5% - .5px), var(--border) calc(62.5% - .5px), var(--border) calc(62.5% + .5px), transparent calc(62.5% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px), transparent calc(87.5% - .5px), var(--border) calc(87.5% - .5px), var(--border) calc(87.5% + .5px), transparent calc(87.5% + .5px)); pointer-events: none; }
   .tl-bar { margin: 8px 4px; padding: 0 10px; border-radius: var(--r); background: var(--bar-bg); border: 1px solid var(--bar-border); height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: all .15s; overflow: hidden; color: var(--bar-fg); position: relative; z-index: 1; }
   .tl-bar:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
   .tl-bar-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
@@ -262,14 +261,47 @@
   .drawer-meta-label { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
   .drawer-meta-value { font-size: 13px; color: var(--text); font-weight: 500; display: flex; align-items: center; gap: 6px; }
 
-  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-  .field-label { font-size: 12px; color: var(--text-2); font-weight: 500; }
-  .field-input, .field-select, .field-textarea { width: 100%; padding: 8px 10px; font-size: 13px; color: var(--text); border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); outline: none; transition: border .15s, box-shadow .15s; }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+  .field-label { font-size: 12px; color: var(--text-2); font-weight: 600; display: flex; align-items: baseline; gap: 6px; }
+  .field-label-optional { font-size: 11px; color: var(--text-4); font-weight: 400; }
+  .field-hint { font-size: 11.5px; color: var(--text-3); line-height: 1.4; }
+  .field-preview { margin-top: 4px; }
+  .field-input, .field-select, .field-textarea { width: 100%; padding: 9px 12px; font-size: 13px; color: var(--text); border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); outline: none; transition: border .15s, box-shadow .15s; }
+  .field-input-lg { padding: 11px 14px; font-size: 15px; font-weight: 500; }
   .field-textarea { resize: vertical; min-height: 80px; font-family: inherit; line-height: 1.5; }
-  .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(24,24,27,.05); }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .drawer-actions { display: flex; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); background: var(--surface); }
-  .drawer-actions .grow { flex: 1; }
+  .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(24,24,27,.06); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .drawer-actions { display: flex; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); background: var(--surface); align-items: center; }
+
+  /* Quarter range picker */
+  .q-picker-year-label { font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-3); font-weight: 500; text-transform: uppercase; margin-bottom: 4px; }
+  .q-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .q-cell { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 8px; cursor: pointer; transition: all .12s; display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: inherit; position: relative; }
+  .q-cell:hover { border-color: var(--border-strong); background: var(--surface-2); }
+  .q-cell-label { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.2; }
+  .q-cell-months { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-3); font-weight: 500; }
+  .q-cell.in-range { background: var(--info-bg); border-color: var(--info-border); }
+  .q-cell.in-range .q-cell-label { color: var(--info); }
+  .q-cell.in-range .q-cell-months { color: var(--info); opacity: .75; }
+  .q-cell.endpoint { background: var(--info); border-color: var(--info); }
+  .q-cell.endpoint .q-cell-label, .q-cell.endpoint .q-cell-months { color: white; opacity: 1; }
+  .q-cell.endpoint .q-cell-months { opacity: .8; }
+
+  /* Notes log */
+  .notes-log { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+  .notes-log:empty + .notes-empty { display: block; }
+  .notes-empty { display: none; font-size: 12px; color: var(--text-4); font-style: italic; padding: 12px; text-align: center; background: var(--surface-2); border-radius: var(--r); margin-bottom: 14px; }
+  .note { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; }
+  .note-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .note-author { font-size: 12px; font-weight: 600; color: var(--text); }
+  .note-time { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-3); }
+  .note-text { font-size: 13px; color: var(--text-2); line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  .note-add-row { display: flex; gap: 8px; align-items: stretch; }
+  .note-add-row .field-textarea { min-height: 60px; flex: 1; }
+  .note-author-input { width: 100%; padding: 7px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 6px; outline: none; }
+  .note-author-input:focus { border-color: var(--accent); }
+  .note-add-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
+  .note-add-hint { font-size: 11px; color: var(--text-4); }
 
   .snapshot-card { padding: 14px 16px; }
   .snapshot-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
@@ -342,9 +374,9 @@
         <rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".3"/>
       </svg>
     </div>
-    <span class="brand-name">Roadmap</span>
+    <span class="brand-name">Commercial Excellence</span>
     <span class="brand-sep">/</span>
-    <span class="brand-org">RevOps</span>
+    <span class="brand-org">RevOps Portfolio</span>
   </div>
 
   <div class="app-bar-search">
@@ -357,10 +389,6 @@
 
   <div class="app-bar-actions">
     <span class="conn-status loading" id="conn-status">Loading…</span>
-    <button class="toggle" id="edit-toggle" onclick="toggleEditMode()" title="Toggle edit mode">
-      <span class="toggle-dot"></span>
-      <span id="edit-toggle-label">View</span>
-    </button>
     <button class="btn btn-ghost btn-sm" onclick="exportData()" title="Download current filter as JSON">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -368,6 +396,10 @@
       Export
     </button>
     <button class="btn btn-sm" onclick="window.print()">Print</button>
+    <button class="btn btn-primary btn-sm" onclick="openNewDrawer()" title="Add a new initiative">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add initiative
+    </button>
   </div>
 </header>
 
@@ -387,7 +419,7 @@
 
   <div class="page-head">
     <div>
-      <h1>2026 Salesforce Portfolio</h1>
+      <h1>Commercial Excellence · Revenue Operations Portfolio</h1>
       <div class="page-sub">
         <span id="page-count">0 initiatives</span>
         <span class="page-sub-dot"></span>
@@ -421,7 +453,7 @@
       <div class="kpi-bar"><div class="kpi-bar-fill" id="m-ontrack-bar" style="--bar-color: var(--success);"></div></div>
     </div>
     <div class="kpi-card kpi-warning">
-      <div class="kpi-head"><span class="kpi-label">At risk</span>
+      <div class="kpi-head"><span class="kpi-label" title="At risk + Blocked">Needs attention</span>
         <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
       </div>
       <div class="kpi-value-row"><span class="kpi-value" id="m-risk">0</span><span class="kpi-delta" id="m-risk-pct">0%</span></div>
@@ -454,12 +486,6 @@
   <div class="section">
     <div class="section-head">
       <div class="section-title"><h2>Timeline</h2><span class="section-count" id="tl-count">0</span></div>
-      <div class="section-actions">
-        <button class="btn btn-sm edit-only" onclick="openNewDrawer()" style="display:none;">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add initiative
-        </button>
-      </div>
     </div>
     <div class="card timeline"><div class="tl-grid" id="timeline"></div></div>
   </div>
@@ -478,7 +504,9 @@
         <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--info)"></div>Shipped</div>
         <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--success)"></div>On track</div>
         <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--warning)"></div>At risk</div>
+        <div class="wl-legend-item"><div class="wl-legend-dot" style="background:#BE185D"></div>Blocked</div>
         <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--neutral)"></div>Not started</div>
+        <div class="wl-legend-item"><div class="wl-legend-dot" style="background:#737373;opacity:.6"></div>Killed</div>
       </div>
     </div>
   </div>
@@ -493,6 +521,9 @@
       <div class="toolbar-divider"></div>
       <span class="toolbar-label">Status</span>
       <div class="filter-group" id="status-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div class="toolbar-divider"></div>
+      <span class="toolbar-label">Owner</span>
+      <div class="filter-group" id="owner-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
       <button class="btn btn-sm btn-ghost" onclick="clearFilters()" style="margin-left:auto;">Reset</button>
     </div>
     <div class="board" id="board"></div>
@@ -532,7 +563,7 @@
       <span class="drawer-ws-pill" id="drawer-ws" style="--ws-color: var(--accent);">—</span>
     </div>
     <div class="drawer-head-r">
-      <button class="btn btn-ghost btn-sm edit-only" id="drawer-edit-btn" onclick="enterEditMode()" style="display:none;">
+      <button class="btn btn-ghost btn-sm" id="drawer-edit-btn" onclick="enterEditMode()">
         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         Edit
       </button>
@@ -552,44 +583,121 @@
     </div>
     <div class="drawer-section"><div class="drawer-section-label">Description</div><div class="drawer-section-body" id="drawer-desc">—</div></div>
     <div class="drawer-section"><div class="drawer-section-label">Business value</div><div class="drawer-section-body" id="drawer-value">—</div></div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-label">Activity log <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-4)">· append-only</span></div>
+      <div class="notes-log" id="drawer-notes-log"></div>
+      <div class="notes-empty">No notes yet. Add the first one below — it'll be timestamped permanently.</div>
+      <input type="text" class="note-author-input" id="note-author" placeholder="Your name or initials" autocomplete="off">
+      <textarea class="field-textarea" id="note-text" placeholder="Add an update: progress, blockers, decisions, questions…" style="min-height:64px;"></textarea>
+      <div class="note-add-actions">
+        <span class="note-add-hint">Notes can't be edited or deleted once posted.</span>
+        <button class="btn btn-primary btn-sm" onclick="addNote()" id="add-note-btn">Add note</button>
+      </div>
+    </div>
   </div>
 
   <div class="drawer-body" id="drawer-edit" style="display:none;">
-    <div class="field"><label class="field-label">Title</label><input class="field-input" id="f-title" type="text" placeholder="Initiative title"></div>
-    <div class="field-row">
-      <div class="field"><label class="field-label">Workstream</label><select class="field-select" id="f-ws"></select></div>
-      <div class="field"><label class="field-label">Status</label><select class="field-select" id="f-status"></select></div>
+    <div class="field">
+      <label class="field-label" for="f-title">Title</label>
+      <input class="field-input field-input-lg" id="f-title" type="text" placeholder="What is this initiative called?" autocomplete="off">
+      <div class="field-hint">A short name your team will recognize</div>
     </div>
+
     <div class="field-row">
-      <div class="field"><label class="field-label">Owner</label><input class="field-input" id="f-owner" type="text" placeholder="e.g. Revenue Operations"></div>
-      <div class="field"><label class="field-label">Effort</label>
-        <select class="field-select" id="f-effort">
-          <option value="S">S — &lt; 2 weeks</option><option value="M">M — 2–6 weeks</option>
-          <option value="L">L — 6–12 weeks</option><option value="XL">XL — 12+ weeks</option>
-        </select>
+      <div class="field">
+        <label class="field-label" for="f-ws">Workstream</label>
+        <select class="field-select" id="f-ws"></select>
+      </div>
+      <div class="field">
+        <label class="field-label" for="f-status">Status</label>
+        <select class="field-select" id="f-status" onchange="updateStatusPreview()"></select>
+        <div class="field-preview" id="f-status-preview"></div>
       </div>
     </div>
+
     <div class="field-row">
-      <div class="field"><label class="field-label">Start quarter</label>
-        <select class="field-select" id="f-startq">
-          <option value="1">Q1 2026</option><option value="2">Q2 2026</option><option value="3">Q3 2026</option><option value="4">Q4 2026</option>
-        </select>
+      <div class="field">
+        <label class="field-label" for="f-owner">Owner</label>
+        <input class="field-input" id="f-owner" type="text" placeholder="e.g. Revenue Operations" autocomplete="off">
+        <div class="field-hint">Team or person responsible</div>
       </div>
-      <div class="field"><label class="field-label">End quarter</label>
-        <select class="field-select" id="f-endq">
-          <option value="1">Q1 2026</option><option value="2">Q2 2026</option><option value="3">Q3 2026</option><option value="4">Q4 2026</option>
+      <div class="field">
+        <label class="field-label" for="f-effort">Effort</label>
+        <select class="field-select" id="f-effort" onchange="updateEffortHint()">
+          <option value="S">S — Small</option>
+          <option value="M">M — Medium</option>
+          <option value="L">L — Large</option>
+          <option value="XL">XL — Extra large</option>
         </select>
+        <div class="field-hint" id="f-effort-hint">2–6 weeks</div>
       </div>
     </div>
-    <div class="field"><label class="field-label">Target label</label><input class="field-input" id="f-target" type="text" placeholder="e.g. Q2 2026 or Q4 2026 – Q1 2027"></div>
-    <div class="field"><label class="field-label">Description</label><textarea class="field-textarea" id="f-desc" placeholder="One or two sentences…"></textarea></div>
-    <div class="field"><label class="field-label">Business value</label><textarea class="field-textarea" id="f-value" placeholder="What outcome does this drive?"></textarea></div>
+
+    <div class="field">
+      <label class="field-label">Timeline</label>
+      <div class="q-picker-year-label">2026</div>
+      <div class="q-picker">
+        <button type="button" class="q-cell" data-q="1">
+          <span class="q-cell-label">Q1</span>
+          <span class="q-cell-months">Jan–Mar</span>
+        </button>
+        <button type="button" class="q-cell" data-q="2">
+          <span class="q-cell-label">Q2</span>
+          <span class="q-cell-months">Apr–Jun</span>
+        </button>
+        <button type="button" class="q-cell" data-q="3">
+          <span class="q-cell-label">Q3</span>
+          <span class="q-cell-months">Jul–Sep</span>
+        </button>
+        <button type="button" class="q-cell" data-q="4">
+          <span class="q-cell-label">Q4</span>
+          <span class="q-cell-months">Oct–Dec</span>
+        </button>
+      </div>
+      <div class="q-picker-year-label" style="margin-top:8px;">2027</div>
+      <div class="q-picker">
+        <button type="button" class="q-cell" data-q="5">
+          <span class="q-cell-label">Q1</span>
+          <span class="q-cell-months">Jan–Mar</span>
+        </button>
+        <button type="button" class="q-cell" data-q="6">
+          <span class="q-cell-label">Q2</span>
+          <span class="q-cell-months">Apr–Jun</span>
+        </button>
+        <button type="button" class="q-cell" data-q="7">
+          <span class="q-cell-label">Q3</span>
+          <span class="q-cell-months">Jul–Sep</span>
+        </button>
+        <button type="button" class="q-cell" data-q="8">
+          <span class="q-cell-label">Q4</span>
+          <span class="q-cell-months">Oct–Dec</span>
+        </button>
+      </div>
+      <div class="field-hint" id="q-picker-hint">Click a quarter to set when this lands. Click another quarter to span multiple.</div>
+      <input type="hidden" id="f-startq" value="2">
+      <input type="hidden" id="f-endq" value="2">
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-desc">Description</label>
+      <textarea class="field-textarea" id="f-desc" placeholder="One or two sentences describing what this initiative does…"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-value">Business value</label>
+      <textarea class="field-textarea" id="f-value" placeholder="What outcome or metric does this drive? e.g. Forecast accuracy +8pts"></textarea>
+    </div>
   </div>
 
   <div class="drawer-actions" id="drawer-actions-view" style="display:none;">
-    <button class="btn btn-danger" onclick="deleteInitiative()" id="delete-btn">Delete</button>
-    <button class="btn grow" onclick="exitEditMode()">Cancel</button>
-    <button class="btn btn-primary" id="save-btn" onclick="saveInitiative()">Save changes</button>
+    <button class="btn btn-danger" onclick="deleteInitiative()" id="delete-btn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+      Delete
+    </button>
+    <div style="flex:1"></div>
+    <button class="btn" onclick="exitEditMode()">Cancel</button>
+    <button class="btn btn-primary" id="save-btn" onclick="saveInitiative()">Save</button>
   </div>
 </aside>
 
@@ -611,7 +719,7 @@
   //  PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW
   //  See SETUP.md for instructions.
   // =======================================================================
-  const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/dental-monitoring.com/s/AKfycbzb3iOgJG3YliDK5C05Z2uAME1UAPvdEWuHP4SPJA4tN56XXERqW9NiEEaa1R5IjlEj/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzb3iOgJG3YliDK5C05Z2uAME1UAPvdEWuHP4SPJA4tN56XXERqW9NiEEaa1R5IjlEj/exec';
   // =======================================================================
 
   const CACHE_KEY = 'roadmap.cache.v1';
@@ -633,18 +741,39 @@
     { id: 'complete',    label: 'Complete',    badge: 'info' },
     { id: 'on_track',    label: 'On track',    badge: 'success' },
     { id: 'at_risk',     label: 'At risk',     badge: 'warning' },
+    { id: 'blocked',     label: 'Blocked',     badge: 'blocked' },
     { id: 'not_started', label: 'Not started', badge: 'neutral' },
+    { id: 'killed',      label: 'Killed',      badge: 'killed' },
   ];
   const STATUS_STYLES = {
     complete:    { fg: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
     on_track:    { fg: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
     at_risk:     { fg: '#CA8A04', bg: '#FEFCE8', border: '#FDE68A' },
+    blocked:     { fg: '#BE185D', bg: '#FDF2F8', border: '#FBCFE8' },
     not_started: { fg: '#71717A', bg: '#FAFAFA', border: '#E4E4E7' },
+    killed:      { fg: '#737373', bg: '#E5E5E5', border: '#D4D4D8' },
   };
 
   let INITIATIVES = [];
   let SNAPSHOTS = [];
-  const state = { wsFilter: null, statusFilter: null, search: '', editMode: false, currentId: null, isNew: false };
+  const state = {
+    wsFilter: new Set(),
+    statusFilter: new Set(),
+    ownerFilter: new Set(),
+    search: '',
+    editMode: false,
+    currentId: null,
+    isNew: false
+  };
+
+  // Author name for notes — remembered per-browser
+  const AUTHOR_KEY = 'roadmap.author.v1';
+  function getAuthor() {
+    return localStorage.getItem(AUTHOR_KEY) || '';
+  }
+  function setAuthor(name) {
+    try { localStorage.setItem(AUTHOR_KEY, name); } catch (_) {}
+  }
 
   // ---------- Connectivity ----------
   function setConnStatus(status, text) {
@@ -730,8 +859,9 @@
   const wsOf = (id) => WORKSTREAMS.find(w => w.id === id);
   const initials = (name) => (name || '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
   function matches(i) {
-    if (state.wsFilter && i.ws !== state.wsFilter) return false;
-    if (state.statusFilter && i.status !== state.statusFilter) return false;
+    if (state.wsFilter.size > 0 && !state.wsFilter.has(i.ws)) return false;
+    if (state.statusFilter.size > 0 && !state.statusFilter.has(i.status)) return false;
+    if (state.ownerFilter.size > 0 && !state.ownerFilter.has(i.owner)) return false;
     if (state.search) {
       const hay = `${i.title} ${i.code} ${i.owner} ${i.desc} ${i.value} ${i.target}`.toLowerCase();
       if (!hay.includes(state.search)) return false;
@@ -741,22 +871,27 @@
 
   // ---------- KPIs ----------
   function renderKpis() {
-    const total = INITIATIVES.length;
-    const by = { complete: 0, on_track: 0, at_risk: 0, not_started: 0 };
-    INITIATIVES.forEach(i => { if (by[i.status] !== undefined) by[i.status]++; });
+    // Killed items are excluded from totals — they're off the portfolio
+    const active = INITIATIVES.filter(i => i.status !== 'killed');
+    const total = active.length;
+    const killedCount = INITIATIVES.length - total;
+    const by = { complete: 0, on_track: 0, at_risk: 0, blocked: 0, not_started: 0 };
+    active.forEach(i => { if (by[i.status] !== undefined) by[i.status]++; });
     const pct = (n) => total ? Math.round((n / total) * 100) + '%' : '0%';
     document.getElementById('m-total').textContent = total;
     document.getElementById('m-complete').textContent = by.complete;
     document.getElementById('m-ontrack').textContent = by.on_track;
-    document.getElementById('m-risk').textContent = by.at_risk;
+    // 'At risk' KPI now combines at_risk + blocked since they're both attention items
+    const atRiskTotal = by.at_risk + by.blocked;
+    document.getElementById('m-risk').textContent = atRiskTotal;
     document.getElementById('m-notstarted').textContent = by.not_started;
     document.getElementById('m-complete-pct').textContent = pct(by.complete);
     document.getElementById('m-ontrack-pct').textContent = pct(by.on_track);
-    document.getElementById('m-risk-pct').textContent = pct(by.at_risk);
+    document.getElementById('m-risk-pct').textContent = pct(atRiskTotal);
     document.getElementById('m-notstarted-pct').textContent = pct(by.not_started);
     document.getElementById('m-complete-bar').style.setProperty('--fill', pct(by.complete));
     document.getElementById('m-ontrack-bar').style.setProperty('--fill', pct(by.on_track));
-    document.getElementById('m-risk-bar').style.setProperty('--fill', pct(by.at_risk));
+    document.getElementById('m-risk-bar').style.setProperty('--fill', pct(atRiskTotal));
     document.getElementById('m-notstarted-bar').style.setProperty('--fill', pct(by.not_started));
     const now = new Date();
     const yearStart = new Date(now.getFullYear(), 0, 1);
@@ -764,7 +899,8 @@
     const ytdPct = Math.round(((now - yearStart) / (yearEnd - yearStart)) * 100);
     document.getElementById('m-ytd').textContent = ytdPct + '%';
     document.getElementById('m-ytd-bar').style.setProperty('--fill', ytdPct + '%');
-    document.getElementById('page-count').textContent = `${total} initiatives`;
+    const killedSuffix = killedCount > 0 ? ` · ${killedCount} killed` : '';
+    document.getElementById('page-count').textContent = `${total} initiatives${killedSuffix}`;
   }
 
   // ---------- Shipped strip ----------
@@ -795,16 +931,18 @@
   function renderWorkload() {
     const root = document.getElementById('workload-rows');
     const owners = {};
-    INITIATIVES.forEach(i => {
-      if (!owners[i.owner]) owners[i.owner] = { total: 0, by: { complete: 0, on_track: 0, at_risk: 0, not_started: 0 } };
+    // Exclude killed items from workload — they're not active work
+    const active = INITIATIVES.filter(i => i.status !== 'killed');
+    active.forEach(i => {
+      if (!owners[i.owner]) owners[i.owner] = { total: 0, by: { complete: 0, on_track: 0, at_risk: 0, blocked: 0, not_started: 0 } };
       owners[i.owner].total++;
-      owners[i.owner].by[i.status]++;
+      if (owners[i.owner].by[i.status] !== undefined) owners[i.owner].by[i.status]++;
     });
     const arr = Object.entries(owners).map(([owner, data]) => ({ owner, ...data })).sort((a, b) => b.total - a.total);
     const max = arr[0]?.total || 1;
     document.getElementById('workload-count').textContent = arr.length;
-    if (arr.length > 0 && INITIATIVES.length > 0) {
-      const topShare = Math.round((arr[0].total / INITIATIVES.length) * 100);
+    if (arr.length > 0 && active.length > 0) {
+      const topShare = Math.round((arr[0].total / active.length) * 100);
       if (topShare >= 50) {
         document.getElementById('workload-flag').style.display = '';
         document.getElementById('workload-flag-text').textContent = `${arr[0].owner} carries ${topShare}% of the portfolio — key-person risk`;
@@ -813,7 +951,7 @@
       }
     }
     root.innerHTML = arr.map(o => {
-      const segs = ['complete', 'on_track', 'at_risk', 'not_started'].map(s => {
+      const segs = ['complete', 'on_track', 'at_risk', 'blocked', 'not_started'].map(s => {
         const n = o.by[s];
         if (n === 0) return '';
         const pct = (n / max) * 100;
@@ -833,13 +971,18 @@
     let html = '', visibleCount = 0;
     html += `<div class="tl-header">
       <div class="tl-header-cell first">Initiative</div>
-      <div class="tl-header-cell">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
+      <div class="tl-header-cell tl-year-divider">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
       <div class="tl-header-cell">Q2 2026<span class="tl-q-range">Apr–Jun</span></div>
       <div class="tl-header-cell">Q3 2026<span class="tl-q-range">Jul–Sep</span></div>
       <div class="tl-header-cell">Q4 2026<span class="tl-q-range">Oct–Dec</span></div>
+      <div class="tl-header-cell tl-year-divider">Q1 2027<span class="tl-q-range">Jan–Mar</span></div>
+      <div class="tl-header-cell">Q2 2027<span class="tl-q-range">Apr–Jun</span></div>
+      <div class="tl-header-cell">Q3 2027<span class="tl-q-range">Jul–Sep</span></div>
+      <div class="tl-header-cell">Q4 2027<span class="tl-q-range">Oct–Dec</span></div>
     </div>`;
     WORKSTREAMS.forEach((ws) => {
-      const items = INITIATIVES.filter(i => i.ws === ws.id && matches(i));
+      // Hide killed items from timeline unless the user has explicitly filtered for them
+      const items = INITIATIVES.filter(i => i.ws === ws.id && matches(i) && (i.status !== 'killed' || state.statusFilter.has('killed')));
       if (items.length === 0) return;
       visibleCount += items.length;
       const byStatus = items.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
@@ -853,14 +996,15 @@
           ${(byStatus.complete  || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--info)"><strong>${byStatus.complete}</strong> shipped</span>` : ''}
           ${(byStatus.on_track  || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--success)"><strong>${byStatus.on_track}</strong> on track</span>` : ''}
           ${(byStatus.at_risk   || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--warning)"><strong>${byStatus.at_risk}</strong> at risk</span>` : ''}
+          ${(byStatus.blocked   || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:#BE185D"><strong>${byStatus.blocked}</strong> blocked</span>` : ''}
           ${(byStatus.not_started || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--neutral)"><strong>${byStatus.not_started}</strong> not started</span>` : ''}
         </div>
       </div>`;
       items.forEach(i => {
         const s = STATUS_STYLES[i.status];
         const sObj = statusOf(i.status);
-        const colStart = Math.max(1, i.startQ || 1);
-        const colEnd = Math.min(5, (i.endQ || i.startQ || 1) + 1);
+        const colStart = Math.max(1, Math.min(8, i.startQ || 1));
+        const colEnd = Math.max(colStart + 1, Math.min(9, (i.endQ || i.startQ || 1) + 1));
         html += `<div class="tl-row" data-id="${i.id}">
           <div class="tl-row-label" onclick="openDrawer('${i.id}')">
             <span class="tl-row-code">${i.code}</span>
@@ -884,17 +1028,21 @@
     const old = document.querySelector('.tl-today-line');
     if (old) old.remove();
     const now = new Date();
-    if (now.getFullYear() !== 2026) return;
-    const yearStart = new Date(2026, 0, 1);
-    const yearEnd = new Date(2027, 0, 1);
-    const pct = (now - yearStart) / (yearEnd - yearStart);
-    if (pct < 0 || pct > 1) return;
+    const year = now.getFullYear();
+    // Timeline spans 2026 + 2027 only
+    if (year !== 2026 && year !== 2027) return;
+    const yearStart = new Date(year, 0, 1);
+    const yearEnd = new Date(year + 1, 0, 1);
+    const yearPct = (now - yearStart) / (yearEnd - yearStart);
+    if (yearPct < 0 || yearPct > 1) return;
+    // Map to overall track position: 2026 occupies 0–50%, 2027 occupies 50–100%
+    const trackPct = year === 2026 ? yearPct * 0.5 : 0.5 + yearPct * 0.5;
     const grid = document.getElementById('timeline');
     if (!grid) return;
-    const labelCol = 320;
+    const labelCol = 280;
     const wrapWidth = grid.offsetWidth;
     const tracksWidth = wrapWidth - labelCol;
-    const left = labelCol + tracksWidth * pct;
+    const left = labelCol + tracksWidth * trackPct;
     const line = document.createElement('div');
     line.className = 'tl-today-line';
     line.style.left = left + 'px';
@@ -906,24 +1054,40 @@
   // ---------- Filters & Board ----------
   function renderFilters() {
     document.getElementById('ws-filters').innerHTML = WORKSTREAMS.map(w =>
-      `<button class="filter-chip ${state.wsFilter === w.id ? 'active' : ''}" onclick="toggleFilter('ws','${w.id}')">
+      `<button class="filter-chip ${state.wsFilter.has(w.id) ? 'active' : ''}" onclick="toggleFilter('ws','${w.id}')">
         <span class="filter-chip-dot" style="--chip-color: ${w.color}"></span>${w.label}
       </button>`
     ).join('');
     document.getElementById('status-filters').innerHTML = STATUSES.map(s => {
       const c = STATUS_STYLES[s.id];
-      return `<button class="filter-chip ${state.statusFilter === s.id ? 'active' : ''}" onclick="toggleFilter('status','${s.id}')">
+      return `<button class="filter-chip ${state.statusFilter.has(s.id) ? 'active' : ''}" onclick="toggleFilter('status','${s.id}')">
         <span class="filter-chip-dot" style="--chip-color: ${c.fg}"></span>${s.label}
       </button>`;
     }).join('');
+    // Owner filter — derived from data, sorted by count descending
+    const ownerCounts = {};
+    INITIATIVES.forEach(i => { ownerCounts[i.owner] = (ownerCounts[i.owner] || 0) + 1; });
+    const owners = Object.entries(ownerCounts).sort((a, b) => b[1] - a[1]).map(([o]) => o);
+    document.getElementById('owner-filters').innerHTML = owners.map(o =>
+      `<button class="filter-chip ${state.ownerFilter.has(o) ? 'active' : ''}" onclick="toggleFilter('owner', ${JSON.stringify(o)})">
+        ${o} <span style="opacity:.6;margin-left:2px">${ownerCounts[o]}</span>
+      </button>`
+    ).join('');
   }
   function toggleFilter(kind, val) {
-    if (kind === 'ws') state.wsFilter = state.wsFilter === val ? null : val;
-    else state.statusFilter = state.statusFilter === val ? null : val;
+    let s;
+    if (kind === 'ws') s = state.wsFilter;
+    else if (kind === 'status') s = state.statusFilter;
+    else if (kind === 'owner') s = state.ownerFilter;
+    else return;
+    if (s.has(val)) s.delete(val); else s.add(val);
     renderAll();
   }
   function clearFilters() {
-    state.wsFilter = null; state.statusFilter = null; state.search = '';
+    state.wsFilter.clear();
+    state.statusFilter.clear();
+    state.ownerFilter.clear();
+    state.search = '';
     document.getElementById('search').value = '';
     renderAll();
   }
@@ -959,7 +1123,7 @@
             <div class="item-desc">${c.desc}</div>
             <div class="item-foot">
               <span class="badge badge-${sObj.badge}">${sObj.label}</span>
-              <span class="item-meta"><span class="avatar" title="${c.owner}">${initials(c.owner)}</span><span class="tag tag-mono">${c.effort}</span></span>
+              <span class="item-meta"><span class="avatar" title="${c.owner}">${initials(c.owner)}</span><span class="tag tag-mono" title="Effort: ${effortFullLabel(c.effort)}">${c.effort}</span></span>
             </div>
           </div>`;
         });
@@ -995,9 +1159,12 @@
     document.getElementById('drawer-status').innerHTML = `<span class="badge badge-${sObj.badge}">${sObj.label}</span>`;
     document.getElementById('drawer-target').textContent = i.target;
     document.getElementById('drawer-owner').innerHTML = `<span class="avatar">${initials(i.owner)}</span> ${i.owner}`;
-    document.getElementById('drawer-effort').innerHTML = `<span class="tag tag-mono">${i.effort}</span>`;
+    document.getElementById('drawer-effort').innerHTML = `<span class="tag tag-mono" title="Effort: ${effortFullLabel(i.effort)}">${i.effort}</span>`;
     document.getElementById('drawer-desc').textContent = i.desc;
     document.getElementById('drawer-value').textContent = i.value;
+    renderNotesLog(i.notes || []);
+    document.getElementById('note-author').value = getAuthor();
+    document.getElementById('note-text').value = '';
     showViewMode();
     document.getElementById('drawer-backdrop').classList.add('open');
     document.getElementById('drawer').classList.add('open');
@@ -1013,17 +1180,19 @@
     document.getElementById('f-owner').value = '';
     document.getElementById('f-desc').value = '';
     document.getElementById('f-value').value = '';
-    document.getElementById('f-target').value = 'Q2 2026';
     showEditMode();
     document.getElementById('f-ws').value = 'sales';
     document.getElementById('f-status').value = 'not_started';
     document.getElementById('f-effort').value = 'M';
-    document.getElementById('f-startq').value = '2';
-    document.getElementById('f-endq').value = '2';
+    setQuarterRange(2, 2);
+    updateStatusPreview();
+    updateEffortHint();
     document.getElementById('delete-btn').style.display = 'none';
     document.getElementById('drawer-backdrop').classList.add('open');
     document.getElementById('drawer').classList.add('open');
     document.body.style.overflow = 'hidden';
+    // Focus title input for fast entry
+    setTimeout(() => document.getElementById('f-title').focus(), 100);
   }
   function closeDrawer() {
     document.getElementById('drawer-backdrop').classList.remove('open');
@@ -1036,12 +1205,14 @@
     document.getElementById('drawer-view').style.display = '';
     document.getElementById('drawer-edit').style.display = 'none';
     document.getElementById('drawer-actions-view').style.display = 'none';
+    document.getElementById('drawer-edit-btn').style.display = '';
   }
   function showEditMode() {
     state.editMode = true;
     document.getElementById('drawer-view').style.display = 'none';
     document.getElementById('drawer-edit').style.display = '';
     document.getElementById('drawer-actions-view').style.display = '';
+    document.getElementById('drawer-edit-btn').style.display = 'none';
     document.getElementById('f-ws').innerHTML = WORKSTREAMS.map(w => `<option value="${w.id}">${w.label}</option>`).join('');
     document.getElementById('f-status').innerHTML = STATUSES.map(s => `<option value="${s.id}">${s.label}</option>`).join('');
   }
@@ -1055,16 +1226,168 @@
     document.getElementById('f-status').value = i.status;
     document.getElementById('f-owner').value = i.owner;
     document.getElementById('f-effort').value = i.effort;
-    document.getElementById('f-startq').value = String(i.startQ);
-    document.getElementById('f-endq').value = String(i.endQ);
-    document.getElementById('f-target').value = i.target;
+    setQuarterRange(Number(i.startQ), Number(i.endQ));
     document.getElementById('f-desc').value = i.desc;
     document.getElementById('f-value').value = i.value;
     document.getElementById('delete-btn').style.display = '';
+    updateStatusPreview();
+    updateEffortHint();
   }
   function exitEditMode() {
     if (state.isNew) { closeDrawer(); return; }
     if (state.currentId) openDrawer(state.currentId);
+  }
+
+  // ---------- Form helpers: quarter picker, status preview, effort hint ----------
+  // Quarter-number to display label (e.g. 5 -> "Q1 2027")
+  function quarterLabel(q) {
+    if (q >= 1 && q <= 4) return `Q${q} 2026`;
+    if (q >= 5 && q <= 8) return `Q${q - 4} 2027`;
+    return `Q${q}`;
+  }
+  function quarterRangeLabel(startQ, endQ) {
+    if (startQ === endQ) return quarterLabel(startQ);
+    // Same year — "Q1–Q3 2026"
+    if (startQ <= 4 && endQ <= 4) return `Q${startQ}–Q${endQ} 2026`;
+    if (startQ >= 5 && endQ >= 5) return `Q${startQ - 4}–Q${endQ - 4} 2027`;
+    // Spans years — "Q4 2026 – Q1 2027"
+    return `${quarterLabel(startQ)} – ${quarterLabel(endQ)}`;
+  }
+
+  function setQuarterRange(startQ, endQ) {
+    document.getElementById('f-startq').value = String(startQ);
+    document.getElementById('f-endq').value = String(endQ);
+    document.querySelectorAll('.q-cell').forEach(cell => {
+      const q = parseInt(cell.dataset.q, 10);
+      cell.classList.remove('in-range', 'endpoint');
+      if (q >= startQ && q <= endQ) {
+        cell.classList.add('in-range');
+        if (q === startQ || q === endQ) cell.classList.add('endpoint');
+      }
+    });
+    updateQuarterHint(startQ, endQ);
+  }
+
+  function updateQuarterHint(startQ, endQ) {
+    const hint = document.getElementById('q-picker-hint');
+    if (startQ === endQ) hint.textContent = `Lands in ${quarterLabel(startQ)}. Click another quarter to span a range.`;
+    else hint.textContent = `Spans ${quarterRangeLabel(startQ, endQ)} (${endQ - startQ + 1} quarters). Click any single quarter to reset.`;
+  }
+
+  // Track quarter picker click state: first click sets start, second click sets end
+  let qPickerState = { lastClick: null };
+  function initQPicker() {
+    document.querySelectorAll('.q-cell').forEach(cell => {
+      cell.addEventListener('click', () => {
+        const q = parseInt(cell.dataset.q, 10);
+        const curStart = parseInt(document.getElementById('f-startq').value, 10);
+        const curEnd = parseInt(document.getElementById('f-endq').value, 10);
+        // If we click a cell that's already the only one selected, treat as single-quarter
+        if (curStart === curEnd && q === curStart) {
+          setQuarterRange(q, q);
+          qPickerState.lastClick = q;
+          return;
+        }
+        // If lastClick is the start of a range, extend to this cell
+        if (qPickerState.lastClick !== null && qPickerState.lastClick === curStart && curStart === curEnd) {
+          const newStart = Math.min(curStart, q);
+          const newEnd = Math.max(curStart, q);
+          setQuarterRange(newStart, newEnd);
+          qPickerState.lastClick = null;
+          return;
+        }
+        // Otherwise reset to single-quarter on this cell
+        setQuarterRange(q, q);
+        qPickerState.lastClick = q;
+      });
+    });
+  }
+
+  function updateStatusPreview() {
+    const status = document.getElementById('f-status').value;
+    const sObj = statusOf(status);
+    if (!sObj) { document.getElementById('f-status-preview').innerHTML = ''; return; }
+    document.getElementById('f-status-preview').innerHTML = `<span class="badge badge-${sObj.badge}">${sObj.label}</span>`;
+  }
+
+  const EFFORT_HINTS = {
+    S:  'Less than 2 weeks',
+    M:  '2–6 weeks',
+    L:  '6–12 weeks',
+    XL: '12+ weeks (multi-quarter)'
+  };
+  function effortFullLabel(eff) {
+    const map = { S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra large' };
+    return `${map[eff] || eff} (${EFFORT_HINTS[eff] || '—'})`;
+  }
+  function updateEffortHint() {
+    const eff = document.getElementById('f-effort').value;
+    document.getElementById('f-effort-hint').textContent = EFFORT_HINTS[eff] || '';
+  }
+
+  // ---------- Notes ----------
+  function formatNoteTime(ts) {
+    const d = new Date(ts);
+    const now = new Date();
+    const diffMs = now - d;
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 1) return 'just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    if (diffMin < 1440) return `${Math.floor(diffMin / 60)}h ago`;
+    const diffDays = Math.floor(diffMin / 1440);
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function escapeHtml(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+
+  function renderNotesLog(notes) {
+    const root = document.getElementById('drawer-notes-log');
+    if (!notes || notes.length === 0) { root.innerHTML = ''; return; }
+    // Newest first
+    const sorted = [...notes].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    root.innerHTML = sorted.map(n => `
+      <div class="note">
+        <div class="note-head">
+          <span class="note-author">${escapeHtml(n.author || 'Anonymous')}</span>
+          <span class="note-time" title="${new Date(n.ts).toLocaleString()}">${formatNoteTime(n.ts)}</span>
+        </div>
+        <div class="note-text">${escapeHtml(n.text)}</div>
+      </div>
+    `).join('');
+  }
+
+  async function addNote() {
+    if (!state.currentId) return;
+    const author = document.getElementById('note-author').value.trim();
+    const text = document.getElementById('note-text').value.trim();
+    if (!author) { alert('Please enter your name or initials first.'); document.getElementById('note-author').focus(); return; }
+    if (!text) { alert('Note text is required.'); document.getElementById('note-text').focus(); return; }
+    setAuthor(author); // remember for next time
+
+    const btn = document.getElementById('add-note-btn');
+    btn.disabled = true; btn.textContent = 'Adding…';
+    try {
+      const res = await apiPost({ action: 'addNote', id: state.currentId, author, text });
+      INITIATIVES = res.initiatives;
+      saveCache();
+      // Refresh the open drawer
+      const updated = INITIATIVES.find(x => x.id === state.currentId);
+      if (updated) {
+        renderNotesLog(updated.notes || []);
+        document.getElementById('note-text').value = '';
+      }
+      toast('Note added');
+    } catch (e) {
+      console.error(e);
+      toast('Failed to add note: ' + e.message, true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Add note';
+    }
   }
 
   async function saveInitiative() {
@@ -1082,7 +1405,7 @@
       owner: document.getElementById('f-owner').value.trim() || 'Unassigned',
       effort: document.getElementById('f-effort').value,
       startQ, endQ,
-      target: document.getElementById('f-target').value.trim() || `Q${startQ} 2026`,
+      target: quarterRangeLabel(startQ, endQ),
       desc: document.getElementById('f-desc').value.trim(),
       value: document.getElementById('f-value').value.trim(),
     };
@@ -1109,7 +1432,7 @@
       console.error(e);
       toast('Save failed: ' + e.message, true);
     } finally {
-      saveBtn.disabled = false; saveBtn.textContent = 'Save changes';
+      saveBtn.disabled = false; saveBtn.textContent = 'Save';
     }
   }
 
@@ -1128,13 +1451,6 @@
     } catch (e) {
       toast('Delete failed: ' + e.message, true);
     }
-  }
-
-  // ---------- Edit toggle ----------
-  function toggleEditMode() {
-    const isOn = document.getElementById('edit-toggle').classList.toggle('on');
-    document.getElementById('edit-toggle-label').textContent = isOn ? 'Editing' : 'View';
-    document.querySelectorAll('.edit-only').forEach(el => el.style.display = isOn ? '' : 'none');
   }
 
   // ---------- Search ----------
@@ -1176,27 +1492,31 @@
     document.getElementById('snapshot-count').textContent = SNAPSHOTS.length;
     if (SNAPSHOTS.length === 0) { empty.style.display = ''; list.innerHTML = ''; return; }
     empty.style.display = 'none';
-    const curBy = INITIATIVES.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
+    const activeNow = INITIATIVES.filter(i => i.status !== 'killed');
+    const curBy = activeNow.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
+    const attentionNow = (curBy.at_risk || 0) + (curBy.blocked || 0);
     let html = `<div class="snapshot-row current">
       <div class="snapshot-label"><span class="badge badge-success">Current</span><span class="snapshot-name">Live data</span></div>
       <div class="snapshot-stats">
-        <span><strong>${INITIATIVES.length}</strong> total</span>
+        <span><strong>${activeNow.length}</strong> active</span>
         <span style="color:var(--info)"><strong>${curBy.complete||0}</strong> shipped</span>
-        <span style="color:var(--warning)"><strong>${curBy.at_risk||0}</strong> at risk</span>
+        <span style="color:var(--warning)"><strong>${attentionNow}</strong> need attention</span>
       </div>
       <span></span><span></span>
     </div>`;
     html += SNAPSHOTS.map(s => {
-      const by = s.data.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
+      const active = s.data.filter(i => i.status !== 'killed');
+      const by = active.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
+      const attention = (by.at_risk || 0) + (by.blocked || 0);
       return `<div class="snapshot-row">
         <div class="snapshot-label">
           <span class="snapshot-name">${s.name}</span>
           <span class="snapshot-date">${new Date(s.takenAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
         </div>
         <div class="snapshot-stats">
-          <span><strong>${s.data.length}</strong> total</span>
+          <span><strong>${active.length}</strong> active</span>
           <span style="color:var(--info)"><strong>${by.complete||0}</strong> shipped</span>
-          <span style="color:var(--warning)"><strong>${by.at_risk||0}</strong> at risk</span>
+          <span style="color:var(--warning)"><strong>${attention}</strong> need attention</span>
         </div>
         <button class="btn btn-sm" onclick="showDiff('${s.id}')">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><polyline points="8 7 12 3 16 7"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
@@ -1300,6 +1620,7 @@
   const today = new Date();
   document.getElementById('updated-date').textContent = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   document.getElementById('footer-year').textContent = today.getFullYear();
+  initQPicker();
   refresh();
 </script>
 
