@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Commercial Excellence · Revenue Operations Portfolio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2318181B'/><rect x='6' y='6' width='8' height='8' rx='1.5' fill='%23FFFFFF'/><rect x='18' y='6' width='8' height='8' rx='1.5' fill='%23FFFFFF' fill-opacity='0.55'/><rect x='6' y='18' width='8' height='8' rx='1.5' fill='%23FFFFFF' fill-opacity='0.55'/><rect x='18' y='18' width='8' height='8' rx='1.5' fill='%23FFFFFF' fill-opacity='0.3'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -155,7 +156,17 @@
   .workload-bar-seg.s-at_risk     { background: var(--warning); }
   .workload-bar-seg.s-blocked     { background: #BE185D; }
   .workload-bar-seg.s-not_started { background: var(--neutral); }
-  .workload-bar-seg.s-killed      { background: #737373; opacity: .6; }
+  .workload-bar-seg.s-killed {
+    background-color: #737373;
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 4px,
+      rgba(255, 255, 255, 0.35) 4px,
+      rgba(255, 255, 255, 0.35) 6px
+    );
+    opacity: .7;
+  }
   .workload-count { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
   .workload-legend { display: flex; gap: 16px; padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
   .wl-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); }
@@ -168,14 +179,44 @@
   .badge-neutral { color: var(--neutral); background: var(--neutral-bg); border-color: var(--neutral-border); }
   .badge-info    { color: var(--info);    background: var(--info-bg);    border-color: var(--info-border); }
   .badge-blocked { color: #BE185D; background: #FDF2F8; border-color: #FBCFE8; }
-  .badge-killed  { color: #737373; background: #E5E5E5; border-color: #D4D4D8; }
+  .badge-killed  {
+    color: #525252;
+    background-color: #E5E5E5;
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 4px,
+      rgba(82, 82, 82, 0.18) 4px,
+      rgba(82, 82, 82, 0.18) 6px
+    );
+    border-color: #A3A3A3;
+    text-decoration: line-through;
+    text-decoration-color: rgba(82, 82, 82, 0.5);
+    text-decoration-thickness: 1px;
+  }
+  .badge-killed::before { background: #525252; }
   .tag { display: inline-flex; align-items: center; height: 22px; padding: 0 7px; font-size: 12px; font-weight: 500; border-radius: var(--r); background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
   .tag-mono { font-family: 'Geist Mono', monospace; font-size: 11px; }
   .avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); color: var(--text-2); font-size: 10px; font-weight: 600; display: inline-grid; place-items: center; border: 1px solid var(--border); text-transform: uppercase; font-family: 'Geist Mono', monospace; }
 
   .timeline { padding: 0; overflow-x: auto; }
-  .tl-grid { min-width: 1400px; position: relative; }
-  .tl-header { display: grid; grid-template-columns: 280px repeat(8, 1fr); background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .tl-grid { position: relative; }
+  .tl-grid.mode-2026 { min-width: 980px; }
+  .tl-grid.mode-2026 .tl-header,
+  .tl-grid.mode-2026 .tl-row { grid-template-columns: 280px repeat(4, 1fr); }
+  .tl-grid.mode-2026 .tl-row-track { grid-template-columns: repeat(4, 1fr); }
+  .tl-grid.mode-2026 .tl-row-track::before { background-image: linear-gradient(to right, transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(50% - .5px), var(--border) calc(50% - .5px), var(--border) calc(50% + .5px), transparent calc(50% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px)); }
+  .tl-grid.mode-2027 { min-width: 980px; }
+  .tl-grid.mode-2027 .tl-header,
+  .tl-grid.mode-2027 .tl-row { grid-template-columns: 280px repeat(4, 1fr); }
+  .tl-grid.mode-2027 .tl-row-track { grid-template-columns: repeat(4, 1fr); }
+  .tl-grid.mode-2027 .tl-row-track::before { background-image: linear-gradient(to right, transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(50% - .5px), var(--border) calc(50% - .5px), var(--border) calc(50% + .5px), transparent calc(50% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px)); }
+  .tl-grid.mode-both { min-width: 1400px; }
+  .tl-grid.mode-both .tl-header,
+  .tl-grid.mode-both .tl-row { grid-template-columns: 280px repeat(8, 1fr); }
+  .tl-grid.mode-both .tl-row-track { grid-template-columns: repeat(8, 1fr); }
+  .tl-grid.mode-both .tl-row-track::before { background-image: linear-gradient(to right, transparent calc(12.5% - .5px), var(--border) calc(12.5% - .5px), var(--border) calc(12.5% + .5px), transparent calc(12.5% + .5px), transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(37.5% - .5px), var(--border) calc(37.5% - .5px), var(--border) calc(37.5% + .5px), transparent calc(37.5% + .5px), transparent calc(50% - 1px), var(--border-strong) calc(50% - 1px), var(--border-strong) calc(50% + 1px), transparent calc(50% + 1px), transparent calc(62.5% - .5px), var(--border) calc(62.5% - .5px), var(--border) calc(62.5% + .5px), transparent calc(62.5% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px), transparent calc(87.5% - .5px), var(--border) calc(87.5% - .5px), var(--border) calc(87.5% + .5px), transparent calc(87.5% + .5px)); }
+  .tl-header { display: grid; background: var(--surface-2); border-bottom: 1px solid var(--border); }
   .tl-header-cell { padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text-2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .tl-header-cell:last-child { border-right: none; }
   .tl-header-cell.first { color: var(--text-3); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -191,15 +232,33 @@
   .tl-ws-summary { padding: 8px 14px; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-3); flex-wrap: wrap; }
   .tl-ws-summary-stat { display: inline-flex; align-items: center; gap: 4px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; }
   .tl-ws-summary-stat strong { color: var(--text); font-weight: 600; }
-  .tl-row { display: grid; grid-template-columns: 280px repeat(8, 1fr); border-bottom: 1px solid var(--border); transition: background .1s; position: relative; min-height: 48px; }
+  .tl-row { display: grid; border-bottom: 1px solid var(--border); transition: background .1s; position: relative; min-height: 48px; }
   .tl-row:hover { background: var(--surface-hover); }
   .tl-row-label { padding: 10px 12px; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
   .tl-row-code { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-3); background: var(--surface-2); padding: 2px 6px; border-radius: var(--r-sm); flex-shrink: 0; }
   .tl-row-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; }
-  .tl-row-track { grid-column: 2 / -1; position: relative; display: grid; grid-template-columns: repeat(8, 1fr); }
-  .tl-row-track::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, transparent calc(12.5% - .5px), var(--border) calc(12.5% - .5px), var(--border) calc(12.5% + .5px), transparent calc(12.5% + .5px), transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(37.5% - .5px), var(--border) calc(37.5% - .5px), var(--border) calc(37.5% + .5px), transparent calc(37.5% + .5px), transparent calc(50% - 1px), var(--border-strong) calc(50% - 1px), var(--border-strong) calc(50% + 1px), transparent calc(50% + 1px), transparent calc(62.5% - .5px), var(--border) calc(62.5% - .5px), var(--border) calc(62.5% + .5px), transparent calc(62.5% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px), transparent calc(87.5% - .5px), var(--border) calc(87.5% - .5px), var(--border) calc(87.5% + .5px), transparent calc(87.5% + .5px)); pointer-events: none; }
+  .tl-row-track { grid-column: 2 / -1; position: relative; display: grid; }
+  .tl-row-track::before { content: ''; position: absolute; inset: 0; pointer-events: none; }
   .tl-bar { margin: 8px 4px; padding: 0 10px; border-radius: var(--r); background: var(--bar-bg); border: 1px solid var(--bar-border); height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: all .15s; overflow: hidden; color: var(--bar-fg); position: relative; z-index: 1; }
   .tl-bar:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+  .tl-bar.tl-bar-killed {
+    background-image: repeating-linear-gradient(135deg, transparent 0, transparent 5px, rgba(82, 82, 82, 0.2) 5px, rgba(82, 82, 82, 0.2) 7px);
+    opacity: .7;
+  }
+  .tl-bar.tl-bar-killed .tl-bar-status,
+  .tl-bar.tl-bar-killed .tl-bar-meta { text-decoration: line-through; text-decoration-thickness: 1px; }
+
+  /* Killed cards on the board */
+  .item.item-killed {
+    background-image: repeating-linear-gradient(135deg, transparent 0, transparent 6px, rgba(115, 115, 115, 0.07) 6px, rgba(115, 115, 115, 0.07) 9px);
+    opacity: .75;
+  }
+  .item.item-killed .item-title { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--text-3); }
+  .item.item-killed .item-desc { color: var(--text-4); }
+
+  /* Killed shipped-style card (if ever shown) and drawer title */
+  .drawer-title.drawer-title-killed { text-decoration: line-through; text-decoration-thickness: 1.5px; color: var(--text-3); }
+
   .tl-bar-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
   .tl-bar-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
   .tl-bar-meta { font-family: 'Geist Mono', monospace; font-size: 11px; opacity: .7; font-weight: 500; }
@@ -286,6 +345,23 @@
   .q-cell.endpoint { background: var(--info); border-color: var(--info); }
   .q-cell.endpoint .q-cell-label, .q-cell.endpoint .q-cell-months { color: white; opacity: 1; }
   .q-cell.endpoint .q-cell-months { opacity: .8; }
+  .q-toggle-link { background: none; border: none; color: var(--info); font-size: 12px; font-weight: 500; cursor: pointer; padding: 8px 0 0; font-family: inherit; }
+  .q-toggle-link:hover { text-decoration: underline; }
+
+  /* Timeline year toggle */
+  .year-toggle { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 2px; gap: 2px; }
+  .year-toggle-btn { background: transparent; border: none; padding: 4px 10px; font-size: 12px; font-weight: 500; color: var(--text-3); cursor: pointer; border-radius: 4px; font-family: inherit; transition: all .12s; }
+  .year-toggle-btn:hover { color: var(--text); }
+  .year-toggle-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+
+  /* Combobox (owner autocomplete) */
+  .combobox { position: relative; }
+  .combobox-menu { position: absolute; top: calc(100% + 2px); left: 0; right: 0; max-height: 220px; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow-lg); z-index: 10; }
+  .combobox-item { padding: 8px 12px; font-size: 13px; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .combobox-item:hover, .combobox-item.active { background: var(--surface-2); }
+  .combobox-item-count { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); }
+  .combobox-item-new { color: var(--info); font-style: italic; border-top: 1px solid var(--border); }
+  .combobox-empty { padding: 10px 12px; font-size: 12px; color: var(--text-3); font-style: italic; }
 
   /* Notes log */
   .notes-log { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
@@ -486,6 +562,13 @@
   <div class="section">
     <div class="section-head">
       <div class="section-title"><h2>Timeline</h2><span class="section-count" id="tl-count">0</span></div>
+      <div class="section-actions">
+        <div class="year-toggle" id="tl-year-toggle">
+          <button class="year-toggle-btn active" data-years="2026" onclick="setTimelineYears('2026')">2026</button>
+          <button class="year-toggle-btn" data-years="2027" onclick="setTimelineYears('2027')">2027</button>
+          <button class="year-toggle-btn" data-years="both" onclick="setTimelineYears('both')">Both</button>
+        </div>
+      </div>
     </div>
     <div class="card timeline"><div class="tl-grid" id="timeline"></div></div>
   </div>
@@ -619,8 +702,11 @@
     <div class="field-row">
       <div class="field">
         <label class="field-label" for="f-owner">Owner</label>
-        <input class="field-input" id="f-owner" type="text" placeholder="e.g. Revenue Operations" autocomplete="off">
-        <div class="field-hint">Team or person responsible</div>
+        <div class="combobox" id="owner-combobox">
+          <input class="field-input" id="f-owner" type="text" placeholder="Start typing… pick existing or create new" autocomplete="off" oninput="filterOwnerSuggestions()" onfocus="showOwnerSuggestions()" onblur="hideOwnerSuggestions()" onkeydown="ownerKeydown(event)">
+          <div class="combobox-menu" id="owner-suggestions" style="display:none;"></div>
+        </div>
+        <div class="field-hint">Existing owners suggested as you type; type a new name to create one</div>
       </div>
       <div class="field">
         <label class="field-label" for="f-effort">Effort</label>
@@ -655,25 +741,28 @@
           <span class="q-cell-months">Oct–Dec</span>
         </button>
       </div>
-      <div class="q-picker-year-label" style="margin-top:8px;">2027</div>
-      <div class="q-picker">
-        <button type="button" class="q-cell" data-q="5">
-          <span class="q-cell-label">Q1</span>
-          <span class="q-cell-months">Jan–Mar</span>
-        </button>
-        <button type="button" class="q-cell" data-q="6">
-          <span class="q-cell-label">Q2</span>
-          <span class="q-cell-months">Apr–Jun</span>
-        </button>
-        <button type="button" class="q-cell" data-q="7">
-          <span class="q-cell-label">Q3</span>
-          <span class="q-cell-months">Jul–Sep</span>
-        </button>
-        <button type="button" class="q-cell" data-q="8">
-          <span class="q-cell-label">Q4</span>
-          <span class="q-cell-months">Oct–Dec</span>
-        </button>
+      <div id="q-2027-wrap" style="display:none;">
+        <div class="q-picker-year-label" style="margin-top:8px;">2027</div>
+        <div class="q-picker">
+          <button type="button" class="q-cell" data-q="5">
+            <span class="q-cell-label">Q1</span>
+            <span class="q-cell-months">Jan–Mar</span>
+          </button>
+          <button type="button" class="q-cell" data-q="6">
+            <span class="q-cell-label">Q2</span>
+            <span class="q-cell-months">Apr–Jun</span>
+          </button>
+          <button type="button" class="q-cell" data-q="7">
+            <span class="q-cell-label">Q3</span>
+            <span class="q-cell-months">Jul–Sep</span>
+          </button>
+          <button type="button" class="q-cell" data-q="8">
+            <span class="q-cell-label">Q4</span>
+            <span class="q-cell-months">Oct–Dec</span>
+          </button>
+        </div>
       </div>
+      <button type="button" class="q-toggle-link" id="q-toggle-2027" onclick="toggle2027()">+ Show 2027 quarters</button>
       <div class="field-hint" id="q-picker-hint">Click a quarter to set when this lands. Click another quarter to span multiple.</div>
       <input type="hidden" id="f-startq" value="2">
       <input type="hidden" id="f-endq" value="2">
@@ -761,6 +850,7 @@
     statusFilter: new Set(),
     ownerFilter: new Set(),
     search: '',
+    timelineYears: '2026',  // '2026' or 'both'
     editMode: false,
     currentId: null,
     isNew: false
@@ -966,23 +1056,64 @@
   }
 
   // ---------- Timeline ----------
+  function setTimelineYears(mode) {
+    state.timelineYears = mode;
+    // Update toggle button states
+    document.querySelectorAll('#tl-year-toggle .year-toggle-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.years === mode);
+    });
+    renderTimeline();
+  }
+
   function renderTimeline() {
     const root = document.getElementById('timeline');
+    const mode = state.timelineYears; // '2026', '2027', or 'both'
+    const showBoth = mode === 'both';
+    const show2026 = mode === '2026' || showBoth;
+    const show2027 = mode === '2027' || showBoth;
+    // Apply the mode class to drive CSS grid templates
+    root.className = 'tl-grid mode-' + mode;
+
     let html = '', visibleCount = 0;
-    html += `<div class="tl-header">
-      <div class="tl-header-cell first">Initiative</div>
-      <div class="tl-header-cell tl-year-divider">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
-      <div class="tl-header-cell">Q2 2026<span class="tl-q-range">Apr–Jun</span></div>
-      <div class="tl-header-cell">Q3 2026<span class="tl-q-range">Jul–Sep</span></div>
-      <div class="tl-header-cell">Q4 2026<span class="tl-q-range">Oct–Dec</span></div>
-      <div class="tl-header-cell tl-year-divider">Q1 2027<span class="tl-q-range">Jan–Mar</span></div>
-      <div class="tl-header-cell">Q2 2027<span class="tl-q-range">Apr–Jun</span></div>
-      <div class="tl-header-cell">Q3 2027<span class="tl-q-range">Jul–Sep</span></div>
-      <div class="tl-header-cell">Q4 2027<span class="tl-q-range">Oct–Dec</span></div>
-    </div>`;
+    if (showBoth) {
+      html += `<div class="tl-header">
+        <div class="tl-header-cell first">Initiative</div>
+        <div class="tl-header-cell">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
+        <div class="tl-header-cell">Q2 2026<span class="tl-q-range">Apr–Jun</span></div>
+        <div class="tl-header-cell">Q3 2026<span class="tl-q-range">Jul–Sep</span></div>
+        <div class="tl-header-cell">Q4 2026<span class="tl-q-range">Oct–Dec</span></div>
+        <div class="tl-header-cell tl-year-divider">Q1 2027<span class="tl-q-range">Jan–Mar</span></div>
+        <div class="tl-header-cell">Q2 2027<span class="tl-q-range">Apr–Jun</span></div>
+        <div class="tl-header-cell">Q3 2027<span class="tl-q-range">Jul–Sep</span></div>
+        <div class="tl-header-cell">Q4 2027<span class="tl-q-range">Oct–Dec</span></div>
+      </div>`;
+    } else if (mode === '2027') {
+      html += `<div class="tl-header">
+        <div class="tl-header-cell first">Initiative</div>
+        <div class="tl-header-cell">Q1 2027<span class="tl-q-range">Jan–Mar</span></div>
+        <div class="tl-header-cell">Q2 2027<span class="tl-q-range">Apr–Jun</span></div>
+        <div class="tl-header-cell">Q3 2027<span class="tl-q-range">Jul–Sep</span></div>
+        <div class="tl-header-cell">Q4 2027<span class="tl-q-range">Oct–Dec</span></div>
+      </div>`;
+    } else {
+      html += `<div class="tl-header">
+        <div class="tl-header-cell first">Initiative</div>
+        <div class="tl-header-cell">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
+        <div class="tl-header-cell">Q2 2026<span class="tl-q-range">Apr–Jun</span></div>
+        <div class="tl-header-cell">Q3 2026<span class="tl-q-range">Jul–Sep</span></div>
+        <div class="tl-header-cell">Q4 2026<span class="tl-q-range">Oct–Dec</span></div>
+      </div>`;
+    }
+
     WORKSTREAMS.forEach((ws) => {
       // Hide killed items from timeline unless the user has explicitly filtered for them
-      const items = INITIATIVES.filter(i => i.ws === ws.id && matches(i) && (i.status !== 'killed' || state.statusFilter.has('killed')));
+      let items = INITIATIVES.filter(i => i.ws === ws.id && matches(i) && (i.status !== 'killed' || state.statusFilter.has('killed')));
+      // Filter by year mode
+      if (mode === '2026') {
+        items = items.filter(i => Number(i.startQ) <= 4); // include anything starting in 2026 (it may extend)
+      } else if (mode === '2027') {
+        items = items.filter(i => Number(i.endQ) >= 5); // include anything ending in 2027 or later
+      }
       if (items.length === 0) return;
       visibleCount += items.length;
       const byStatus = items.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
@@ -1003,23 +1134,49 @@
       items.forEach(i => {
         const s = STATUS_STYLES[i.status];
         const sObj = statusOf(i.status);
-        const colStart = Math.max(1, Math.min(8, i.startQ || 1));
-        const colEnd = Math.max(colStart + 1, Math.min(9, (i.endQ || i.startQ || 1) + 1));
+        const rawStart = Number(i.startQ) || 1;
+        const rawEnd = Number(i.endQ) || rawStart;
+        let colStart, colEnd, extendsBefore = false, extendsAfter = false;
+        if (showBoth) {
+          // Columns map 1:1 with quarters 1–8
+          colStart = Math.max(1, Math.min(8, rawStart));
+          colEnd = Math.max(colStart + 1, Math.min(9, rawEnd + 1));
+        } else if (mode === '2026') {
+          // Show 2026 portion only — clip end to Q4 2026 (col 4)
+          colStart = Math.max(1, Math.min(4, rawStart));
+          colEnd = Math.max(colStart + 1, Math.min(5, rawEnd + 1));
+          if (rawEnd > 4) extendsAfter = true;
+        } else { // mode === '2027'
+          // Show 2027 portion only — shift quarters 5–8 to columns 1–4
+          const startInY = Math.max(5, rawStart) - 4;       // map Q5 -> col 1
+          const endInY = Math.min(8, rawEnd) - 4;            // map Q8 -> col 4
+          colStart = Math.max(1, Math.min(4, startInY));
+          colEnd = Math.max(colStart + 1, Math.min(5, endInY + 1));
+          if (rawStart < 5) extendsBefore = true;
+        }
+        const beyondLabel = (extendsBefore ? `<span style="opacity:.6">←</span> ` : '') + (extendsAfter ? ` <span style="opacity:.6">→</span>` : '');
+        const isKilled = i.status === 'killed';
+        const titleStyle = isKilled ? 'text-decoration: line-through; color: var(--text-3);' : '';
         html += `<div class="tl-row" data-id="${i.id}">
           <div class="tl-row-label" onclick="openDrawer('${i.id}')">
             <span class="tl-row-code">${i.code}</span>
-            <span class="tl-row-title">${i.title}</span>
+            <span class="tl-row-title" style="${titleStyle}">${i.title}</span>
           </div>
           <div class="tl-row-track">
-            <div class="tl-bar" onclick="openDrawer('${i.id}')" style="grid-column: ${colStart} / ${colEnd}; --bar-bg:${s.bg}; --bar-fg:${s.fg}; --bar-border:${s.border};" title="${sObj.label} · ${i.target} · ${i.owner}">
+            <div class="tl-bar${isKilled ? ' tl-bar-killed' : ''}" onclick="openDrawer('${i.id}')" style="grid-column: ${colStart} / ${colEnd}; --bar-bg:${s.bg}; --bar-fg:${s.fg}; --bar-border:${s.border};" title="${sObj.label} · ${i.target} · ${i.owner}">
               <span class="tl-bar-status">${sObj.label}</span>
-              <span class="tl-bar-meta">${i.target}</span>
+              <span class="tl-bar-meta">${beyondLabel}${i.target}${extendsAfter ? '' : ''}</span>
             </div>
           </div>
         </div>`;
       });
     });
-    if (visibleCount === 0) html += `<div style="padding:48px;text-align:center;color:var(--text-3);font-size:13px;">No initiatives match the current filter.</div>`;
+    if (visibleCount === 0) {
+      const emptyMsg = mode === '2027'
+        ? 'No initiatives in 2027 yet. Switch to "2026" or "Both" to see current work.'
+        : 'No initiatives match the current filter.';
+      html += `<div style="padding:48px;text-align:center;color:var(--text-3);font-size:13px;">${emptyMsg}</div>`;
+    }
     root.innerHTML = html;
     document.getElementById('tl-count').textContent = visibleCount;
     positionToday();
@@ -1029,14 +1186,22 @@
     if (old) old.remove();
     const now = new Date();
     const year = now.getFullYear();
-    // Timeline spans 2026 + 2027 only
-    if (year !== 2026 && year !== 2027) return;
+    const mode = state.timelineYears;
+    // Only show Today marker when current year is in the visible range
+    if (mode === '2026' && year !== 2026) return;
+    if (mode === '2027' && year !== 2027) return;
+    if (mode === 'both' && year !== 2026 && year !== 2027) return;
     const yearStart = new Date(year, 0, 1);
     const yearEnd = new Date(year + 1, 0, 1);
     const yearPct = (now - yearStart) / (yearEnd - yearStart);
     if (yearPct < 0 || yearPct > 1) return;
-    // Map to overall track position: 2026 occupies 0–50%, 2027 occupies 50–100%
-    const trackPct = year === 2026 ? yearPct * 0.5 : 0.5 + yearPct * 0.5;
+    // Map to overall track position
+    let trackPct;
+    if (mode === 'both') {
+      trackPct = year === 2026 ? yearPct * 0.5 : 0.5 + yearPct * 0.5;
+    } else {
+      trackPct = yearPct;
+    }
     const grid = document.getElementById('timeline');
     if (!grid) return;
     const labelCol = 280;
@@ -1117,7 +1282,8 @@
         if (cards.length === 0) html += `<div class="board-cell-empty">No items</div>`;
         else cards.forEach(c => {
           const sObj = statusOf(c.status);
-          html += `<div class="item" onclick="openDrawer('${c.id}')">
+          const isKilled = c.status === 'killed';
+          html += `<div class="item${isKilled ? ' item-killed' : ''}" onclick="openDrawer('${c.id}')">
             <div class="item-head"><span class="item-code">${c.code}</span><span class="item-target">${c.target}</span></div>
             <div class="item-title">${c.title}</div>
             <div class="item-desc">${c.desc}</div>
@@ -1155,7 +1321,9 @@
     const wsPill = document.getElementById('drawer-ws');
     wsPill.textContent = ws.label;
     wsPill.style.setProperty('--ws-color', ws.color);
-    document.getElementById('drawer-title').textContent = i.title;
+    const drawerTitleEl = document.getElementById('drawer-title');
+    drawerTitleEl.textContent = i.title;
+    drawerTitleEl.classList.toggle('drawer-title-killed', i.status === 'killed');
     document.getElementById('drawer-status').innerHTML = `<span class="badge badge-${sObj.badge}">${sObj.label}</span>`;
     document.getElementById('drawer-target').textContent = i.target;
     document.getElementById('drawer-owner').innerHTML = `<span class="avatar">${initials(i.owner)}</span> ${i.owner}`;
@@ -1184,6 +1352,7 @@
     document.getElementById('f-ws').value = 'sales';
     document.getElementById('f-status').value = 'not_started';
     document.getElementById('f-effort').value = 'M';
+    show2027(false);
     setQuarterRange(2, 2);
     updateStatusPreview();
     updateEffortHint();
@@ -1257,6 +1426,8 @@
   function setQuarterRange(startQ, endQ) {
     document.getElementById('f-startq').value = String(startQ);
     document.getElementById('f-endq').value = String(endQ);
+    // Auto-expand 2027 row if range touches 2027
+    if (endQ > 4 || startQ > 4) show2027(true);
     document.querySelectorAll('.q-cell').forEach(cell => {
       const q = parseInt(cell.dataset.q, 10);
       cell.classList.remove('in-range', 'endpoint');
@@ -1323,6 +1494,104 @@
   function updateEffortHint() {
     const eff = document.getElementById('f-effort').value;
     document.getElementById('f-effort-hint').textContent = EFFORT_HINTS[eff] || '';
+  }
+
+  // ---------- Year toggle (2027 quarters) ----------
+  function show2027(show) {
+    const wrap = document.getElementById('q-2027-wrap');
+    const link = document.getElementById('q-toggle-2027');
+    if (show) {
+      wrap.style.display = '';
+      link.textContent = '– Hide 2027 quarters';
+    } else {
+      wrap.style.display = 'none';
+      link.textContent = '+ Show 2027 quarters';
+    }
+  }
+  function toggle2027() {
+    const wrap = document.getElementById('q-2027-wrap');
+    show2027(wrap.style.display === 'none');
+  }
+
+  // ---------- Owner autocomplete (combobox) ----------
+  let ownerComboActiveIdx = -1;
+
+  function getOwnerList() {
+    const counts = {};
+    INITIATIVES.forEach(i => { if (i.owner) counts[i.owner] = (counts[i.owner] || 0) + 1; });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
+  }
+
+  function renderOwnerSuggestions(query) {
+    const menu = document.getElementById('owner-suggestions');
+    const owners = getOwnerList();
+    const q = (query || '').trim().toLowerCase();
+    const filtered = q ? owners.filter(o => o.name.toLowerCase().includes(q)) : owners;
+    const exactMatch = filtered.some(o => o.name.toLowerCase() === q);
+
+    let html = '';
+    if (filtered.length === 0 && !q) {
+      html = `<div class="combobox-empty">No owners yet — start typing to create the first one.</div>`;
+    } else {
+      html = filtered.map((o, idx) =>
+        `<div class="combobox-item ${idx === ownerComboActiveIdx ? 'active' : ''}" onmousedown="pickOwner(${JSON.stringify(o.name)})">
+          <span>${escapeHtml(o.name)}</span>
+          <span class="combobox-item-count">${o.count}</span>
+        </div>`
+      ).join('');
+      // Offer to create new if there's input that doesn't exactly match
+      if (q && !exactMatch) {
+        html += `<div class="combobox-item combobox-item-new" onmousedown="pickOwner(${JSON.stringify(query.trim())})">
+          + Create "${escapeHtml(query.trim())}" as a new owner
+        </div>`;
+      }
+    }
+    menu.innerHTML = html;
+    menu.style.display = '';
+  }
+
+  function showOwnerSuggestions() {
+    ownerComboActiveIdx = -1;
+    renderOwnerSuggestions(document.getElementById('f-owner').value);
+  }
+
+  function hideOwnerSuggestions() {
+    // Small delay so onmousedown on items fires before the menu closes
+    setTimeout(() => {
+      document.getElementById('owner-suggestions').style.display = 'none';
+    }, 150);
+  }
+
+  function filterOwnerSuggestions() {
+    ownerComboActiveIdx = -1;
+    renderOwnerSuggestions(document.getElementById('f-owner').value);
+  }
+
+  function pickOwner(name) {
+    document.getElementById('f-owner').value = name;
+    document.getElementById('owner-suggestions').style.display = 'none';
+  }
+
+  function ownerKeydown(e) {
+    const menu = document.getElementById('owner-suggestions');
+    if (menu.style.display === 'none') return;
+    const items = menu.querySelectorAll('.combobox-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      ownerComboActiveIdx = Math.min(items.length - 1, ownerComboActiveIdx + 1);
+      renderOwnerSuggestions(document.getElementById('f-owner').value);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      ownerComboActiveIdx = Math.max(-1, ownerComboActiveIdx - 1);
+      renderOwnerSuggestions(document.getElementById('f-owner').value);
+    } else if (e.key === 'Enter') {
+      if (ownerComboActiveIdx >= 0 && items[ownerComboActiveIdx]) {
+        e.preventDefault();
+        items[ownerComboActiveIdx].dispatchEvent(new Event('mousedown'));
+      }
+    } else if (e.key === 'Escape') {
+      menu.style.display = 'none';
+    }
   }
 
   // ---------- Notes ----------
