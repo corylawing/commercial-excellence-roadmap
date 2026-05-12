@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap · RevOps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAFA;
+    --surface: #FFFFFF;
+    --surface-2: #F4F4F5;
+    --surface-hover: #FAFAFA;
+    --border: #E4E4E7;
+    --border-strong: #D4D4D8;
+    --text: #09090B;
+    --text-2: #3F3F46;
+    --text-3: #71717A;
+    --text-4: #A1A1AA;
+    --accent: #18181B;
+    --accent-hover: #27272A;
+
+    --success: #16A34A; --success-bg: #F0FDF4; --success-border: #BBF7D0;
+    --warning: #CA8A04; --warning-bg: #FEFCE8; --warning-border: #FDE68A;
+    --danger:  #DC2626; --danger-bg:  #FEF2F2; --danger-border:  #FECACA;
+    --info:    #2563EB; --info-bg:    #EFF6FF; --info-border:    #BFDBFE;
+    --neutral: #71717A; --neutral-bg: #F4F4F5; --neutral-border: #E4E4E7;
+
+    --ws-sales: #E11D48;
+    --ws-marketing: #EA580C;
+    --ws-finance: #16A34A;
+    --ws-service: #2563EB;
+    --ws-optimization: #7C3AED;
+
+    --shadow-sm: 0 1px 2px rgba(9,9,11,.04), 0 1px 3px rgba(9,9,11,.06);
+    --shadow-md: 0 4px 6px -1px rgba(9,9,11,.05), 0 2px 4px -2px rgba(9,9,11,.04);
+    --shadow-lg: 0 10px 15px -3px rgba(9,9,11,.06), 0 4px 6px -4px rgba(9,9,11,.04);
+    --shadow-xl: 0 20px 25px -5px rgba(9,9,11,.1), 0 8px 10px -6px rgba(9,9,11,.06);
+
+    --r-sm: 4px; --r: 6px; --r-lg: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Geist', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input, select, textarea { font-family: inherit; }
+  ::placeholder { color: var(--text-4); }
+
+  .app-bar { height: 52px; background: rgba(255,255,255,.85); backdrop-filter: saturate(180%) blur(8px); -webkit-backdrop-filter: saturate(180%) blur(8px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; position: sticky; top: 0; z-index: 50; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .brand-mark { width: 22px; height: 22px; border-radius: 5px; background: var(--accent); display: grid; place-items: center; color: white; }
+  .brand-name { font-weight: 600; font-size: 14px; letter-spacing: -0.01em; }
+  .brand-sep { color: var(--text-4); }
+  .brand-org { font-size: 13px; color: var(--text-3); font-weight: 500; }
+  .app-bar-search { flex: 1; max-width: 360px; position: relative; margin: 0 auto; }
+  .app-bar-search input { width: 100%; height: 32px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); padding: 0 36px 0 32px; font-size: 13px; color: var(--text); outline: none; transition: border .15s, box-shadow .15s; }
+  .app-bar-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(24,24,27,.05); }
+  .app-bar-search .icon-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-4); pointer-events: none; }
+  .app-bar-search kbd { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-size: 11px; color: var(--text-3); font-family: 'Geist Mono', monospace; font-weight: 500; }
+  .app-bar-actions { display: flex; gap: 6px; align-items: center; }
+
+  .conn-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 11px; font-weight: 500; border-radius: 100px; border: 1px solid; }
+  .conn-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .conn-status.online { color: var(--success); background: var(--success-bg); border-color: var(--success-border); }
+  .conn-status.offline { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-border); }
+  .conn-status.loading { color: var(--text-3); background: var(--surface-2); border-color: var(--border); }
+  .conn-status.error { color: var(--danger); background: var(--danger-bg); border-color: var(--danger-border); }
+
+  .btn { height: 32px; padding: 0 12px; border-radius: var(--r); font-size: 13px; font-weight: 500; border: 1px solid var(--border); background: var(--surface); color: var(--text); display: inline-flex; align-items: center; gap: 6px; transition: all .12s; white-space: nowrap; }
+  .btn:hover { background: var(--surface-2); border-color: var(--border-strong); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn-ghost { border-color: transparent; background: transparent; }
+  .btn-ghost:hover { background: var(--surface-2); border-color: var(--border); }
+  .btn-danger { color: var(--danger); }
+  .btn-danger:hover { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
+  .btn-sm { height: 28px; padding: 0 10px; font-size: 12px; }
+
+  .toggle { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); cursor: pointer; transition: all .12s; }
+  .toggle:hover { border-color: var(--border-strong); }
+  .toggle.on { background: var(--accent); color: white; border-color: var(--accent); }
+  .toggle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-4); }
+  .toggle.on .toggle-dot { background: var(--success); }
+
+  .container { max-width: 1440px; margin: 0 auto; padding: 32px 24px 80px; }
+  .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
+  .page-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: var(--text-3); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .page-sub-dot { width: 3px; height: 3px; background: var(--text-4); border-radius: 50%; }
+
+  /* Setup banner */
+  .setup-banner { background: var(--warning-bg); border: 1px solid var(--warning-border); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 24px; display: flex; gap: 14px; align-items: flex-start; }
+  .setup-banner-icon { color: var(--warning); flex-shrink: 0; }
+  .setup-banner-title { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .setup-banner-body { font-size: 13px; color: var(--text-2); line-height: 1.55; }
+  .setup-banner-body code { font-family: 'Geist Mono', monospace; font-size: 12px; background: var(--surface); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 32px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; transition: border-color .15s, box-shadow .15s; }
+  .kpi-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+  .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .kpi-label { font-size: 12px; color: var(--text-3); font-weight: 500; }
+  .kpi-icon { width: 18px; height: 18px; border-radius: 4px; display: grid; place-items: center; color: var(--text-3); background: var(--surface-2); }
+  .kpi-value-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+  .kpi-value { font-size: 26px; font-weight: 600; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .kpi-delta { font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; font-family: 'Geist Mono', monospace; }
+  .kpi-bar { height: 4px; background: var(--surface-2); border-radius: 100px; overflow: hidden; position: relative; }
+  .kpi-bar-fill { position: absolute; inset: 0 auto 0 0; background: var(--bar-color, var(--accent)); border-radius: 100px; width: var(--fill, 0%); transition: width .6s cubic-bezier(.16,1,.3,1); }
+  .kpi-success .kpi-icon { background: var(--success-bg); color: var(--success); }
+  .kpi-warning .kpi-icon { background: var(--warning-bg); color: var(--warning); }
+  .kpi-info .kpi-icon { background: var(--info-bg); color: var(--info); }
+  .kpi-neutral .kpi-icon { background: var(--neutral-bg); color: var(--neutral); }
+
+  .section { margin-bottom: 32px; }
+  .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 16px; flex-wrap: wrap; }
+  .section-title { display: flex; align-items: center; gap: 10px; }
+  .section-title h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+  .section-count { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); background: var(--surface-2); padding: 2px 7px; border-radius: 4px; font-weight: 500; }
+  .section-actions { display: flex; gap: 6px; align-items: center; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+
+  .shipped-strip { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 12px; scroll-snap-type: x mandatory; }
+  .shipped-strip::-webkit-scrollbar { height: 6px; }
+  .shipped-strip::-webkit-scrollbar-track { background: transparent; }
+  .shipped-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
+  .shipped-card { flex: 0 0 280px; scroll-snap-align: start; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px; cursor: pointer; transition: all .15s; position: relative; overflow: hidden; }
+  .shipped-card:hover { border-color: var(--info-border); box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+  .shipped-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--info); }
+  .shipped-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .shipped-check { width: 22px; height: 22px; border-radius: 50%; background: var(--info-bg); color: var(--info); display: grid; place-items: center; }
+  .shipped-target { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); font-weight: 500; }
+  .shipped-code { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-3); font-weight: 500; margin-bottom: 4px; }
+  .shipped-title { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; color: var(--text); }
+  .shipped-value { font-size: 12px; color: var(--text-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .shipped-ws { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-3); margin-top: 10px; }
+  .shipped-ws::before { content: ''; width: 6px; height: 6px; border-radius: 2px; background: var(--ws-color, var(--text-4)); }
+
+  .workload-card { padding: 18px 20px; }
+  .workload-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+  .workload-flag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--warning); background: var(--warning-bg); border: 1px solid var(--warning-border); padding: 4px 10px; border-radius: 100px; font-weight: 500; }
+  .workload-row { display: grid; grid-template-columns: 200px 1fr 60px; gap: 16px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .workload-row:last-child { border-bottom: none; }
+  .workload-name { font-size: 13px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .workload-bar-track { height: 24px; background: var(--surface-2); border-radius: var(--r); overflow: hidden; display: flex; }
+  .workload-bar-seg { height: 100%; transition: width .6s cubic-bezier(.16,1,.3,1); cursor: pointer; position: relative; }
+  .workload-bar-seg:hover { filter: brightness(0.92); }
+  .workload-bar-seg.s-complete    { background: var(--info); }
+  .workload-bar-seg.s-on_track    { background: var(--success); }
+  .workload-bar-seg.s-at_risk     { background: var(--warning); }
+  .workload-bar-seg.s-not_started { background: var(--neutral); }
+  .workload-count { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
+  .workload-legend { display: flex; gap: 16px; padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .wl-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); }
+  .wl-legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; font-size: 12px; font-weight: 500; border-radius: 100px; border: 1px solid; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .badge-success { color: var(--success); background: var(--success-bg); border-color: var(--success-border); }
+  .badge-warning { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-border); }
+  .badge-neutral { color: var(--neutral); background: var(--neutral-bg); border-color: var(--neutral-border); }
+  .badge-info    { color: var(--info);    background: var(--info-bg);    border-color: var(--info-border); }
+  .tag { display: inline-flex; align-items: center; height: 22px; padding: 0 7px; font-size: 12px; font-weight: 500; border-radius: var(--r); background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+  .tag-mono { font-family: 'Geist Mono', monospace; font-size: 11px; }
+  .avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); color: var(--text-2); font-size: 10px; font-weight: 600; display: inline-grid; place-items: center; border: 1px solid var(--border); text-transform: uppercase; font-family: 'Geist Mono', monospace; }
+
+  .timeline { padding: 0; overflow-x: auto; }
+  .tl-grid { min-width: 980px; position: relative; }
+  .tl-header { display: grid; grid-template-columns: 320px repeat(4, 1fr); background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .tl-header-cell { padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text-2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tl-header-cell:last-child { border-right: none; }
+  .tl-header-cell.first { color: var(--text-3); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tl-q-range { font-size: 11px; color: var(--text-3); font-weight: 500; font-family: 'Geist Mono', monospace; }
+  .tl-ws-row { display: grid; grid-template-columns: 320px 1fr; background: var(--surface-2); border-bottom: 1px solid var(--border); border-top: 1px solid var(--border); }
+  .tl-ws-row:first-of-type { border-top: none; }
+  .tl-ws-cell { padding: 8px 14px; display: flex; align-items: center; gap: 8px; border-right: 1px solid var(--border); }
+  .tl-ws-cell:last-child { border-right: none; }
+  .tl-ws-dot { width: 8px; height: 8px; border-radius: 2px; }
+  .tl-ws-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .tl-ws-count { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); font-weight: 500; }
+  .tl-ws-summary { padding: 8px 14px; display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-3); flex-wrap: wrap; }
+  .tl-ws-summary-stat { display: inline-flex; align-items: center; gap: 4px; font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; }
+  .tl-ws-summary-stat strong { color: var(--text); font-weight: 600; }
+  .tl-row { display: grid; grid-template-columns: 320px repeat(4, 1fr); border-bottom: 1px solid var(--border); transition: background .1s; position: relative; min-height: 48px; }
+  .tl-row:hover { background: var(--surface-hover); }
+  .tl-row-label { padding: 10px 14px; border-right: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .tl-row-code { font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 500; color: var(--text-3); background: var(--surface-2); padding: 2px 6px; border-radius: var(--r-sm); flex-shrink: 0; }
+  .tl-row-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; }
+  .tl-row-track { grid-column: 2 / -1; position: relative; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .tl-row-track::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(to right, transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(50% - .5px), var(--border) calc(50% - .5px), var(--border) calc(50% + .5px), transparent calc(50% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px)); pointer-events: none; }
+  .tl-bar { margin: 8px 4px; padding: 0 10px; border-radius: var(--r); background: var(--bar-bg); border: 1px solid var(--bar-border); height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: all .15s; overflow: hidden; color: var(--bar-fg); position: relative; z-index: 1; }
+  .tl-bar:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+  .tl-bar-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
+  .tl-bar-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .tl-bar-meta { font-family: 'Geist Mono', monospace; font-size: 11px; opacity: .7; font-weight: 500; }
+  .tl-today-line { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--danger); pointer-events: none; z-index: 4; }
+  .tl-today-line::before { content: 'Today'; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 600; color: var(--danger); background: var(--surface); border: 1px solid var(--danger-border); padding: 1px 6px; border-radius: 100px; white-space: nowrap; }
+  .tl-today-line::after { content: ''; position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 7px; height: 7px; border-radius: 50%; background: var(--danger); }
+
+  .board-toolbar { background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: var(--r-lg) var(--r-lg) 0 0; padding: 10px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .toolbar-divider { width: 1px; height: 18px; background: var(--border); }
+  .toolbar-label { font-size: 11px; color: var(--text-3); font-weight: 500; margin-right: 2px; }
+  .filter-chip { height: 26px; padding: 0 10px; font-size: 12px; font-weight: 500; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); color: var(--text-2); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all .12s; }
+  .filter-chip:hover { background: var(--surface-2); color: var(--text); }
+  .filter-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .filter-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--chip-color, var(--text-4)); }
+  .filter-chip.active .filter-chip-dot { background: white; }
+
+  .board { background: var(--surface); border: 1px solid var(--border); border-radius: 0 0 var(--r-lg) var(--r-lg); display: grid; grid-template-columns: 180px repeat(3, 1fr); overflow: hidden; }
+  .board-header-corner { background: var(--surface-2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .board-header-cell { background: var(--surface-2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
+  .board-header-cell:last-child { border-right: none; }
+  .board-header-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .board-header-sub { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); font-weight: 500; }
+  .board-ws-cell { padding: 14px; background: var(--surface-2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); display: flex; align-items: flex-start; gap: 8px; }
+  .board-ws-mark { width: 4px; align-self: stretch; border-radius: 100px; background: var(--ws-color); flex-shrink: 0; margin-top: 2px; }
+  .board-ws-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .board-ws-count { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); font-weight: 500; }
+  .board-cell { padding: 8px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; min-height: 100px; }
+  .board-cell:last-of-type { border-right: none; }
+  .board-row-last .board-cell, .board-row-last .board-ws-cell { border-bottom: none; }
+  .board-cell-empty { flex: 1; display: grid; place-items: center; color: var(--text-4); font-size: 12px; font-style: italic; border: 1px dashed var(--border); border-radius: var(--r); min-height: 60px; }
+
+  .item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px; cursor: pointer; transition: all .12s; position: relative; }
+  .item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+  .item-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 6px; }
+  .item-code { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-3); font-weight: 500; }
+  .item-target { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-3); font-weight: 500; }
+  .item-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 6px; }
+  .item-desc { font-size: 12px; color: var(--text-3); line-height: 1.4; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .item-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .item-meta { display: flex; align-items: center; gap: 6px; }
+
+  .drawer-backdrop { position: fixed; inset: 0; background: rgba(9,9,11,.4); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(580px, 96vw); background: var(--surface); border-left: 1px solid var(--border); box-shadow: var(--shadow-xl); z-index: 100; transform: translateX(100%); transition: transform .25s cubic-bezier(.16,1,.3,1); display: flex; flex-direction: column; }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .drawer-head-l { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+  .drawer-code { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); background: var(--surface-2); padding: 3px 7px; border-radius: var(--r-sm); font-weight: 500; }
+  .drawer-ws-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: var(--text-2); }
+  .drawer-ws-pill::before { content: ''; width: 8px; height: 8px; border-radius: 2px; background: var(--ws-color); }
+  .drawer-head-r { display: flex; align-items: center; gap: 6px; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+  .drawer-title { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; margin-bottom: 16px; }
+  .drawer-section { margin-bottom: 20px; }
+  .drawer-section-label { font-size: 11px; font-weight: 500; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .drawer-section-body { font-size: 14px; color: var(--text-2); line-height: 1.55; }
+  .drawer-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 20px; }
+  .drawer-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .drawer-meta-label { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+  .drawer-meta-value { font-size: 13px; color: var(--text); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field-label { font-size: 12px; color: var(--text-2); font-weight: 500; }
+  .field-input, .field-select, .field-textarea { width: 100%; padding: 8px 10px; font-size: 13px; color: var(--text); border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); outline: none; transition: border .15s, box-shadow .15s; }
+  .field-textarea { resize: vertical; min-height: 80px; font-family: inherit; line-height: 1.5; }
+  .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(24,24,27,.05); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .drawer-actions { display: flex; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); background: var(--surface); }
+  .drawer-actions .grow { flex: 1; }
+
+  .snapshot-card { padding: 14px 16px; }
+  .snapshot-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .snapshot-row:last-child { border-bottom: none; }
+  .snapshot-row.current { background: var(--surface-2); margin: 0 -16px; padding: 10px 16px; border-radius: var(--r); border: none; margin-bottom: 4px; }
+  .snapshot-label { display: flex; align-items: center; gap: 10px; }
+  .snapshot-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .snapshot-date { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); }
+  .snapshot-stats { display: flex; gap: 12px; font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); }
+  .snapshot-stats strong { color: var(--text); font-weight: 600; }
+  .snapshot-empty { text-align: center; padding: 32px 16px; color: var(--text-3); font-size: 13px; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(9,9,11,.4); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+  .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -48%); opacity: 0; pointer-events: none; width: min(720px, 96vw); max-height: 86vh; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--shadow-xl); z-index: 100; transition: opacity .2s, transform .25s cubic-bezier(.16,1,.3,1); display: flex; flex-direction: column; }
+  .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .modal-title { font-size: 16px; font-weight: 600; }
+  .modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+  .diff-section { margin-bottom: 20px; }
+  .diff-section-title { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .diff-row { padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 6px; font-size: 13px; }
+  .diff-added { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
+  .diff-removed { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
+  .diff-changed { background: var(--warning-bg); border-color: var(--warning-border); }
+  .diff-row-title { font-weight: 600; color: var(--text); }
+  .diff-row-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .diff-empty { color: var(--text-3); font-size: 13px; padding: 16px; text-align: center; }
+
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translate(-50%, 20px); background: var(--ink, var(--text)); color: white; padding: 10px 16px; border-radius: var(--r); font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 200; opacity: 0; pointer-events: none; transition: all .2s; display: flex; align-items: center; gap: 8px; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .toast.error { background: var(--danger); }
+
+  footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-3); flex-wrap: wrap; gap: 8px; }
+
+  .icon { width: 14px; height: 14px; stroke-width: 1.6; }
+  .icon-sm { width: 12px; height: 12px; }
+  .spinner { animation: spin 1s linear infinite; }
+  @keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+  @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .board { grid-template-columns: 1fr; }
+    .app-bar-search { display: none; }
+    .workload-row { grid-template-columns: 1fr; }
+  }
+  @media print {
+    @page { size: landscape; margin: 12mm; }
+    body { background: white; }
+    .app-bar, .board-toolbar, .app-bar-actions, .drawer-backdrop, .drawer, .modal, .modal-backdrop, .section-actions, .btn, .toast { display: none !important; }
+    .container { padding: 0; max-width: none; }
+    .kpi-card, .card, .item, .tl-bar, .badge, .shipped-card { box-shadow: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tl-row, .tl-ws-row, .board-cell, .board-ws-cell, .tl-bar, .shipped-card { page-break-inside: avoid; }
+    .section { page-break-inside: avoid; }
+    .item-desc { -webkit-line-clamp: unset; display: block; }
+    .shipped-strip { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-bar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <rect x="0" y="0" width="5" height="5" rx="1" fill="currentColor"/>
+        <rect x="7" y="0" width="5" height="5" rx="1" fill="currentColor" opacity=".55"/>
+        <rect x="0" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".55"/>
+        <rect x="7" y="7" width="5" height="5" rx="1" fill="currentColor" opacity=".3"/>
+      </svg>
+    </div>
+    <span class="brand-name">Roadmap</span>
+    <span class="brand-sep">/</span>
+    <span class="brand-org">RevOps</span>
+  </div>
+
+  <div class="app-bar-search">
+    <svg class="icon icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+    </svg>
+    <input type="search" id="search" placeholder="Search initiatives, owners, codes…">
+    <kbd>⌘K</kbd>
+  </div>
+
+  <div class="app-bar-actions">
+    <span class="conn-status loading" id="conn-status">Loading…</span>
+    <button class="toggle" id="edit-toggle" onclick="toggleEditMode()" title="Toggle edit mode">
+      <span class="toggle-dot"></span>
+      <span id="edit-toggle-label">View</span>
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="exportData()" title="Download current filter as JSON">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Export
+    </button>
+    <button class="btn btn-sm" onclick="window.print()">Print</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <div id="setup-banner" class="setup-banner" style="display:none;">
+    <div class="setup-banner-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div>
+      <div class="setup-banner-title">Backend not connected</div>
+      <div class="setup-banner-body">
+        Paste your Google Apps Script Web App URL into the <code>APPS_SCRIPT_URL</code> constant near the top of the <code>&lt;script&gt;</code> block in <code>index.html</code>, then refresh. See <code>SETUP.md</code> for the 5-minute setup. The page is currently showing cached or empty data.
+      </div>
+    </div>
+  </div>
+
+  <div class="page-head">
+    <div>
+      <h1>2026 Salesforce Portfolio</h1>
+      <div class="page-sub">
+        <span id="page-count">0 initiatives</span>
+        <span class="page-sub-dot"></span>
+        <span>5 workstreams</span>
+        <span class="page-sub-dot"></span>
+        <span>Updated <span id="updated-date">today</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-head"><span class="kpi-label">Total</span>
+        <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+      </div>
+      <div class="kpi-value-row"><span class="kpi-value" id="m-total">0</span></div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="--fill: 100%; --bar-color: var(--accent);"></div></div>
+    </div>
+    <div class="kpi-card kpi-info">
+      <div class="kpi-head"><span class="kpi-label">Shipped</span>
+        <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+      </div>
+      <div class="kpi-value-row"><span class="kpi-value" id="m-complete">0</span><span class="kpi-delta" id="m-complete-pct">0%</span></div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="m-complete-bar" style="--bar-color: var(--info);"></div></div>
+    </div>
+    <div class="kpi-card kpi-success">
+      <div class="kpi-head"><span class="kpi-label">On track</span>
+        <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+      </div>
+      <div class="kpi-value-row"><span class="kpi-value" id="m-ontrack">0</span><span class="kpi-delta" id="m-ontrack-pct">0%</span></div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="m-ontrack-bar" style="--bar-color: var(--success);"></div></div>
+    </div>
+    <div class="kpi-card kpi-warning">
+      <div class="kpi-head"><span class="kpi-label">At risk</span>
+        <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+      </div>
+      <div class="kpi-value-row"><span class="kpi-value" id="m-risk">0</span><span class="kpi-delta" id="m-risk-pct">0%</span></div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="m-risk-bar" style="--bar-color: var(--warning);"></div></div>
+    </div>
+    <div class="kpi-card kpi-neutral">
+      <div class="kpi-head"><span class="kpi-label">Not started</span>
+        <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></span>
+      </div>
+      <div class="kpi-value-row"><span class="kpi-value" id="m-notstarted">0</span><span class="kpi-delta" id="m-notstarted-pct">0%</span></div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="m-notstarted-bar" style="--bar-color: var(--neutral);"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-head"><span class="kpi-label">YTD elapsed</span>
+        <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+      </div>
+      <div class="kpi-value-row"><span class="kpi-value" id="m-ytd">0%</span><span class="kpi-delta">FY26</span></div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="m-ytd-bar" style="--bar-color: var(--accent);"></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title"><h2>Shipped this year</h2><span class="section-count" id="shipped-count">0</span></div>
+      <span class="page-sub" style="font-size:12px;">What we've already delivered →</span>
+    </div>
+    <div class="shipped-strip" id="shipped-strip"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title"><h2>Timeline</h2><span class="section-count" id="tl-count">0</span></div>
+      <div class="section-actions">
+        <button class="btn btn-sm edit-only" onclick="openNewDrawer()" style="display:none;">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add initiative
+        </button>
+      </div>
+    </div>
+    <div class="card timeline"><div class="tl-grid" id="timeline"></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title"><h2>Owner workload</h2><span class="section-count" id="workload-count">0</span></div>
+      <span class="workload-flag" id="workload-flag" style="display:none;">
+        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span id="workload-flag-text"></span>
+      </span>
+    </div>
+    <div class="card workload-card">
+      <div id="workload-rows"></div>
+      <div class="workload-legend">
+        <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--info)"></div>Shipped</div>
+        <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--success)"></div>On track</div>
+        <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--warning)"></div>At risk</div>
+        <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--neutral)"></div>Not started</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title"><h2>Portfolio</h2><span class="section-count" id="board-count">0</span></div>
+    </div>
+    <div class="board-toolbar">
+      <span class="toolbar-label">Workstream</span>
+      <div class="filter-group" id="ws-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div class="toolbar-divider"></div>
+      <span class="toolbar-label">Status</span>
+      <div class="filter-group" id="status-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <button class="btn btn-sm btn-ghost" onclick="clearFilters()" style="margin-left:auto;">Reset</button>
+    </div>
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title"><h2>Snapshots</h2><span class="section-count" id="snapshot-count">0</span></div>
+      <div class="section-actions">
+        <button class="btn btn-sm btn-primary" onclick="takeSnapshot()">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Take snapshot
+        </button>
+      </div>
+    </div>
+    <div class="card snapshot-card" id="snapshot-card">
+      <div class="snapshot-empty" id="snapshot-empty">No snapshots yet. Take one to track quarterly changes over time.</div>
+      <div id="snapshot-list"></div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© RevOps · <span id="footer-year">2026</span></span>
+    <div style="display:flex;gap:14px;align-items:center;">
+      <button class="btn btn-ghost btn-sm btn-danger" onclick="resetAllData()" title="Restore the original seed data">Reset to defaults</button>
+      <span>Owner: Cory Lawing · Global Director of Revenue Operations</span>
+    </div>
+  </footer>
+
+</main>
+
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true">
+  <div class="drawer-head">
+    <div class="drawer-head-l">
+      <span class="drawer-code" id="drawer-code">—</span>
+      <span class="drawer-ws-pill" id="drawer-ws" style="--ws-color: var(--accent);">—</span>
+    </div>
+    <div class="drawer-head-r">
+      <button class="btn btn-ghost btn-sm edit-only" id="drawer-edit-btn" onclick="enterEditMode()" style="display:none;">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="closeDrawer()" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="drawer-body" id="drawer-view">
+    <h3 class="drawer-title" id="drawer-title">—</h3>
+    <div class="drawer-meta-grid">
+      <div class="drawer-meta-item"><span class="drawer-meta-label">Status</span><span class="drawer-meta-value" id="drawer-status">—</span></div>
+      <div class="drawer-meta-item"><span class="drawer-meta-label">Target</span><span class="drawer-meta-value" id="drawer-target">—</span></div>
+      <div class="drawer-meta-item"><span class="drawer-meta-label">Owner</span><span class="drawer-meta-value" id="drawer-owner">—</span></div>
+      <div class="drawer-meta-item"><span class="drawer-meta-label">Effort</span><span class="drawer-meta-value" id="drawer-effort">—</span></div>
+    </div>
+    <div class="drawer-section"><div class="drawer-section-label">Description</div><div class="drawer-section-body" id="drawer-desc">—</div></div>
+    <div class="drawer-section"><div class="drawer-section-label">Business value</div><div class="drawer-section-body" id="drawer-value">—</div></div>
+  </div>
+
+  <div class="drawer-body" id="drawer-edit" style="display:none;">
+    <div class="field"><label class="field-label">Title</label><input class="field-input" id="f-title" type="text" placeholder="Initiative title"></div>
+    <div class="field-row">
+      <div class="field"><label class="field-label">Workstream</label><select class="field-select" id="f-ws"></select></div>
+      <div class="field"><label class="field-label">Status</label><select class="field-select" id="f-status"></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label class="field-label">Owner</label><input class="field-input" id="f-owner" type="text" placeholder="e.g. Revenue Operations"></div>
+      <div class="field"><label class="field-label">Effort</label>
+        <select class="field-select" id="f-effort">
+          <option value="S">S — &lt; 2 weeks</option><option value="M">M — 2–6 weeks</option>
+          <option value="L">L — 6–12 weeks</option><option value="XL">XL — 12+ weeks</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label class="field-label">Start quarter</label>
+        <select class="field-select" id="f-startq">
+          <option value="1">Q1 2026</option><option value="2">Q2 2026</option><option value="3">Q3 2026</option><option value="4">Q4 2026</option>
+        </select>
+      </div>
+      <div class="field"><label class="field-label">End quarter</label>
+        <select class="field-select" id="f-endq">
+          <option value="1">Q1 2026</option><option value="2">Q2 2026</option><option value="3">Q3 2026</option><option value="4">Q4 2026</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Target label</label><input class="field-input" id="f-target" type="text" placeholder="e.g. Q2 2026 or Q4 2026 – Q1 2027"></div>
+    <div class="field"><label class="field-label">Description</label><textarea class="field-textarea" id="f-desc" placeholder="One or two sentences…"></textarea></div>
+    <div class="field"><label class="field-label">Business value</label><textarea class="field-textarea" id="f-value" placeholder="What outcome does this drive?"></textarea></div>
+  </div>
+
+  <div class="drawer-actions" id="drawer-actions-view" style="display:none;">
+    <button class="btn btn-danger" onclick="deleteInitiative()" id="delete-btn">Delete</button>
+    <button class="btn grow" onclick="exitEditMode()">Cancel</button>
+    <button class="btn btn-primary" id="save-btn" onclick="saveInitiative()">Save changes</button>
+  </div>
+</aside>
+
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeDiff()"></div>
+<div class="modal" id="diff-modal" role="dialog" aria-modal="true">
+  <div class="modal-head">
+    <div class="modal-title" id="diff-title">Compare with snapshot</div>
+    <button class="btn btn-ghost btn-sm" onclick="closeDiff()">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="modal-body" id="diff-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // =======================================================================
+  //  PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW
+  //  See SETUP.md for instructions.
+  // =======================================================================
+  const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/dental-monitoring.com/s/AKfycbzb3iOgJG3YliDK5C05Z2uAME1UAPvdEWuHP4SPJA4tN56XXERqW9NiEEaa1R5IjlEj/exec';
+  // =======================================================================
+
+  const CACHE_KEY = 'roadmap.cache.v1';
+  const isConfigured = () => APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'PASTE_YOUR_WEB_APP_URL_HERE' && APPS_SCRIPT_URL.startsWith('https://');
+
+  const WORKSTREAMS = [
+    { id: 'sales',        label: 'Sales',            code: 'SLS', color: 'var(--ws-sales)' },
+    { id: 'marketing',    label: 'Marketing',        code: 'MKT', color: 'var(--ws-marketing)' },
+    { id: 'finance',      label: 'Finance',          code: 'FIN', color: 'var(--ws-finance)' },
+    { id: 'service',      label: 'Customer Service', code: 'SRV', color: 'var(--ws-service)' },
+    { id: 'optimization', label: 'Optimization',     code: 'OPT', color: 'var(--ws-optimization)' },
+  ];
+  const HORIZONS = [
+    { id: 'now',   label: 'Now',   sub: '0–3 mo' },
+    { id: 'next',  label: 'Next',  sub: '3–9 mo' },
+    { id: 'later', label: 'Later', sub: '9+ mo' },
+  ];
+  const STATUSES = [
+    { id: 'complete',    label: 'Complete',    badge: 'info' },
+    { id: 'on_track',    label: 'On track',    badge: 'success' },
+    { id: 'at_risk',     label: 'At risk',     badge: 'warning' },
+    { id: 'not_started', label: 'Not started', badge: 'neutral' },
+  ];
+  const STATUS_STYLES = {
+    complete:    { fg: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
+    on_track:    { fg: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
+    at_risk:     { fg: '#CA8A04', bg: '#FEFCE8', border: '#FDE68A' },
+    not_started: { fg: '#71717A', bg: '#FAFAFA', border: '#E4E4E7' },
+  };
+
+  let INITIATIVES = [];
+  let SNAPSHOTS = [];
+  const state = { wsFilter: null, statusFilter: null, search: '', editMode: false, currentId: null, isNew: false };
+
+  // ---------- Connectivity ----------
+  function setConnStatus(status, text) {
+    const el = document.getElementById('conn-status');
+    el.className = 'conn-status ' + status;
+    el.textContent = text;
+  }
+
+  function toast(msg, isError = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => { el.className = 'toast' + (isError ? ' error' : ''); }, 2400);
+  }
+
+  function loadCache() {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        INITIATIVES = parsed.initiatives || [];
+        SNAPSHOTS = parsed.snapshots || [];
+      }
+    } catch (_) {}
+  }
+  function saveCache() {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ initiatives: INITIATIVES, snapshots: SNAPSHOTS }));
+    } catch (_) {}
+  }
+
+  async function apiRead() {
+    if (!isConfigured()) return null;
+    const res = await fetch(APPS_SCRIPT_URL + '?action=read', { method: 'GET' });
+    if (!res.ok) throw new Error('Read failed: HTTP ' + res.status);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Read failed');
+    return json;
+  }
+
+  async function apiPost(body) {
+    if (!isConfigured()) throw new Error('Backend URL not configured');
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      // Use text/plain to avoid CORS preflight; Apps Script will parse it
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error('Write failed: HTTP ' + res.status);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Write failed');
+    return json;
+  }
+
+  async function refresh() {
+    if (!isConfigured()) {
+      document.getElementById('setup-banner').style.display = '';
+      setConnStatus('error', 'Not configured');
+      loadCache();
+      renderAll();
+      return;
+    }
+    document.getElementById('setup-banner').style.display = 'none';
+    setConnStatus('loading', 'Loading…');
+    try {
+      const data = await apiRead();
+      INITIATIVES = data.initiatives || [];
+      SNAPSHOTS = data.snapshots || [];
+      saveCache();
+      setConnStatus('online', 'Synced');
+      renderAll();
+    } catch (e) {
+      console.error(e);
+      setConnStatus('offline', 'Offline — using cache');
+      loadCache();
+      renderAll();
+      toast('Could not reach the Sheet. Showing cached data.', true);
+    }
+  }
+
+  // ---------- Helpers ----------
+  const statusOf = (id) => STATUSES.find(s => s.id === id);
+  const wsOf = (id) => WORKSTREAMS.find(w => w.id === id);
+  const initials = (name) => (name || '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  function matches(i) {
+    if (state.wsFilter && i.ws !== state.wsFilter) return false;
+    if (state.statusFilter && i.status !== state.statusFilter) return false;
+    if (state.search) {
+      const hay = `${i.title} ${i.code} ${i.owner} ${i.desc} ${i.value} ${i.target}`.toLowerCase();
+      if (!hay.includes(state.search)) return false;
+    }
+    return true;
+  }
+
+  // ---------- KPIs ----------
+  function renderKpis() {
+    const total = INITIATIVES.length;
+    const by = { complete: 0, on_track: 0, at_risk: 0, not_started: 0 };
+    INITIATIVES.forEach(i => { if (by[i.status] !== undefined) by[i.status]++; });
+    const pct = (n) => total ? Math.round((n / total) * 100) + '%' : '0%';
+    document.getElementById('m-total').textContent = total;
+    document.getElementById('m-complete').textContent = by.complete;
+    document.getElementById('m-ontrack').textContent = by.on_track;
+    document.getElementById('m-risk').textContent = by.at_risk;
+    document.getElementById('m-notstarted').textContent = by.not_started;
+    document.getElementById('m-complete-pct').textContent = pct(by.complete);
+    document.getElementById('m-ontrack-pct').textContent = pct(by.on_track);
+    document.getElementById('m-risk-pct').textContent = pct(by.at_risk);
+    document.getElementById('m-notstarted-pct').textContent = pct(by.not_started);
+    document.getElementById('m-complete-bar').style.setProperty('--fill', pct(by.complete));
+    document.getElementById('m-ontrack-bar').style.setProperty('--fill', pct(by.on_track));
+    document.getElementById('m-risk-bar').style.setProperty('--fill', pct(by.at_risk));
+    document.getElementById('m-notstarted-bar').style.setProperty('--fill', pct(by.not_started));
+    const now = new Date();
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+    const yearEnd = new Date(now.getFullYear() + 1, 0, 1);
+    const ytdPct = Math.round(((now - yearStart) / (yearEnd - yearStart)) * 100);
+    document.getElementById('m-ytd').textContent = ytdPct + '%';
+    document.getElementById('m-ytd-bar').style.setProperty('--fill', ytdPct + '%');
+    document.getElementById('page-count').textContent = `${total} initiatives`;
+  }
+
+  // ---------- Shipped strip ----------
+  function renderShipped() {
+    const root = document.getElementById('shipped-strip');
+    const shipped = INITIATIVES.filter(i => i.status === 'complete').sort((a,b) => (a.startQ||0) - (b.startQ||0));
+    document.getElementById('shipped-count').textContent = shipped.length;
+    if (shipped.length === 0) {
+      root.innerHTML = `<div style="padding:24px;color:var(--text-3);font-size:13px;">Nothing shipped yet — items appear here when status is Complete.</div>`;
+      return;
+    }
+    root.innerHTML = shipped.map(i => {
+      const ws = wsOf(i.ws);
+      return `<div class="shipped-card" onclick="openDrawer('${i.id}')">
+        <div class="shipped-head">
+          <div class="shipped-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="shipped-target">${i.target}</span>
+        </div>
+        <div class="shipped-code">${i.code}</div>
+        <div class="shipped-title">${i.title}</div>
+        <div class="shipped-value">${i.value}</div>
+        <div class="shipped-ws" style="--ws-color:${ws.color}">${ws.label}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ---------- Owner workload ----------
+  function renderWorkload() {
+    const root = document.getElementById('workload-rows');
+    const owners = {};
+    INITIATIVES.forEach(i => {
+      if (!owners[i.owner]) owners[i.owner] = { total: 0, by: { complete: 0, on_track: 0, at_risk: 0, not_started: 0 } };
+      owners[i.owner].total++;
+      owners[i.owner].by[i.status]++;
+    });
+    const arr = Object.entries(owners).map(([owner, data]) => ({ owner, ...data })).sort((a, b) => b.total - a.total);
+    const max = arr[0]?.total || 1;
+    document.getElementById('workload-count').textContent = arr.length;
+    if (arr.length > 0 && INITIATIVES.length > 0) {
+      const topShare = Math.round((arr[0].total / INITIATIVES.length) * 100);
+      if (topShare >= 50) {
+        document.getElementById('workload-flag').style.display = '';
+        document.getElementById('workload-flag-text').textContent = `${arr[0].owner} carries ${topShare}% of the portfolio — key-person risk`;
+      } else {
+        document.getElementById('workload-flag').style.display = 'none';
+      }
+    }
+    root.innerHTML = arr.map(o => {
+      const segs = ['complete', 'on_track', 'at_risk', 'not_started'].map(s => {
+        const n = o.by[s];
+        if (n === 0) return '';
+        const pct = (n / max) * 100;
+        return `<div class="workload-bar-seg s-${s}" style="width: ${pct}%" title="${statusOf(s).label}: ${n}"></div>`;
+      }).join('');
+      return `<div class="workload-row">
+        <div class="workload-name"><span class="avatar">${initials(o.owner)}</span> ${o.owner}</div>
+        <div class="workload-bar-track">${segs}</div>
+        <div class="workload-count">${o.total}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ---------- Timeline ----------
+  function renderTimeline() {
+    const root = document.getElementById('timeline');
+    let html = '', visibleCount = 0;
+    html += `<div class="tl-header">
+      <div class="tl-header-cell first">Initiative</div>
+      <div class="tl-header-cell">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
+      <div class="tl-header-cell">Q2 2026<span class="tl-q-range">Apr–Jun</span></div>
+      <div class="tl-header-cell">Q3 2026<span class="tl-q-range">Jul–Sep</span></div>
+      <div class="tl-header-cell">Q4 2026<span class="tl-q-range">Oct–Dec</span></div>
+    </div>`;
+    WORKSTREAMS.forEach((ws) => {
+      const items = INITIATIVES.filter(i => i.ws === ws.id && matches(i));
+      if (items.length === 0) return;
+      visibleCount += items.length;
+      const byStatus = items.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
+      html += `<div class="tl-ws-row">
+        <div class="tl-ws-cell">
+          <div class="tl-ws-dot" style="background:${ws.color}"></div>
+          <span class="tl-ws-name">${ws.label}</span>
+          <span class="tl-ws-count">${items.length}</span>
+        </div>
+        <div class="tl-ws-summary">
+          ${(byStatus.complete  || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--info)"><strong>${byStatus.complete}</strong> shipped</span>` : ''}
+          ${(byStatus.on_track  || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--success)"><strong>${byStatus.on_track}</strong> on track</span>` : ''}
+          ${(byStatus.at_risk   || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--warning)"><strong>${byStatus.at_risk}</strong> at risk</span>` : ''}
+          ${(byStatus.not_started || 0) > 0 ? `<span class="tl-ws-summary-stat" style="color:var(--neutral)"><strong>${byStatus.not_started}</strong> not started</span>` : ''}
+        </div>
+      </div>`;
+      items.forEach(i => {
+        const s = STATUS_STYLES[i.status];
+        const sObj = statusOf(i.status);
+        const colStart = Math.max(1, i.startQ || 1);
+        const colEnd = Math.min(5, (i.endQ || i.startQ || 1) + 1);
+        html += `<div class="tl-row" data-id="${i.id}">
+          <div class="tl-row-label" onclick="openDrawer('${i.id}')">
+            <span class="tl-row-code">${i.code}</span>
+            <span class="tl-row-title">${i.title}</span>
+          </div>
+          <div class="tl-row-track">
+            <div class="tl-bar" onclick="openDrawer('${i.id}')" style="grid-column: ${colStart} / ${colEnd}; --bar-bg:${s.bg}; --bar-fg:${s.fg}; --bar-border:${s.border};" title="${sObj.label} · ${i.target} · ${i.owner}">
+              <span class="tl-bar-status">${sObj.label}</span>
+              <span class="tl-bar-meta">${i.target}</span>
+            </div>
+          </div>
+        </div>`;
+      });
+    });
+    if (visibleCount === 0) html += `<div style="padding:48px;text-align:center;color:var(--text-3);font-size:13px;">No initiatives match the current filter.</div>`;
+    root.innerHTML = html;
+    document.getElementById('tl-count').textContent = visibleCount;
+    positionToday();
+  }
+  function positionToday() {
+    const old = document.querySelector('.tl-today-line');
+    if (old) old.remove();
+    const now = new Date();
+    if (now.getFullYear() !== 2026) return;
+    const yearStart = new Date(2026, 0, 1);
+    const yearEnd = new Date(2027, 0, 1);
+    const pct = (now - yearStart) / (yearEnd - yearStart);
+    if (pct < 0 || pct > 1) return;
+    const grid = document.getElementById('timeline');
+    if (!grid) return;
+    const labelCol = 320;
+    const wrapWidth = grid.offsetWidth;
+    const tracksWidth = wrapWidth - labelCol;
+    const left = labelCol + tracksWidth * pct;
+    const line = document.createElement('div');
+    line.className = 'tl-today-line';
+    line.style.left = left + 'px';
+    line.style.top = '44px';
+    grid.appendChild(line);
+  }
+  window.addEventListener('resize', positionToday);
+
+  // ---------- Filters & Board ----------
+  function renderFilters() {
+    document.getElementById('ws-filters').innerHTML = WORKSTREAMS.map(w =>
+      `<button class="filter-chip ${state.wsFilter === w.id ? 'active' : ''}" onclick="toggleFilter('ws','${w.id}')">
+        <span class="filter-chip-dot" style="--chip-color: ${w.color}"></span>${w.label}
+      </button>`
+    ).join('');
+    document.getElementById('status-filters').innerHTML = STATUSES.map(s => {
+      const c = STATUS_STYLES[s.id];
+      return `<button class="filter-chip ${state.statusFilter === s.id ? 'active' : ''}" onclick="toggleFilter('status','${s.id}')">
+        <span class="filter-chip-dot" style="--chip-color: ${c.fg}"></span>${s.label}
+      </button>`;
+    }).join('');
+  }
+  function toggleFilter(kind, val) {
+    if (kind === 'ws') state.wsFilter = state.wsFilter === val ? null : val;
+    else state.statusFilter = state.statusFilter === val ? null : val;
+    renderAll();
+  }
+  function clearFilters() {
+    state.wsFilter = null; state.statusFilter = null; state.search = '';
+    document.getElementById('search').value = '';
+    renderAll();
+  }
+  function renderBoard() {
+    const root = document.getElementById('board');
+    let html = '', visibleCount = 0;
+    html += `<div class="board-header-corner"></div>`;
+    HORIZONS.forEach(h => {
+      const count = INITIATIVES.filter(i => i.h === h.id && matches(i)).length;
+      html += `<div class="board-header-cell">
+        <span class="board-header-title">${h.label}</span>
+        <span class="board-header-sub">${h.sub}</span>
+        <span class="section-count" style="margin-left:auto">${count}</span>
+      </div>`;
+    });
+    WORKSTREAMS.forEach((ws, wsIdx) => {
+      const isLast = wsIdx === WORKSTREAMS.length - 1;
+      const wsCount = INITIATIVES.filter(i => i.ws === ws.id).length;
+      html += `<div class="board-ws-cell ${isLast ? 'board-row-last' : ''}">
+        <div class="board-ws-mark" style="--ws-color:${ws.color}"></div>
+        <div><div class="board-ws-name">${ws.label}</div><div class="board-ws-count">${wsCount} items</div></div>
+      </div>`;
+      HORIZONS.forEach(h => {
+        const cards = INITIATIVES.filter(i => i.ws === ws.id && i.h === h.id && matches(i));
+        visibleCount += cards.length;
+        html += `<div class="board-cell ${isLast ? 'board-row-last' : ''}">`;
+        if (cards.length === 0) html += `<div class="board-cell-empty">No items</div>`;
+        else cards.forEach(c => {
+          const sObj = statusOf(c.status);
+          html += `<div class="item" onclick="openDrawer('${c.id}')">
+            <div class="item-head"><span class="item-code">${c.code}</span><span class="item-target">${c.target}</span></div>
+            <div class="item-title">${c.title}</div>
+            <div class="item-desc">${c.desc}</div>
+            <div class="item-foot">
+              <span class="badge badge-${sObj.badge}">${sObj.label}</span>
+              <span class="item-meta"><span class="avatar" title="${c.owner}">${initials(c.owner)}</span><span class="tag tag-mono">${c.effort}</span></span>
+            </div>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+    });
+    root.innerHTML = html;
+    document.getElementById('board-count').textContent = visibleCount;
+  }
+
+  function renderAll() {
+    renderKpis();
+    renderShipped();
+    renderTimeline();
+    renderWorkload();
+    renderFilters();
+    renderBoard();
+    renderSnapshots();
+  }
+
+  // ---------- Drawer ----------
+  function openDrawer(id) {
+    const i = INITIATIVES.find(x => x.id === id);
+    if (!i) return;
+    state.currentId = id; state.isNew = false; state.editMode = false;
+    const ws = wsOf(i.ws);
+    const sObj = statusOf(i.status);
+    document.getElementById('drawer-code').textContent = i.code;
+    const wsPill = document.getElementById('drawer-ws');
+    wsPill.textContent = ws.label;
+    wsPill.style.setProperty('--ws-color', ws.color);
+    document.getElementById('drawer-title').textContent = i.title;
+    document.getElementById('drawer-status').innerHTML = `<span class="badge badge-${sObj.badge}">${sObj.label}</span>`;
+    document.getElementById('drawer-target').textContent = i.target;
+    document.getElementById('drawer-owner').innerHTML = `<span class="avatar">${initials(i.owner)}</span> ${i.owner}`;
+    document.getElementById('drawer-effort').innerHTML = `<span class="tag tag-mono">${i.effort}</span>`;
+    document.getElementById('drawer-desc').textContent = i.desc;
+    document.getElementById('drawer-value').textContent = i.value;
+    showViewMode();
+    document.getElementById('drawer-backdrop').classList.add('open');
+    document.getElementById('drawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function openNewDrawer() {
+    state.currentId = null; state.isNew = true; state.editMode = true;
+    document.getElementById('drawer-code').textContent = 'NEW';
+    const wsPill = document.getElementById('drawer-ws');
+    wsPill.textContent = 'New initiative';
+    wsPill.style.setProperty('--ws-color', 'var(--accent)');
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-owner').value = '';
+    document.getElementById('f-desc').value = '';
+    document.getElementById('f-value').value = '';
+    document.getElementById('f-target').value = 'Q2 2026';
+    showEditMode();
+    document.getElementById('f-ws').value = 'sales';
+    document.getElementById('f-status').value = 'not_started';
+    document.getElementById('f-effort').value = 'M';
+    document.getElementById('f-startq').value = '2';
+    document.getElementById('f-endq').value = '2';
+    document.getElementById('delete-btn').style.display = 'none';
+    document.getElementById('drawer-backdrop').classList.add('open');
+    document.getElementById('drawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    document.getElementById('drawer-backdrop').classList.remove('open');
+    document.getElementById('drawer').classList.remove('open');
+    document.body.style.overflow = '';
+    state.currentId = null; state.editMode = false; state.isNew = false;
+  }
+  function showViewMode() {
+    state.editMode = false;
+    document.getElementById('drawer-view').style.display = '';
+    document.getElementById('drawer-edit').style.display = 'none';
+    document.getElementById('drawer-actions-view').style.display = 'none';
+  }
+  function showEditMode() {
+    state.editMode = true;
+    document.getElementById('drawer-view').style.display = 'none';
+    document.getElementById('drawer-edit').style.display = '';
+    document.getElementById('drawer-actions-view').style.display = '';
+    document.getElementById('f-ws').innerHTML = WORKSTREAMS.map(w => `<option value="${w.id}">${w.label}</option>`).join('');
+    document.getElementById('f-status').innerHTML = STATUSES.map(s => `<option value="${s.id}">${s.label}</option>`).join('');
+  }
+  function enterEditMode() {
+    if (!state.currentId) return;
+    const i = INITIATIVES.find(x => x.id === state.currentId);
+    if (!i) return;
+    showEditMode();
+    document.getElementById('f-title').value = i.title;
+    document.getElementById('f-ws').value = i.ws;
+    document.getElementById('f-status').value = i.status;
+    document.getElementById('f-owner').value = i.owner;
+    document.getElementById('f-effort').value = i.effort;
+    document.getElementById('f-startq').value = String(i.startQ);
+    document.getElementById('f-endq').value = String(i.endQ);
+    document.getElementById('f-target').value = i.target;
+    document.getElementById('f-desc').value = i.desc;
+    document.getElementById('f-value').value = i.value;
+    document.getElementById('delete-btn').style.display = '';
+  }
+  function exitEditMode() {
+    if (state.isNew) { closeDrawer(); return; }
+    if (state.currentId) openDrawer(state.currentId);
+  }
+
+  async function saveInitiative() {
+    const title = document.getElementById('f-title').value.trim();
+    if (!title) { alert('Title is required'); return; }
+    const startQ = parseInt(document.getElementById('f-startq').value, 10);
+    const endQ = parseInt(document.getElementById('f-endq').value, 10);
+    if (endQ < startQ) { alert('End quarter must be ≥ start quarter'); return; }
+
+    const item = {
+      id: state.isNew ? null : state.currentId,
+      title,
+      ws: document.getElementById('f-ws').value,
+      status: document.getElementById('f-status').value,
+      owner: document.getElementById('f-owner').value.trim() || 'Unassigned',
+      effort: document.getElementById('f-effort').value,
+      startQ, endQ,
+      target: document.getElementById('f-target').value.trim() || `Q${startQ} 2026`,
+      desc: document.getElementById('f-desc').value.trim(),
+      value: document.getElementById('f-value').value.trim(),
+    };
+
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+    try {
+      const res = await apiPost({ action: 'upsert', item });
+      INITIATIVES = res.initiatives;
+      saveCache();
+      // Find the saved item — for new items, it's the one with our title + ws + owner most recently
+      let saved;
+      if (state.isNew) {
+        saved = INITIATIVES.filter(x => x.title === title && x.ws === item.ws).sort((a,b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''))[0];
+      } else {
+        saved = INITIATIVES.find(x => x.id === state.currentId);
+      }
+      state.isNew = false;
+      state.currentId = saved ? saved.id : null;
+      renderAll();
+      toast('Saved');
+      if (saved) openDrawer(saved.id); else closeDrawer();
+    } catch (e) {
+      console.error(e);
+      toast('Save failed: ' + e.message, true);
+    } finally {
+      saveBtn.disabled = false; saveBtn.textContent = 'Save changes';
+    }
+  }
+
+  async function deleteInitiative() {
+    if (!state.currentId || state.isNew) return;
+    const i = INITIATIVES.find(x => x.id === state.currentId);
+    if (!i) return;
+    if (!confirm(`Delete "${i.title}"? This can't be undone.`)) return;
+    try {
+      const res = await apiPost({ action: 'delete', id: state.currentId });
+      INITIATIVES = res.initiatives;
+      saveCache();
+      closeDrawer();
+      renderAll();
+      toast('Deleted');
+    } catch (e) {
+      toast('Delete failed: ' + e.message, true);
+    }
+  }
+
+  // ---------- Edit toggle ----------
+  function toggleEditMode() {
+    const isOn = document.getElementById('edit-toggle').classList.toggle('on');
+    document.getElementById('edit-toggle-label').textContent = isOn ? 'Editing' : 'View';
+    document.querySelectorAll('.edit-only').forEach(el => el.style.display = isOn ? '' : 'none');
+  }
+
+  // ---------- Search ----------
+  document.getElementById('search').addEventListener('input', (e) => {
+    state.search = (e.target.value || '').toLowerCase().trim();
+    renderTimeline();
+    renderBoard();
+  });
+
+  // ---------- Snapshots ----------
+  async function takeSnapshot() {
+    const name = prompt('Snapshot name', `Snapshot ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
+    if (!name) return;
+    try {
+      const res = await apiPost({ action: 'snapshot', name });
+      SNAPSHOTS = res.snapshots;
+      saveCache();
+      renderSnapshots();
+      toast('Snapshot saved');
+    } catch (e) {
+      toast('Snapshot failed: ' + e.message, true);
+    }
+  }
+  async function deleteSnapshot(id) {
+    if (!confirm('Delete this snapshot?')) return;
+    try {
+      const res = await apiPost({ action: 'deleteSnapshot', id });
+      SNAPSHOTS = res.snapshots;
+      saveCache();
+      renderSnapshots();
+      toast('Snapshot deleted');
+    } catch (e) {
+      toast('Delete failed: ' + e.message, true);
+    }
+  }
+  function renderSnapshots() {
+    const list = document.getElementById('snapshot-list');
+    const empty = document.getElementById('snapshot-empty');
+    document.getElementById('snapshot-count').textContent = SNAPSHOTS.length;
+    if (SNAPSHOTS.length === 0) { empty.style.display = ''; list.innerHTML = ''; return; }
+    empty.style.display = 'none';
+    const curBy = INITIATIVES.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
+    let html = `<div class="snapshot-row current">
+      <div class="snapshot-label"><span class="badge badge-success">Current</span><span class="snapshot-name">Live data</span></div>
+      <div class="snapshot-stats">
+        <span><strong>${INITIATIVES.length}</strong> total</span>
+        <span style="color:var(--info)"><strong>${curBy.complete||0}</strong> shipped</span>
+        <span style="color:var(--warning)"><strong>${curBy.at_risk||0}</strong> at risk</span>
+      </div>
+      <span></span><span></span>
+    </div>`;
+    html += SNAPSHOTS.map(s => {
+      const by = s.data.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
+      return `<div class="snapshot-row">
+        <div class="snapshot-label">
+          <span class="snapshot-name">${s.name}</span>
+          <span class="snapshot-date">${new Date(s.takenAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        </div>
+        <div class="snapshot-stats">
+          <span><strong>${s.data.length}</strong> total</span>
+          <span style="color:var(--info)"><strong>${by.complete||0}</strong> shipped</span>
+          <span style="color:var(--warning)"><strong>${by.at_risk||0}</strong> at risk</span>
+        </div>
+        <button class="btn btn-sm" onclick="showDiff('${s.id}')">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><polyline points="8 7 12 3 16 7"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+          Diff
+        </button>
+        <button class="btn btn-sm btn-ghost btn-danger" onclick="deleteSnapshot('${s.id}')" title="Delete snapshot">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+    list.innerHTML = html;
+  }
+  function showDiff(snapId) {
+    const snap = SNAPSHOTS.find(s => s.id === snapId);
+    if (!snap) return;
+    const prevById = {};
+    snap.data.forEach(p => { prevById[p.id] = p; });
+    const currById = {};
+    INITIATIVES.forEach(c => { currById[c.id] = c; });
+    const added = INITIATIVES.filter(c => !prevById[c.id]);
+    const removed = snap.data.filter(p => !currById[p.id]);
+    const changed = [];
+    INITIATIVES.forEach(c => {
+      const p = prevById[c.id];
+      if (!p) return;
+      const diffs = [];
+      if (p.status !== c.status) diffs.push(`status: ${statusOf(p.status)?.label} → ${statusOf(c.status)?.label}`);
+      if (p.owner !== c.owner) diffs.push(`owner: ${p.owner} → ${c.owner}`);
+      if (p.target !== c.target) diffs.push(`target: ${p.target} → ${c.target}`);
+      if (p.title !== c.title) diffs.push(`title changed`);
+      if (diffs.length > 0) changed.push({ item: c, diffs });
+    });
+    document.getElementById('diff-title').textContent = `Compare "${snap.name}" → current`;
+    const body = document.getElementById('diff-body');
+    let html = '';
+    if (added.length === 0 && removed.length === 0 && changed.length === 0) {
+      html = `<div class="diff-empty">No changes since this snapshot.</div>`;
+    } else {
+      if (added.length > 0) {
+        html += `<div class="diff-section"><div class="diff-section-title" style="color:var(--success)">＋ Added (${added.length})</div>`;
+        added.forEach(i => {
+          html += `<div class="diff-row diff-added"><div class="diff-row-title">${i.code} — ${i.title}</div><div class="diff-row-meta">${wsOf(i.ws).label} · ${statusOf(i.status).label} · ${i.target}</div></div>`;
+        });
+        html += `</div>`;
+      }
+      if (removed.length > 0) {
+        html += `<div class="diff-section"><div class="diff-section-title" style="color:var(--danger)">− Removed (${removed.length})</div>`;
+        removed.forEach(i => {
+          html += `<div class="diff-row diff-removed"><div class="diff-row-title">${i.code} — ${i.title}</div><div class="diff-row-meta">${wsOf(i.ws).label} · ${statusOf(i.status).label} · ${i.target}</div></div>`;
+        });
+        html += `</div>`;
+      }
+      if (changed.length > 0) {
+        html += `<div class="diff-section"><div class="diff-section-title" style="color:var(--warning)">↻ Changed (${changed.length})</div>`;
+        changed.forEach(({ item, diffs }) => {
+          html += `<div class="diff-row diff-changed"><div class="diff-row-title">${item.code} — ${item.title}</div><div class="diff-row-meta">${diffs.join(' · ')}</div></div>`;
+        });
+        html += `</div>`;
+      }
+    }
+    body.innerHTML = html;
+    document.getElementById('modal-backdrop').classList.add('open');
+    document.getElementById('diff-modal').classList.add('open');
+  }
+  function closeDiff() {
+    document.getElementById('modal-backdrop').classList.remove('open');
+    document.getElementById('diff-modal').classList.remove('open');
+  }
+
+  // ---------- Reset / Export ----------
+  async function resetAllData() {
+    if (!confirm('Reset the Sheet to the original seed data? This will delete all current initiatives AND all snapshots.')) return;
+    try {
+      const res = await apiPost({ action: 'reset' });
+      INITIATIVES = res.initiatives;
+      SNAPSHOTS = res.snapshots;
+      saveCache();
+      renderAll();
+      toast('Reset complete');
+    } catch (e) {
+      toast('Reset failed: ' + e.message, true);
+    }
+  }
+  function exportData() {
+    const data = INITIATIVES.filter(matches);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'roadmap-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeDrawer(); closeDiff(); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('search').focus(); }
+  });
+
+  // ---------- Init ----------
+  const today = new Date();
+  document.getElementById('updated-date').textContent = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  document.getElementById('footer-year').textContent = today.getFullYear();
+  refresh();
+</script>
+
+</body>
+</html>
