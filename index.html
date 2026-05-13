@@ -759,6 +759,22 @@
     .item { padding: 14px; min-height: 64px; }
     .item-title { font-size: 14px; }
 
+    /* Board on mobile — hide empty cells and empty workstream rows entirely */
+    .board-header-corner, .board-header-cell { display: none; }
+    .board-cell[data-cell-empty="true"] { display: none; }
+    .board-ws-cell[data-row-empty="true"],
+    .board-cell[data-row-empty="true"] { display: none; }
+    /* Make the workstream label row a real header on mobile */
+    .board-ws-cell {
+      padding: 14px 14px 8px;
+      background: var(--surface-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .board-ws-cell:first-of-type { border-top: none; }
+    /* Each board-cell gets a subtle separator on mobile */
+    .board-cell { padding: 8px 12px 12px; }
+
     /* DRAWER — bottom sheet pattern */
     .drawer {
       width: 100% !important;
@@ -1785,18 +1801,8 @@
     document.querySelectorAll('#tl-year-toggle .year-toggle-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.years === mode);
     });
-    // When switching years, drop any quarter filters that no longer apply to this view
-    const visibleQuarters = new Set(quartersForYearMode());
-    [...state.quarterFilter].forEach(q => {
-      if (!visibleQuarters.has(q)) state.quarterFilter.delete(q);
-    });
-    renderQuarterStrip();
-    renderTimeline();
-    // Re-render everything else too since quarter filter may have changed
-    renderKpis();
-    renderShipped();
-    renderWorkload();
-    renderBoard();
+    // Re-render everything (Quarter filter persists across year-toggle changes)
+    renderAll();
   }
 
   function renderTimeline() {
@@ -2041,9 +2047,9 @@
         <span class="filter-chip-dot" style="--chip-color: ${c.fg}"></span>${s.label}
       </button>`;
     }).join('');
-    // Quarter filter — chips for the quarters in the current year mode
-    const quarters = quartersForYearMode();
-    const quarterHtml = quarters.map(q => {
+    // Quarter filter — shows ALL 8 quarters (Q1 2026 → Q4 2027) regardless of Timeline year toggle.
+    // The Timeline year toggle is a display control; the Quarter filter is a data filter.
+    const quarterHtml = [1, 2, 3, 4, 5, 6, 7, 8].map(q => {
       const year = q <= 4 ? 2026 : 2027;
       const qNum = ((q - 1) % 4) + 1;
       return `<button class="filter-chip filter-quarter-chip ${state.quarterFilter.has(q) ? 'active' : ''}" data-filter-kind="quarter" data-filter-val="${q}">
@@ -2183,16 +2189,20 @@
     });
     WORKSTREAMS.forEach((ws, wsIdx) => {
       const isLast = wsIdx === WORKSTREAMS.length - 1;
-      const wsCount = INITIATIVES.filter(i => i.ws === ws.id).length;
-      html += `<div class="board-ws-cell ${isLast ? 'board-row-last' : ''}">
+      const wsItems = INITIATIVES.filter(i => i.ws === ws.id && matches(i));
+      const wsTotal = wsItems.length;
+      const rowEmpty = wsTotal === 0;
+      // Workstream label cell — mark whole row as empty so mobile CSS can collapse it
+      html += `<div class="board-ws-cell ${isLast ? 'board-row-last' : ''}" data-row-empty="${rowEmpty}">
         <div class="board-ws-mark" style="--ws-color:${ws.color}"></div>
-        <div><div class="board-ws-name">${ws.label}</div><div class="board-ws-count">${wsCount} items</div></div>
+        <div><div class="board-ws-name">${ws.label}</div><div class="board-ws-count">${wsTotal} ${wsTotal === 1 ? 'item' : 'items'}</div></div>
       </div>`;
       HORIZONS.forEach(h => {
-        const cards = INITIATIVES.filter(i => i.ws === ws.id && i.h === h.id && matches(i)).sort(compareBoard);
+        const cards = wsItems.filter(i => i.h === h.id).sort(compareBoard);
         visibleCount += cards.length;
-        html += `<div class="board-cell ${isLast ? 'board-row-last' : ''}">`;
-        if (cards.length === 0) html += `<div class="board-cell-empty">No items</div>`;
+        const cellEmpty = cards.length === 0;
+        html += `<div class="board-cell ${isLast ? 'board-row-last' : ''}" data-cell-empty="${cellEmpty}" data-row-empty="${rowEmpty}">`;
+        if (cellEmpty) html += `<div class="board-cell-empty">No items</div>`;
         else cards.forEach(c => {
           const sObj = statusOf(c.status);
           const isKilled = c.status === 'killed';
