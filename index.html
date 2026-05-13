@@ -103,6 +103,39 @@
   .setup-banner-body code { font-family: 'Geist Mono', monospace; font-size: 12px; background: var(--surface); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); }
 
   .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 32px; }
+
+  /* Filtered KPI banner */
+  .kpi-filtered-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    border-radius: var(--r);
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--info);
+    font-weight: 500;
+  }
+  .kpi-filtered-banner #kpi-filter-summary {
+    color: var(--text-2);
+    font-weight: 400;
+  }
+  .kpi-banner-clear {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--info);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    transition: background .12s;
+  }
+  .kpi-banner-clear:hover { background: rgba(37, 99, 235, 0.1); }
+  .kpi-grid-filtered .kpi-card { border-color: var(--info-border); }
   .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; transition: border-color .15s, box-shadow .15s; }
   .kpi-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
   .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -268,16 +301,86 @@
 
   .board-toolbar { background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: var(--r-lg) var(--r-lg) 0 0; padding: 10px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-  /* Filters bar — top of page, above Timeline */
-  .filters-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
-  .filter-group-block { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .filter-group-block .toolbar-label { font-size: 11px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; min-width: 80px; }
+  /* Sticky filter bar — compact, horizontal, sits just below app bar when scrolled past */
+  .filter-bar-wrap {
+    position: sticky;
+    top: 52px; /* sits right under app-bar (height 52px) */
+    z-index: 40;
+    background: rgba(250, 250, 250, 0.92);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    margin: -12px -24px 24px;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .filter-bar-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .filter-bar-label {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 500;
+    margin-right: 2px;
+    white-space: nowrap;
+  }
+  .filter-bar-divider {
+    width: 1px;
+    height: 16px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .filter-bar-spacer { flex: 1; }
+  .filter-bar .filter-group { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .filter-reset-btn { color: var(--text-3); }
+  .filter-reset-btn:hover { color: var(--danger); background: var(--danger-bg); }
+
+  @media (max-width: 900px) {
+    .filter-bar-wrap { margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
+    .filter-bar-divider { display: none; }
+  }
   .toolbar-divider { width: 1px; height: 18px; background: var(--border); }
   .toolbar-label { font-size: 11px; color: var(--text-3); font-weight: 500; margin-right: 2px; }
-  .filter-chip { height: 26px; padding: 0 10px; font-size: 12px; font-weight: 500; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); color: var(--text-2); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all .12s; }
+  .filter-chip {
+    height: 24px;
+    padding: 0 9px;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 100px;
+    color: var(--text-3);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all .12s;
+    white-space: nowrap;
+  }
   .filter-chip:hover { background: var(--surface-2); color: var(--text); }
-  .filter-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
-  .filter-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--chip-color, var(--text-4)); }
+  .filter-chip.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .filter-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--chip-color, var(--text-4));
+    flex-shrink: 0;
+  }
   .filter-chip.active .filter-chip-dot { background: white; }
 
   .board { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); display: grid; grid-template-columns: 180px repeat(3, 1fr); overflow: hidden; }
@@ -370,6 +473,8 @@
   .notes-log:empty + .notes-empty { display: block; }
   .notes-empty { display: none; font-size: 12px; color: var(--text-4); font-style: italic; padding: 12px; text-align: center; background: var(--surface-2); border-radius: var(--r); margin-bottom: 14px; }
   .note { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 12px; }
+  .note-pending { opacity: 0.7; border-style: dashed; }
+  .note-pending .note-time { font-style: italic; color: var(--info); }
   .note-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
   .note-author { font-size: 12px; font-weight: 600; color: var(--text); }
   .note-time { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-3); }
@@ -508,12 +613,20 @@
     </div>
   </div>
 
+  <div class="kpi-filtered-banner" id="kpi-filtered-banner" style="display:none;">
+    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+    <span>Filtered view —</span> <span id="kpi-filter-summary"></span>
+    <button class="kpi-banner-clear" onclick="clearFilters()" title="Clear filters">
+      <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
   <div class="kpi-grid">
     <div class="kpi-card">
       <div class="kpi-head"><span class="kpi-label">Total</span>
         <span class="kpi-icon"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
       </div>
-      <div class="kpi-value-row"><span class="kpi-value" id="m-total">0</span></div>
+      <div class="kpi-value-row"><span class="kpi-value" id="m-total">0</span><span class="kpi-delta" id="m-total-delta" style="display:none;">of 0</span></div>
       <div class="kpi-bar"><div class="kpi-bar-fill" style="--fill: 100%; --bar-color: var(--accent);"></div></div>
     </div>
     <div class="kpi-card kpi-info">
@@ -561,24 +674,27 @@
     <div class="shipped-strip" id="shipped-strip"></div>
   </div>
 
-  <div class="section">
-    <div class="section-head">
-      <div class="section-title"><h2>Filters</h2></div>
-      <button class="btn btn-sm btn-ghost" onclick="clearFilters()">Reset all</button>
-    </div>
-    <div class="filters-bar">
-      <div class="filter-group-block">
-        <span class="toolbar-label">Workstream</span>
-        <div class="filter-group filter-group-ws" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+  <div class="filter-bar-wrap" id="filter-bar">
+    <div class="filter-bar">
+      <div class="filter-bar-group">
+        <span class="filter-bar-label">Workstream</span>
+        <div class="filter-group filter-group-ws"></div>
       </div>
-      <div class="filter-group-block">
-        <span class="toolbar-label">Status</span>
-        <div class="filter-group filter-group-status" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div class="filter-bar-divider"></div>
+      <div class="filter-bar-group">
+        <span class="filter-bar-label">Status</span>
+        <div class="filter-group filter-group-status"></div>
       </div>
-      <div class="filter-group-block">
-        <span class="toolbar-label">Owner</span>
-        <div class="filter-group filter-group-owner" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div class="filter-bar-divider"></div>
+      <div class="filter-bar-group">
+        <span class="filter-bar-label">Owner</span>
+        <div class="filter-group filter-group-owner"></div>
       </div>
+      <div class="filter-bar-spacer"></div>
+      <button class="btn btn-sm btn-ghost filter-reset-btn" onclick="clearFilters()" id="filter-reset-btn" style="display:none;">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Reset
+      </button>
     </div>
   </div>
 
@@ -613,27 +729,6 @@
         <div class="wl-legend-item"><div class="wl-legend-dot" style="background:#BE185D"></div>Blocked</div>
         <div class="wl-legend-item"><div class="wl-legend-dot" style="background:var(--neutral)"></div>Not started</div>
         <div class="wl-legend-item"><div class="wl-legend-dot" style="background:#737373;opacity:.6"></div>Killed</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-head">
-      <div class="section-title"><h2>Filters</h2><span class="page-sub" style="font-size:11px;">Applies to all views</span></div>
-      <button class="btn btn-sm btn-ghost" onclick="clearFilters()">Reset all</button>
-    </div>
-    <div class="filters-bar">
-      <div class="filter-group-block">
-        <span class="toolbar-label">Workstream</span>
-        <div class="filter-group filter-group-ws" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-      </div>
-      <div class="filter-group-block">
-        <span class="toolbar-label">Status</span>
-        <div class="filter-group filter-group-status" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-      </div>
-      <div class="filter-group-block">
-        <span class="toolbar-label">Owner</span>
-        <div class="filter-group filter-group-owner" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
       </div>
     </div>
   </div>
@@ -1028,16 +1123,31 @@
   // ---------- KPIs ----------
   function renderKpis() {
     // Killed items are excluded from totals — they're off the portfolio
-    const active = INITIATIVES.filter(i => i.status !== 'killed');
+    const allActive = INITIATIVES.filter(i => i.status !== 'killed');
+    // Apply filters (workstream / status / owner / search) — KPIs reflect what the user is seeing
+    const filtersActive = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size + (state.search ? 1 : 0) > 0;
+    const active = filtersActive ? allActive.filter(matches) : allActive;
     const total = active.length;
-    const killedCount = INITIATIVES.length - total;
+    const grandTotal = allActive.length;
+    const killedCount = INITIATIVES.length - grandTotal;
     const by = { complete: 0, on_track: 0, at_risk: 0, blocked: 0, not_started: 0 };
     active.forEach(i => { if (by[i.status] !== undefined) by[i.status]++; });
     const pct = (n) => total ? Math.round((n / total) * 100) + '%' : '0%';
+
+    // Total card: when filters are active, show "X of Y"
     document.getElementById('m-total').textContent = total;
+    const totalDelta = document.getElementById('m-total-delta');
+    if (totalDelta) {
+      if (filtersActive) {
+        totalDelta.textContent = `of ${grandTotal}`;
+        totalDelta.style.display = '';
+      } else {
+        totalDelta.style.display = 'none';
+      }
+    }
+
     document.getElementById('m-complete').textContent = by.complete;
     document.getElementById('m-ontrack').textContent = by.on_track;
-    // 'At risk' KPI now combines at_risk + blocked since they're both attention items
     const atRiskTotal = by.at_risk + by.blocked;
     document.getElementById('m-risk').textContent = atRiskTotal;
     document.getElementById('m-notstarted').textContent = by.not_started;
@@ -1049,23 +1159,62 @@
     document.getElementById('m-ontrack-bar').style.setProperty('--fill', pct(by.on_track));
     document.getElementById('m-risk-bar').style.setProperty('--fill', pct(atRiskTotal));
     document.getElementById('m-notstarted-bar').style.setProperty('--fill', pct(by.not_started));
+
+    // Toggle filtered visual state on KPI grid
+    const kpiGrid = document.querySelector('.kpi-grid');
+    if (kpiGrid) kpiGrid.classList.toggle('kpi-grid-filtered', filtersActive);
+
+    // Filtered banner
+    const banner = document.getElementById('kpi-filtered-banner');
+    const summary = document.getElementById('kpi-filter-summary');
+    if (banner && summary) {
+      if (filtersActive) {
+        const parts = [];
+        if (state.wsFilter.size) {
+          const names = [...state.wsFilter].map(id => (WORKSTREAMS.find(w => w.id === id) || {}).label).filter(Boolean);
+          parts.push(`Workstream: ${names.join(', ')}`);
+        }
+        if (state.statusFilter.size) {
+          const names = [...state.statusFilter].map(id => (STATUSES.find(s => s.id === id) || {}).label).filter(Boolean);
+          parts.push(`Status: ${names.join(', ')}`);
+        }
+        if (state.ownerFilter.size) {
+          parts.push(`Owner: ${[...state.ownerFilter].join(', ')}`);
+        }
+        if (state.search) parts.push(`Search: "${state.search}"`);
+        summary.textContent = `showing ${total} of ${grandTotal} initiatives matching ${parts.join(' · ')}`;
+        banner.style.display = '';
+      } else {
+        banner.style.display = 'none';
+      }
+    }
+
     const now = new Date();
     const yearStart = new Date(now.getFullYear(), 0, 1);
     const yearEnd = new Date(now.getFullYear() + 1, 0, 1);
     const ytdPct = Math.round(((now - yearStart) / (yearEnd - yearStart)) * 100);
     document.getElementById('m-ytd').textContent = ytdPct + '%';
     document.getElementById('m-ytd-bar').style.setProperty('--fill', ytdPct + '%');
+
+    // Page count subhead reflects total (always full, unfiltered)
     const killedSuffix = killedCount > 0 ? ` · ${killedCount} killed` : '';
-    document.getElementById('page-count').textContent = `${total} initiatives${killedSuffix}`;
+    const filterSuffix = filtersActive ? ` · ${total} filtered` : '';
+    document.getElementById('page-count').textContent = `${grandTotal} initiatives${killedSuffix}${filterSuffix}`;
   }
 
   // ---------- Shipped strip ----------
   function renderShipped() {
     const root = document.getElementById('shipped-strip');
-    const shipped = INITIATIVES.filter(i => i.status === 'complete').sort((a,b) => (a.startQ||0) - (b.startQ||0));
+    const filtersActive = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size + (state.search ? 1 : 0) > 0;
+    let shipped = INITIATIVES.filter(i => i.status === 'complete');
+    if (filtersActive) shipped = shipped.filter(matches);
+    shipped.sort((a, b) => (a.startQ || 0) - (b.startQ || 0));
     document.getElementById('shipped-count').textContent = shipped.length;
     if (shipped.length === 0) {
-      root.innerHTML = `<div style="padding:24px;color:var(--text-3);font-size:13px;">Nothing shipped yet — items appear here when status is Complete.</div>`;
+      const msg = filtersActive
+        ? 'Nothing shipped matches the current filter.'
+        : 'Nothing shipped yet — items appear here when status is Complete.';
+      root.innerHTML = `<div style="padding:24px;color:var(--text-3);font-size:13px;">${msg}</div>`;
       return;
     }
     root.innerHTML = shipped.map(i => {
@@ -1088,7 +1237,22 @@
     const root = document.getElementById('workload-rows');
     const owners = {};
     // Exclude killed items from workload — they're not active work
-    const active = INITIATIVES.filter(i => i.status !== 'killed');
+    let active = INITIATIVES.filter(i => i.status !== 'killed');
+    // Respect workstream, status, and search filters — but NOT the owner filter
+    // (filtering by owner would collapse the chart to a single bar, defeating the purpose)
+    const nonOwnerFiltersActive = state.wsFilter.size + state.statusFilter.size + (state.search ? 1 : 0) > 0;
+    if (nonOwnerFiltersActive) {
+      active = active.filter(i => {
+        if (state.wsFilter.size && !state.wsFilter.has(i.ws)) return false;
+        if (state.statusFilter.size && !state.statusFilter.has(i.status)) return false;
+        if (state.search) {
+          const q = state.search.toLowerCase();
+          const hay = `${i.title} ${i.desc} ${i.code} ${i.owner}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
     active.forEach(i => {
       if (!owners[i.owner]) owners[i.owner] = { total: 0, by: { complete: 0, on_track: 0, at_risk: 0, blocked: 0, not_started: 0 } };
       owners[i.owner].total++;
@@ -1101,10 +1265,17 @@
       const topShare = Math.round((arr[0].total / active.length) * 100);
       if (topShare >= 50) {
         document.getElementById('workload-flag').style.display = '';
-        document.getElementById('workload-flag-text').textContent = `${arr[0].owner} carries ${topShare}% of the portfolio — key-person risk`;
+        const scope = nonOwnerFiltersActive ? 'this view' : 'the portfolio';
+        document.getElementById('workload-flag-text').textContent = `${arr[0].owner} carries ${topShare}% of ${scope} — key-person risk`;
       } else {
         document.getElementById('workload-flag').style.display = 'none';
       }
+    } else {
+      document.getElementById('workload-flag').style.display = 'none';
+    }
+    if (arr.length === 0) {
+      root.innerHTML = `<div style="padding:24px;color:var(--text-3);font-size:13px;">No owners match the current filter.</div>`;
+      return;
     }
     root.innerHTML = arr.map(o => {
       const segs = ['complete', 'on_track', 'at_risk', 'blocked', 'not_started'].map(s => {
@@ -1311,6 +1482,10 @@
     document.querySelectorAll('.filter-group-ws').forEach(el => el.innerHTML = wsHtml);
     document.querySelectorAll('.filter-group-status').forEach(el => el.innerHTML = statusHtml);
     document.querySelectorAll('.filter-group-owner').forEach(el => el.innerHTML = ownerHtml);
+    // Show Reset button only when at least one filter is active
+    const hasActive = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size > 0;
+    const resetBtn = document.getElementById('filter-reset-btn');
+    if (resetBtn) resetBtn.style.display = hasActive ? '' : 'none';
   }
   function escapeAttr(s) {
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -1711,10 +1886,10 @@
     // Newest first
     const sorted = [...notes].sort((a, b) => (b.ts || 0) - (a.ts || 0));
     root.innerHTML = sorted.map(n => `
-      <div class="note">
+      <div class="note${n._pending ? ' note-pending' : ''}">
         <div class="note-head">
           <span class="note-author">${escapeHtml(n.author || 'Anonymous')}</span>
-          <span class="note-time" title="${new Date(n.ts).toLocaleString()}">${formatNoteTime(n.ts)}</span>
+          <span class="note-time" title="${new Date(n.ts).toLocaleString()}">${n._pending ? 'saving…' : formatNoteTime(n.ts)}</span>
         </div>
         <div class="note-text">${escapeHtml(n.text)}</div>
       </div>
@@ -1729,21 +1904,38 @@
     if (!text) { alert('Note text is required.'); document.getElementById('note-text').focus(); return; }
     setAuthor(author); // remember for next time
 
+    // OPTIMISTIC UI: append the note locally and render IMMEDIATELY.
+    // The API call runs in the background; we roll back on failure.
+    const initiative = INITIATIVES.find(x => x.id === state.currentId);
+    if (!initiative) { toast('Initiative not found', true); return; }
+    const tempNote = { ts: Date.now(), author, text, _pending: true };
+    initiative.notes = initiative.notes || [];
+    initiative.notes.push(tempNote);
+    renderNotesLog(initiative.notes);
+    document.getElementById('note-text').value = '';
+
     const btn = document.getElementById('add-note-btn');
-    btn.disabled = true; btn.textContent = 'Adding…';
+    btn.disabled = true; btn.textContent = 'Saving…';
+
+    // Fire the API call without blocking the UI.
     try {
       const res = await apiPost({ action: 'addNote', id: state.currentId, author, text });
-      INITIATIVES = (res.initiatives || []).filter(isValidInitiative);
-      saveCache();
-      // Refresh the open drawer
-      const updated = INITIATIVES.find(x => x.id === state.currentId);
-      if (updated) {
-        renderNotesLog(updated.notes || []);
-        document.getElementById('note-text').value = '';
+      // Replace the pending placeholder with the server-confirmed note (same content, no _pending flag).
+      const idx = initiative.notes.findIndex(n => n._pending && n.ts === tempNote.ts);
+      if (idx >= 0) {
+        initiative.notes[idx] = res.note || { ts: tempNote.ts, author, text };
       }
-      toast('Note added');
+      saveCache();
+      // Only re-render if the drawer is still showing this initiative
+      if (state.currentId === initiative.id) renderNotesLog(initiative.notes);
     } catch (e) {
-      console.error(e);
+      // Roll back: remove the pending note we optimistically added
+      console.error('Note save failed:', e);
+      const idx = initiative.notes.findIndex(n => n._pending && n.ts === tempNote.ts);
+      if (idx >= 0) initiative.notes.splice(idx, 1);
+      if (state.currentId === initiative.id) renderNotesLog(initiative.notes);
+      // Restore the text in the input so the user doesn't lose it
+      document.getElementById('note-text').value = text;
       toast('Failed to add note: ' + e.message, true);
     } finally {
       btn.disabled = false; btn.textContent = 'Add note';
