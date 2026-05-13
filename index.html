@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<meta name="theme-color" content="#FAFAFA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Commercial Excellence · Revenue Operations Portfolio</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2318181B'/><rect x='6' y='6' width='8' height='8' rx='1.5' fill='%23FFFFFF'/><rect x='18' y='6' width='8' height='8' rx='1.5' fill='%23FFFFFF' fill-opacity='0.55'/><rect x='6' y='18' width='8' height='8' rx='1.5' fill='%23FFFFFF' fill-opacity='0.55'/><rect x='18' y='18' width='8' height='8' rx='1.5' fill='%23FFFFFF' fill-opacity='0.3'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -343,6 +346,44 @@
   .tl-today-line::before { content: 'Today'; position: absolute; top: -22px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 600; color: var(--danger); background: var(--surface); border: 1px solid var(--danger-border); padding: 1px 6px; border-radius: 100px; white-space: nowrap; }
   .tl-today-line::after { content: ''; position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 7px; height: 7px; border-radius: 50%; background: var(--danger); }
 
+  /* Mobile Timeline — vertical list grouped by quarter */
+  .timeline-mobile { display: none; }
+  .tlm-quarter { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); margin-bottom: 12px; overflow: hidden; }
+  .tlm-quarter.tlm-current { border-color: var(--info-border); box-shadow: 0 0 0 2px var(--info-bg); }
+  .tlm-quarter-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .tlm-quarter-label { font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 600; color: var(--text); }
+  .tlm-quarter-today { font-size: 11px; color: var(--info); font-weight: 500; margin-left: 6px; }
+  .tlm-quarter-count { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--text-3); font-weight: 500; }
+  .tlm-items { display: flex; flex-direction: column; }
+  .tlm-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .tlm-item:last-child { border-bottom: none; }
+  .tlm-item:active { background: var(--surface-2); }
+  .tlm-item-head { display: flex; align-items: center; gap: 8px; }
+  .tlm-item-code { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); background: var(--surface-2); padding: 2px 6px; border-radius: var(--r-sm); flex-shrink: 0; }
+  .tlm-item-ws-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .tlm-item-target { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); margin-left: auto; }
+  .tlm-item-title { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.35; }
+  .tlm-item-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tlm-item-owner { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-3); }
+  .tlm-item.tlm-item-killed { opacity: .55; }
+  .tlm-item.tlm-item-killed .tlm-item-title { text-decoration: line-through; color: var(--text-3); }
+  .tlm-empty { padding: 32px 16px; text-align: center; color: var(--text-3); font-size: 13px; }
+
   .board-toolbar { background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: var(--r-lg) var(--r-lg) 0 0; padding: 10px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
   /* Filter dropdown menu — anchored to a button in the app bar */
@@ -511,6 +552,7 @@
   .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
   .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(580px, 96vw); background: var(--surface); border-left: 1px solid var(--border); box-shadow: var(--shadow-xl); z-index: 100; transform: translateX(100%); transition: transform .25s cubic-bezier(.16,1,.3,1); display: flex; flex-direction: column; }
   .drawer.open { transform: translateX(0); }
+  .drawer-handle { display: none; } /* hidden on desktop; shown on mobile via media query */
   .drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
   .drawer-head-l { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
   .drawer-code { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-3); background: var(--surface-2); padding: 3px 7px; border-radius: var(--r-sm); font-weight: 500; }
@@ -631,6 +673,144 @@
     .app-bar-search { display: none; }
     .workload-row { grid-template-columns: 1fr; }
   }
+
+  /* ============== MOBILE (≤640px) — phone-optimized ============== */
+
+  @media (max-width: 640px) {
+    /* Container — tighter padding */
+    .container { padding: 16px 12px 80px; }
+
+    /* App bar — hide non-essential buttons, keep brand + Filters + Add */
+    .app-bar { padding: 0 12px; gap: 6px; }
+    .brand-sep, .brand-org { display: none; }
+    .brand-name { font-size: 13px; }
+    .conn-status { display: none; }
+    /* Icon-only action buttons */
+    .app-bar-actions .btn { padding: 0 8px; min-width: 36px; height: 36px; }
+    /* Hide Export/Print labels — keep Filters + Add visible */
+    .app-bar-actions > button.btn-ghost,
+    .app-bar-actions > button:not(.btn-primary):not(.filter-menu-wrap *) {
+      display: none;
+    }
+    /* Filters button — icon only on mobile */
+    #filter-menu-btn { font-size: 0 !important; padding: 0 10px; position: relative; }
+    #filter-menu-btn .icon { margin: 0; }
+    #filter-menu-btn .filter-menu-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      font-size: 10px !important;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      margin: 0;
+    }
+    /* Add initiative button — icon only */
+    .app-bar-actions .btn-primary { font-size: 0; padding: 0 10px; }
+    .app-bar-actions .btn-primary .icon { margin: 0; }
+
+    /* Filter dropdown — full width, larger tap targets */
+    .filter-menu {
+      width: calc(100vw - 12px);
+      right: -6px;
+      max-height: 80vh;
+      border-radius: var(--r);
+    }
+    .filter-menu .filter-chip { min-height: 36px; padding: 0 14px; font-size: 13px; }
+
+    /* KPI grid — 2 columns, compact */
+    .kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .kpi-card { padding: 12px; }
+    .kpi-value { font-size: 22px; }
+
+    /* Quarter strip — 2 columns */
+    .quarter-strip { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+    .qstrip-card { padding: 10px 12px; min-height: 56px; }
+    .qstrip-count { font-size: 20px; }
+
+    /* Shipped strip — already horizontal scroll */
+    .shipped-card { flex: 0 0 240px; padding: 12px; }
+
+    /* TIMELINE — swap to vertical mobile view */
+    .timeline-desktop { display: none; }
+    .timeline-mobile { display: block; }
+
+    /* Owner workload — vertical stack */
+    .workload-row { padding: 12px 14px; }
+    .workload-bar-track { height: 20px; }
+
+    /* Board cards — larger taps */
+    .item { padding: 14px; min-height: 64px; }
+    .item-title { font-size: 14px; }
+
+    /* DRAWER — bottom sheet pattern */
+    .drawer {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 92vh;
+      top: auto !important;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+      transition: transform .25s ease-out;
+    }
+    .drawer.open { transform: translateY(0); }
+    .drawer-handle {
+      display: block;
+      width: 36px;
+      height: 4px;
+      background: var(--border-strong);
+      border-radius: 100px;
+      margin: 8px auto 4px;
+    }
+    .drawer-head { padding: 4px 16px 12px; }
+    .drawer-body { padding: 12px 16px 24px; -webkit-overflow-scrolling: touch; }
+    .drawer-foot { padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+
+    /* Snapshots row — vertical layout */
+    .snapshot-row { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+    .snapshot-stats { flex-wrap: wrap; gap: 8px; font-size: 11px; }
+
+    /* Form fields — 16px font prevents iOS zoom-on-focus */
+    .field-input, .field-input-large, textarea.field-input, select.field-input,
+    .filter-owner-search, #search, #note-text, #note-author {
+      font-size: 16px !important;
+      min-height: 40px;
+    }
+    .q-cell { min-height: 56px; padding: 8px 4px; }
+    .q-cell-label { font-size: 13px; }
+    .q-cell-months { font-size: 9px; }
+
+    /* Year toggle in Timeline section */
+    .year-toggle-btn { min-height: 32px; padding: 6px 12px; font-size: 13px; }
+
+    /* Tap targets — comply with Apple's 44pt guideline */
+    .filter-chip { min-height: 32px; }
+    .btn-sm { min-height: 36px; }
+    .btn { min-height: 40px; }
+
+    /* Hide elements that are desktop-only */
+    .hide-mobile { display: none !important; }
+
+    /* Section heads */
+    .section-head { flex-wrap: wrap; gap: 8px; }
+    .section-head h2 { font-size: 16px; }
+    .section-count { font-size: 11px; }
+
+    /* Owner workload flag — wrap on small screens */
+    .workload-flag { white-space: normal; line-height: 1.4; padding: 6px 10px; font-size: 11px; }
+
+    /* iOS scroll polish */
+    .timeline, .shipped-strip, .quarter-strip, .filter-menu-body, .drawer-body {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Drawer handle visible only on mobile by default */
+    .drawer-handle { display: block !important; }
+  }
+
   @media print {
     @page { size: landscape; margin: 12mm; }
     body { background: white; }
@@ -833,7 +1013,10 @@
         </div>
       </div>
     </div>
-    <div class="card timeline"><div class="tl-grid" id="timeline"></div></div>
+    <div class="timeline-desktop">
+      <div class="card timeline"><div class="tl-grid" id="timeline"></div></div>
+    </div>
+    <div class="timeline-mobile" id="timeline-mobile"></div>
   </div>
 
   <div class="section">
@@ -892,6 +1075,7 @@
 
 <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true">
+  <div class="drawer-handle" id="drawer-handle"></div>
   <div class="drawer-head">
     <div class="drawer-head-l">
       <span class="drawer-code" id="drawer-code">—</span>
@@ -1714,6 +1898,71 @@
     root.innerHTML = html;
     document.getElementById('tl-count').textContent = visibleCount;
     positionToday();
+    // Render mobile timeline at the same time so the count and data stay in sync
+    renderTimelineMobile();
+  }
+
+  // Mobile timeline — vertical list grouped by quarter
+  function renderTimelineMobile() {
+    const root = document.getElementById('timeline-mobile');
+    if (!root) return;
+    const mode = state.timelineYears;
+    const quarters = quartersForYearMode();
+    // Compute current quarter for highlight
+    const now = new Date();
+    const nowYear = now.getFullYear();
+    const nowQNum = Math.floor(now.getMonth() / 3) + 1;
+    const currentQuarter = nowYear === 2026 ? nowQNum : (nowYear === 2027 ? nowQNum + 4 : 0);
+
+    // Filter initiatives (same logic as desktop) but bucket by quarter
+    let allItems = INITIATIVES.filter(i => matches(i) && (i.status !== 'killed' || state.statusFilter.has('killed')));
+    // Mode filtering
+    if (mode === '2026') allItems = allItems.filter(i => Number(i.startQ) <= 4);
+    else if (mode === '2027') allItems = allItems.filter(i => Number(i.endQ) >= 5);
+
+    let html = '';
+    let totalVisible = 0;
+    quarters.forEach(q => {
+      const qItems = allItems.filter(i => touchesQuarter(i, q)).sort(compareTimeline);
+      if (qItems.length === 0) return;
+      totalVisible += qItems.length;
+      const isCurrent = q === currentQuarter;
+      html += `<div class="tlm-quarter ${isCurrent ? 'tlm-current' : ''}">
+        <div class="tlm-quarter-head">
+          <div>
+            <span class="tlm-quarter-label">${quarterLabel(q)}</span>${isCurrent ? '<span class="tlm-quarter-today">· today</span>' : ''}
+          </div>
+          <span class="tlm-quarter-count">${qItems.length} ${qItems.length === 1 ? 'item' : 'items'}</span>
+        </div>
+        <div class="tlm-items">
+          ${qItems.map(i => {
+            const ws = wsOf(i.ws);
+            const sObj = statusOf(i.status);
+            const isKilled = i.status === 'killed';
+            return `<div class="tlm-item ${isKilled ? 'tlm-item-killed' : ''}" onclick="openDrawer('${i.id}')">
+              <div class="tlm-item-head">
+                <span class="tlm-item-ws-dot" style="background:${ws.color}" title="${ws.label}"></span>
+                <span class="tlm-item-code">${i.code}</span>
+                <span class="tlm-item-target">${i.target}</span>
+              </div>
+              <div class="tlm-item-title">${escapeHtml(i.title)}</div>
+              <div class="tlm-item-foot">
+                <span class="badge badge-${sObj.badge}">${sObj.label}</span>
+                <span class="tlm-item-owner"><span class="avatar" style="width:18px;height:18px;font-size:9px;">${initials(i.owner)}</span>${escapeHtml(i.owner || 'Unassigned')}</span>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    });
+
+    if (totalVisible === 0) {
+      const msg = anyFiltersActive()
+        ? 'No initiatives match the current filter.'
+        : (mode === '2027' ? 'No initiatives in 2027 yet.' : 'No initiatives yet.');
+      html = `<div class="tlm-empty">${msg}</div>`;
+    }
+    root.innerHTML = html;
   }
   function positionToday() {
     const old = document.querySelector('.tl-today-line');
@@ -2617,10 +2866,48 @@
   setupFilterDelegation();
   setupQuarterStripDelegation();
   setupTimelineHeaderDelegation();
+  setupDrawerSwipe();
   refresh().then(() => {
     // After initial data load, retry any notes that were queued but not confirmed
     replayPendingNotes();
   });
+
+  // Drawer swipe-to-dismiss on mobile
+  function setupDrawerSwipe() {
+    const drawer = document.getElementById('drawer');
+    const handle = document.getElementById('drawer-handle');
+    if (!drawer || !handle) return;
+    let startY = 0, currentY = 0, dragging = false;
+    function isMobile() { return window.innerWidth <= 640; }
+    function onStart(e) {
+      if (!isMobile()) return;
+      dragging = true;
+      startY = (e.touches ? e.touches[0].clientY : e.clientY);
+      drawer.style.transition = 'none';
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      currentY = (e.touches ? e.touches[0].clientY : e.clientY);
+      const delta = Math.max(0, currentY - startY);
+      drawer.style.transform = `translateY(${delta}px)`;
+    }
+    function onEnd() {
+      if (!dragging) return;
+      dragging = false;
+      drawer.style.transition = '';
+      const delta = currentY - startY;
+      if (delta > 100) {
+        closeDrawer();
+      } else {
+        drawer.style.transform = '';
+      }
+    }
+    handle.addEventListener('touchstart', onStart, { passive: true });
+    handle.addEventListener('touchmove', onMove, { passive: true });
+    handle.addEventListener('touchend', onEnd);
+    // Tap the handle to close — bonus
+    handle.addEventListener('click', () => { if (isMobile()) closeDrawer(); });
+  }
 </script>
 
 </body>
