@@ -709,14 +709,30 @@
     .app-bar-actions .btn-primary { font-size: 0; padding: 0 10px; }
     .app-bar-actions .btn-primary .icon { margin: 0; }
 
-    /* Filter dropdown — full width, larger tap targets */
+    /* Filter dropdown — pinned to viewport on mobile so it doesn't overflow */
     .filter-menu {
-      width: calc(100vw - 12px);
-      right: -6px;
-      max-height: 80vh;
-      border-radius: var(--r);
+      position: fixed !important;
+      top: 56px !important;   /* just below the app bar (52px + 4px gap) */
+      left: 8px !important;
+      right: 8px !important;
+      width: auto !important;
+      max-width: none !important;
+      max-height: calc(100vh - 72px);
+      border-radius: var(--r-lg);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
     }
     .filter-menu .filter-chip { min-height: 36px; padding: 0 14px; font-size: 13px; }
+
+    /* Backdrop behind the menu — tap anywhere to close, prevent body scroll */
+    body.filter-menu-open::after {
+      content: '';
+      position: fixed;
+      inset: 52px 0 0 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 55;
+      pointer-events: none;  /* let clicks reach the menu, click-outside is handled by JS */
+    }
+    body.filter-menu-open { overflow: hidden; }
 
     /* KPI grid — 2 columns, compact */
     .kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -2122,10 +2138,12 @@
   function openFilterMenu() {
     const menu = document.getElementById('filter-menu');
     if (menu) menu.classList.add('open');
+    document.body.classList.add('filter-menu-open');
   }
   function closeFilterMenu() {
     const menu = document.getElementById('filter-menu');
     if (menu) menu.classList.remove('open');
+    document.body.classList.remove('filter-menu-open');
   }
   // Click outside closes; Esc closes
   document.addEventListener('click', (e) => {
