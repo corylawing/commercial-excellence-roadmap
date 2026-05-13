@@ -160,6 +160,45 @@
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
 
   .shipped-strip { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 12px; scroll-snap-type: x mandatory; }
+
+  /* Quarter load strip — clickable cards, one per quarter in current year mode */
+  .quarter-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .quarter-strip:has(.qstrip-card:nth-child(5)) { grid-template-columns: repeat(8, 1fr); }
+  .qstrip-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all .12s;
+    text-align: left;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .qstrip-card:hover { border-color: var(--border-strong); background: var(--surface-2); }
+  .qstrip-card.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .qstrip-card.active .qstrip-label,
+  .qstrip-card.active .qstrip-count { color: white; }
+  .qstrip-card.current { box-shadow: 0 0 0 2px var(--info-border); }
+  .qstrip-card.current.active { box-shadow: 0 0 0 2px var(--accent); }
+  .qstrip-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .qstrip-label { font-size: 12px; font-weight: 500; color: var(--text-2); font-family: 'Geist Mono', monospace; }
+  .qstrip-count { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+  .qstrip-bar { display: flex; height: 6px; background: var(--surface-2); border-radius: 100px; overflow: hidden; gap: 1px; }
+  .qstrip-card.active .qstrip-bar { background: rgba(255, 255, 255, 0.18); }
+  .qstrip-bar-empty { opacity: .4; }
+  .qstrip-seg { height: 100%; }
+  .qstrip-seg.s-complete { background: var(--info); }
+  .qstrip-seg.s-on_track { background: var(--success); }
+  .qstrip-seg.s-at_risk { background: var(--warning); }
+  .qstrip-seg.s-blocked { background: #BE185D; }
+  .qstrip-seg.s-not_started { background: var(--neutral); }
+
+  @media (max-width: 900px) {
+    .quarter-strip { grid-template-columns: repeat(2, 1fr) !important; }
+  }
   .shipped-strip::-webkit-scrollbar { height: 6px; }
   .shipped-strip::-webkit-scrollbar-track { background: transparent; }
   .shipped-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
@@ -250,7 +289,12 @@
   .tl-grid.mode-both .tl-row-track { grid-template-columns: repeat(8, 1fr); }
   .tl-grid.mode-both .tl-row-track::before { background-image: linear-gradient(to right, transparent calc(12.5% - .5px), var(--border) calc(12.5% - .5px), var(--border) calc(12.5% + .5px), transparent calc(12.5% + .5px), transparent calc(25% - .5px), var(--border) calc(25% - .5px), var(--border) calc(25% + .5px), transparent calc(25% + .5px), transparent calc(37.5% - .5px), var(--border) calc(37.5% - .5px), var(--border) calc(37.5% + .5px), transparent calc(37.5% + .5px), transparent calc(50% - 1px), var(--border-strong) calc(50% - 1px), var(--border-strong) calc(50% + 1px), transparent calc(50% + 1px), transparent calc(62.5% - .5px), var(--border) calc(62.5% - .5px), var(--border) calc(62.5% + .5px), transparent calc(62.5% + .5px), transparent calc(75% - .5px), var(--border) calc(75% - .5px), var(--border) calc(75% + .5px), transparent calc(75% + .5px), transparent calc(87.5% - .5px), var(--border) calc(87.5% - .5px), var(--border) calc(87.5% + .5px), transparent calc(87.5% + .5px)); }
   .tl-header { display: grid; background: var(--surface-2); border-bottom: 1px solid var(--border); }
-  .tl-header-cell { padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text-2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tl-header-cell { padding: 10px 12px; font-size: 12px; font-weight: 600; color: var(--text-2); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: background .12s; user-select: none; }
+  .tl-header-cell[data-quarter]:hover { background: var(--surface); color: var(--text); }
+  .tl-header-cell.first { cursor: default; }
+  .tl-header-cell.first:hover { background: transparent; color: var(--text-2); }
+  .tl-header-cell.tl-header-active { background: var(--accent); color: white; }
+  .tl-header-cell.tl-header-active .tl-q-range { color: rgba(255, 255, 255, 0.75); }
   .tl-header-cell:last-child { border-right: none; }
   .tl-header-cell.first { color: var(--text-3); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
   .tl-header-cell.tl-year-divider { border-left: 2px solid var(--border-strong); }
@@ -668,6 +712,13 @@
 
   <div class="section">
     <div class="section-head">
+      <div class="section-title"><h2>Quarter load</h2><span class="page-sub" style="font-size:12px;">Click a quarter to filter · respects all other filters</span></div>
+    </div>
+    <div class="quarter-strip" id="quarter-strip"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
       <div class="section-title"><h2>Shipped this year</h2><span class="section-count" id="shipped-count">0</span></div>
       <span class="page-sub" style="font-size:12px;">What we've already delivered →</span>
     </div>
@@ -1010,6 +1061,7 @@
     wsFilter: new Set(),
     statusFilter: new Set(),
     ownerFilter: new Set(),
+    quarterFilter: new Set(),     // values are quarter numbers 1-8 (1-4 = 2026, 5-8 = 2027)
     search: '',
     timelineYears: '2026',  // '2026' or 'both'
     editMode: false,
@@ -1145,23 +1197,41 @@
   const statusOf = (id) => STATUSES.find(s => s.id === id);
   const wsOf = (id) => WORKSTREAMS.find(w => w.id === id);
   const initials = (name) => (name || '').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  // Returns true if quarter q (1-8) overlaps the initiative's range
+  function touchesQuarter(i, q) {
+    const start = Number(i.startQ) || 0;
+    const end = Number(i.endQ) || start;
+    return q >= start && q <= end;
+  }
+  // True if the initiative overlaps ANY of the filtered quarters (OR within set)
+  function matchesQuarterFilter(i) {
+    if (state.quarterFilter.size === 0) return true;
+    for (const q of state.quarterFilter) {
+      if (touchesQuarter(i, q)) return true;
+    }
+    return false;
+  }
   function matches(i) {
     if (state.wsFilter.size > 0 && !state.wsFilter.has(i.ws)) return false;
     if (state.statusFilter.size > 0 && !state.statusFilter.has(i.status)) return false;
     if (state.ownerFilter.size > 0 && !state.ownerFilter.has(i.owner)) return false;
+    if (!matchesQuarterFilter(i)) return false;
     if (state.search) {
       const hay = `${i.title} ${i.code} ${i.owner} ${i.desc} ${i.value} ${i.target}`.toLowerCase();
       if (!hay.includes(state.search)) return false;
     }
     return true;
   }
+  function anyFiltersActive() {
+    return state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size + state.quarterFilter.size + (state.search ? 1 : 0) > 0;
+  }
 
   // ---------- KPIs ----------
   function renderKpis() {
     // Killed items are excluded from totals — they're off the portfolio
     const allActive = INITIATIVES.filter(i => i.status !== 'killed');
-    // Apply filters (workstream / status / owner / search) — KPIs reflect what the user is seeing
-    const filtersActive = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size + (state.search ? 1 : 0) > 0;
+    // Apply filters — KPIs reflect what the user is seeing
+    const filtersActive = anyFiltersActive();
     const active = filtersActive ? allActive.filter(matches) : allActive;
     const total = active.length;
     const grandTotal = allActive.length;
@@ -1214,6 +1284,10 @@
           const names = [...state.statusFilter].map(id => (STATUSES.find(s => s.id === id) || {}).label).filter(Boolean);
           parts.push(`Status: ${names.join(', ')}`);
         }
+        if (state.quarterFilter.size) {
+          const names = [...state.quarterFilter].sort((a, b) => a - b).map(q => quarterLabel(q));
+          parts.push(`Quarter: ${names.join(', ')}`);
+        }
         if (state.ownerFilter.size) {
           parts.push(`Owner: ${[...state.ownerFilter].join(', ')}`);
         }
@@ -1238,10 +1312,92 @@
     document.getElementById('page-count').textContent = `${grandTotal} initiatives${killedSuffix}${filterSuffix}`;
   }
 
+  // ---------- Quarter strip (Q1 2026 · 6 items, etc.) ----------
+  function quarterLabel(q) {
+    // q is 1-8; 1-4 = 2026, 5-8 = 2027
+    const year = q <= 4 ? 2026 : 2027;
+    const qNum = ((q - 1) % 4) + 1;
+    return `Q${qNum} ${year}`;
+  }
+  function quartersForYearMode() {
+    if (state.timelineYears === '2026') return [1, 2, 3, 4];
+    if (state.timelineYears === '2027') return [5, 6, 7, 8];
+    return [1, 2, 3, 4, 5, 6, 7, 8];
+  }
+  function toggleQuarter(q) {
+    if (state.quarterFilter.has(q)) state.quarterFilter.delete(q);
+    else state.quarterFilter.add(q);
+    renderAll();
+  }
+  function renderQuarterStrip() {
+    const root = document.getElementById('quarter-strip');
+    if (!root) return;
+    const quarters = quartersForYearMode();
+    // For each quarter, count initiatives that match all OTHER filters AND touch this quarter
+    // This is the cross-filter behavior: "for someone who's already filtered, how many items per quarter?"
+    const allActive = INITIATIVES.filter(i => i.status !== 'killed');
+    // Build a "matches everything except quarter filter" predicate
+    function matchesNonQuarter(i) {
+      if (state.wsFilter.size > 0 && !state.wsFilter.has(i.ws)) return false;
+      if (state.statusFilter.size > 0 && !state.statusFilter.has(i.status)) return false;
+      if (state.ownerFilter.size > 0 && !state.ownerFilter.has(i.owner)) return false;
+      if (state.search) {
+        const hay = `${i.title} ${i.code} ${i.owner} ${i.desc} ${i.value} ${i.target}`.toLowerCase();
+        if (!hay.includes(state.search)) return false;
+      }
+      return true;
+    }
+    const baseSet = allActive.filter(matchesNonQuarter);
+    const html = quarters.map(q => {
+      const inQ = baseSet.filter(i => touchesQuarter(i, q));
+      const by = { complete: 0, on_track: 0, at_risk: 0, blocked: 0, not_started: 0 };
+      inQ.forEach(i => { if (by[i.status] !== undefined) by[i.status]++; });
+      const total = inQ.length;
+      const isActive = state.quarterFilter.has(q);
+      const isCurrent = isCurrentQuarter(q);
+      const segs = total === 0 ? '' : `
+        <div class="qstrip-bar">
+          ${by.complete > 0 ? `<div class="qstrip-seg s-complete" style="flex:${by.complete}" title="${by.complete} shipped"></div>` : ''}
+          ${by.on_track > 0 ? `<div class="qstrip-seg s-on_track" style="flex:${by.on_track}" title="${by.on_track} on track"></div>` : ''}
+          ${by.at_risk > 0 ? `<div class="qstrip-seg s-at_risk" style="flex:${by.at_risk}" title="${by.at_risk} at risk"></div>` : ''}
+          ${by.blocked > 0 ? `<div class="qstrip-seg s-blocked" style="flex:${by.blocked}" title="${by.blocked} blocked"></div>` : ''}
+          ${by.not_started > 0 ? `<div class="qstrip-seg s-not_started" style="flex:${by.not_started}" title="${by.not_started} not started"></div>` : ''}
+        </div>`;
+      return `<button type="button" class="qstrip-card ${isActive ? 'active' : ''} ${isCurrent ? 'current' : ''}" data-quarter="${q}" title="Click to filter to ${quarterLabel(q)}">
+        <div class="qstrip-head">
+          <span class="qstrip-label">${quarterLabel(q)}${isCurrent ? ' · today' : ''}</span>
+          <span class="qstrip-count">${total}</span>
+        </div>
+        ${segs || '<div class="qstrip-bar qstrip-bar-empty"></div>'}
+      </button>`;
+    }).join('');
+    root.innerHTML = html;
+  }
+  function isCurrentQuarter(q) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const currentQNum = Math.floor(month / 3) + 1;
+    if (year === 2026 && q === currentQNum) return true;
+    if (year === 2027 && q === currentQNum + 4) return true;
+    return false;
+  }
+  function setupQuarterStripDelegation() {
+    const root = document.getElementById('quarter-strip');
+    if (!root || root._delegated) return;
+    root.addEventListener('click', (e) => {
+      const card = e.target.closest('.qstrip-card');
+      if (!card) return;
+      const q = Number(card.getAttribute('data-quarter'));
+      if (q) toggleQuarter(q);
+    });
+    root._delegated = true;
+  }
+
   // ---------- Shipped strip ----------
   function renderShipped() {
     const root = document.getElementById('shipped-strip');
-    const filtersActive = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size + (state.search ? 1 : 0) > 0;
+    const filtersActive = anyFiltersActive();
     let shipped = INITIATIVES.filter(i => i.status === 'complete');
     if (filtersActive) shipped = shipped.filter(matches);
     shipped.sort((a, b) => {
@@ -1278,13 +1434,14 @@
     const owners = {};
     // Exclude killed items from workload — they're not active work
     let active = INITIATIVES.filter(i => i.status !== 'killed');
-    // Respect workstream, status, and search filters — but NOT the owner filter
+    // Respect workstream, status, quarter, and search filters — but NOT the owner filter
     // (filtering by owner would collapse the chart to a single bar, defeating the purpose)
-    const nonOwnerFiltersActive = state.wsFilter.size + state.statusFilter.size + (state.search ? 1 : 0) > 0;
+    const nonOwnerFiltersActive = state.wsFilter.size + state.statusFilter.size + state.quarterFilter.size + (state.search ? 1 : 0) > 0;
     if (nonOwnerFiltersActive) {
       active = active.filter(i => {
         if (state.wsFilter.size && !state.wsFilter.has(i.ws)) return false;
         if (state.statusFilter.size && !state.statusFilter.has(i.status)) return false;
+        if (!matchesQuarterFilter(i)) return false;
         if (state.search) {
           const q = state.search.toLowerCase();
           const hay = `${i.title} ${i.desc} ${i.code} ${i.owner}`.toLowerCase();
@@ -1339,7 +1496,18 @@
     document.querySelectorAll('#tl-year-toggle .year-toggle-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.years === mode);
     });
+    // When switching years, drop any quarter filters that no longer apply to this view
+    const visibleQuarters = new Set(quartersForYearMode());
+    [...state.quarterFilter].forEach(q => {
+      if (!visibleQuarters.has(q)) state.quarterFilter.delete(q);
+    });
+    renderQuarterStrip();
     renderTimeline();
+    // Re-render everything else too since quarter filter may have changed
+    renderKpis();
+    renderShipped();
+    renderWorkload();
+    renderBoard();
   }
 
   function renderTimeline() {
@@ -1351,34 +1519,32 @@
     // Apply the mode class to drive CSS grid templates
     root.className = 'tl-grid mode-' + mode;
 
+    // Build header cells data-driven so they can be clickable and reflect quarter filter state
+    const QUARTER_MONTHS = ['Jan–Mar', 'Apr–Jun', 'Jul–Sep', 'Oct–Dec'];
+    function headerCell(q, extraClass = '') {
+      const year = q <= 4 ? 2026 : 2027;
+      const qNum = ((q - 1) % 4) + 1;
+      const months = QUARTER_MONTHS[qNum - 1];
+      const isActive = state.quarterFilter.has(q);
+      return `<div class="tl-header-cell ${extraClass} ${isActive ? 'tl-header-active' : ''}" data-quarter="${q}" title="Click to filter to Q${qNum} ${year}">Q${qNum} ${year}<span class="tl-q-range">${months}</span></div>`;
+    }
+
     let html = '', visibleCount = 0;
     if (showBoth) {
       html += `<div class="tl-header">
         <div class="tl-header-cell first">Initiative</div>
-        <div class="tl-header-cell">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
-        <div class="tl-header-cell">Q2 2026<span class="tl-q-range">Apr–Jun</span></div>
-        <div class="tl-header-cell">Q3 2026<span class="tl-q-range">Jul–Sep</span></div>
-        <div class="tl-header-cell">Q4 2026<span class="tl-q-range">Oct–Dec</span></div>
-        <div class="tl-header-cell tl-year-divider">Q1 2027<span class="tl-q-range">Jan–Mar</span></div>
-        <div class="tl-header-cell">Q2 2027<span class="tl-q-range">Apr–Jun</span></div>
-        <div class="tl-header-cell">Q3 2027<span class="tl-q-range">Jul–Sep</span></div>
-        <div class="tl-header-cell">Q4 2027<span class="tl-q-range">Oct–Dec</span></div>
+        ${headerCell(1)}${headerCell(2)}${headerCell(3)}${headerCell(4)}
+        ${headerCell(5, 'tl-year-divider')}${headerCell(6)}${headerCell(7)}${headerCell(8)}
       </div>`;
     } else if (mode === '2027') {
       html += `<div class="tl-header">
         <div class="tl-header-cell first">Initiative</div>
-        <div class="tl-header-cell">Q1 2027<span class="tl-q-range">Jan–Mar</span></div>
-        <div class="tl-header-cell">Q2 2027<span class="tl-q-range">Apr–Jun</span></div>
-        <div class="tl-header-cell">Q3 2027<span class="tl-q-range">Jul–Sep</span></div>
-        <div class="tl-header-cell">Q4 2027<span class="tl-q-range">Oct–Dec</span></div>
+        ${headerCell(5)}${headerCell(6)}${headerCell(7)}${headerCell(8)}
       </div>`;
     } else {
       html += `<div class="tl-header">
         <div class="tl-header-cell first">Initiative</div>
-        <div class="tl-header-cell">Q1 2026<span class="tl-q-range">Jan–Mar</span></div>
-        <div class="tl-header-cell">Q2 2026<span class="tl-q-range">Apr–Jun</span></div>
-        <div class="tl-header-cell">Q3 2026<span class="tl-q-range">Jul–Sep</span></div>
-        <div class="tl-header-cell">Q4 2026<span class="tl-q-range">Oct–Dec</span></div>
+        ${headerCell(1)}${headerCell(2)}${headerCell(3)}${headerCell(4)}
       </div>`;
     }
 
@@ -1495,6 +1661,19 @@
   }
   window.addEventListener('resize', positionToday);
 
+  // Delegate clicks on timeline header cells (quarter cells become clickable filter toggles)
+  function setupTimelineHeaderDelegation() {
+    const grid = document.getElementById('timeline');
+    if (!grid || grid._headerDelegated) return;
+    grid.addEventListener('click', (e) => {
+      const cell = e.target.closest('.tl-header-cell[data-quarter]');
+      if (!cell) return;
+      const q = Number(cell.getAttribute('data-quarter'));
+      if (q) toggleQuarter(q);
+    });
+    grid._headerDelegated = true;
+  }
+
   // ---------- Filters & Board ----------
   function renderFilters() {
     const wsHtml = WORKSTREAMS.map(w =>
@@ -1525,7 +1704,7 @@
     document.querySelectorAll('.filter-group-status').forEach(el => el.innerHTML = statusHtml);
     document.querySelectorAll('.filter-group-owner').forEach(el => el.innerHTML = ownerHtml);
     // Show Reset button only when at least one filter is active
-    const hasActive = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size > 0;
+    const hasActive = anyFiltersActive();
     const resetBtn = document.getElementById('filter-reset-btn');
     if (resetBtn) resetBtn.style.display = hasActive ? '' : 'none';
   }
@@ -1559,6 +1738,7 @@
     state.wsFilter.clear();
     state.statusFilter.clear();
     state.ownerFilter.clear();
+    state.quarterFilter.clear();
     state.search = '';
     document.getElementById('search').value = '';
     renderAll();
@@ -1609,6 +1789,7 @@
 
   function renderAll() {
     renderKpis();
+    renderQuarterStrip();
     renderShipped();
     renderTimeline();
     renderWorkload();
@@ -2217,6 +2398,8 @@
   initQPicker();
   setupOwnerComboboxDelegation();
   setupFilterDelegation();
+  setupQuarterStripDelegation();
+  setupTimelineHeaderDelegation();
   refresh();
 </script>
 
