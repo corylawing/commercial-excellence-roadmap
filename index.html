@@ -968,6 +968,42 @@
     killed:      { fg: '#737373', bg: '#E5E5E5', border: '#D4D4D8' },
   };
 
+  // Sort priorities — lower = appears first
+  // Timeline: by (startQ, then status order matching visual reading) — earlier quarters first, shipped at the left
+  const STATUS_PRIORITY_TIMELINE = {
+    complete: 1,     // shipped reads naturally on the left (it's "done")
+    on_track: 2,
+    at_risk: 3,
+    blocked: 4,
+    not_started: 5,
+    killed: 6
+  };
+  // Board: active work first, blockers stand out, shipped/killed last
+  const STATUS_PRIORITY_BOARD = {
+    blocked: 1,      // needs attention NOW
+    at_risk: 2,
+    on_track: 3,
+    not_started: 4,
+    complete: 5,     // shipped — context only
+    killed: 6
+  };
+  function compareTimeline(a, b) {
+    const aQ = Number(a.startQ) || 99, bQ = Number(b.startQ) || 99;
+    if (aQ !== bQ) return aQ - bQ;
+    const aS = STATUS_PRIORITY_TIMELINE[a.status] || 99;
+    const bS = STATUS_PRIORITY_TIMELINE[b.status] || 99;
+    if (aS !== bS) return aS - bS;
+    return (a.code || '').localeCompare(b.code || '');
+  }
+  function compareBoard(a, b) {
+    const aS = STATUS_PRIORITY_BOARD[a.status] || 99;
+    const bS = STATUS_PRIORITY_BOARD[b.status] || 99;
+    if (aS !== bS) return aS - bS;
+    const aQ = Number(a.startQ) || 99, bQ = Number(b.startQ) || 99;
+    if (aQ !== bQ) return aQ - bQ;
+    return (a.code || '').localeCompare(b.code || '');
+  }
+
   let INITIATIVES = [];
   let SNAPSHOTS = [];
   const state = {
@@ -1208,7 +1244,11 @@
     const filtersActive = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size + (state.search ? 1 : 0) > 0;
     let shipped = INITIATIVES.filter(i => i.status === 'complete');
     if (filtersActive) shipped = shipped.filter(matches);
-    shipped.sort((a, b) => (a.startQ || 0) - (b.startQ || 0));
+    shipped.sort((a, b) => {
+      const aQ = Number(a.startQ) || 99, bQ = Number(b.startQ) || 99;
+      if (aQ !== bQ) return aQ - bQ;
+      return (a.code || '').localeCompare(b.code || '');
+    });
     document.getElementById('shipped-count').textContent = shipped.length;
     if (shipped.length === 0) {
       const msg = filtersActive
@@ -1351,6 +1391,8 @@
       } else if (mode === '2027') {
         items = items.filter(i => Number(i.endQ) >= 5); // include anything ending in 2027 or later
       }
+      // Sort: earliest quarter first, then by status (shipped clusters on the left), then code
+      items.sort(compareTimeline);
       if (items.length === 0) return;
       visibleCount += items.length;
       const byStatus = items.reduce((acc, i) => { acc[i.status] = (acc[i.status]||0)+1; return acc; }, {});
@@ -1541,7 +1583,7 @@
         <div><div class="board-ws-name">${ws.label}</div><div class="board-ws-count">${wsCount} items</div></div>
       </div>`;
       HORIZONS.forEach(h => {
-        const cards = INITIATIVES.filter(i => i.ws === ws.id && i.h === h.id && matches(i));
+        const cards = INITIATIVES.filter(i => i.ws === ws.id && i.h === h.id && matches(i)).sort(compareBoard);
         visibleCount += cards.length;
         html += `<div class="board-cell ${isLast ? 'board-row-last' : ''}">`;
         if (cards.length === 0) html += `<div class="board-cell-empty">No items</div>`;
