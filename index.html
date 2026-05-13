@@ -267,6 +267,11 @@
   .tl-today-line::after { content: ''; position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 7px; height: 7px; border-radius: 50%; background: var(--danger); }
 
   .board-toolbar { background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: var(--r-lg) var(--r-lg) 0 0; padding: 10px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  /* Filters bar — top of page, above Timeline */
+  .filters-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .filter-group-block { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .filter-group-block .toolbar-label { font-size: 11px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; min-width: 80px; }
   .toolbar-divider { width: 1px; height: 18px; background: var(--border); }
   .toolbar-label { font-size: 11px; color: var(--text-3); font-weight: 500; margin-right: 2px; }
   .filter-chip { height: 26px; padding: 0 10px; font-size: 12px; font-weight: 500; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); color: var(--text-2); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all .12s; }
@@ -275,7 +280,7 @@
   .filter-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--chip-color, var(--text-4)); }
   .filter-chip.active .filter-chip-dot { background: white; }
 
-  .board { background: var(--surface); border: 1px solid var(--border); border-radius: 0 0 var(--r-lg) var(--r-lg); display: grid; grid-template-columns: 180px repeat(3, 1fr); overflow: hidden; }
+  .board { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); display: grid; grid-template-columns: 180px repeat(3, 1fr); overflow: hidden; }
   .board-header-corner { background: var(--surface-2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
   .board-header-cell { background: var(--surface-2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
   .board-header-cell:last-child { border-right: none; }
@@ -345,9 +350,6 @@
   .q-cell.endpoint { background: var(--info); border-color: var(--info); }
   .q-cell.endpoint .q-cell-label, .q-cell.endpoint .q-cell-months { color: white; opacity: 1; }
   .q-cell.endpoint .q-cell-months { opacity: .8; }
-  .q-toggle-link { background: none; border: none; color: var(--info); font-size: 12px; font-weight: 500; cursor: pointer; padding: 8px 0 0; font-family: inherit; }
-  .q-toggle-link:hover { text-decoration: underline; }
-
   /* Timeline year toggle */
   .year-toggle { display: inline-flex; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r); padding: 2px; gap: 2px; }
   .year-toggle-btn { background: transparent; border: none; padding: 4px 10px; font-size: 12px; font-weight: 500; color: var(--text-3); cursor: pointer; border-radius: 4px; font-family: inherit; transition: all .12s; }
@@ -561,6 +563,27 @@
 
   <div class="section">
     <div class="section-head">
+      <div class="section-title"><h2>Filters</h2></div>
+      <button class="btn btn-sm btn-ghost" onclick="clearFilters()">Reset all</button>
+    </div>
+    <div class="filters-bar">
+      <div class="filter-group-block">
+        <span class="toolbar-label">Workstream</span>
+        <div class="filter-group filter-group-ws" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="filter-group-block">
+        <span class="toolbar-label">Status</span>
+        <div class="filter-group filter-group-status" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="filter-group-block">
+        <span class="toolbar-label">Owner</span>
+        <div class="filter-group filter-group-owner" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
       <div class="section-title"><h2>Timeline</h2><span class="section-count" id="tl-count">0</span></div>
       <div class="section-actions">
         <div class="year-toggle" id="tl-year-toggle">
@@ -596,18 +619,28 @@
 
   <div class="section">
     <div class="section-head">
-      <div class="section-title"><h2>Portfolio</h2><span class="section-count" id="board-count">0</span></div>
+      <div class="section-title"><h2>Filters</h2><span class="page-sub" style="font-size:11px;">Applies to all views</span></div>
+      <button class="btn btn-sm btn-ghost" onclick="clearFilters()">Reset all</button>
     </div>
-    <div class="board-toolbar">
-      <span class="toolbar-label">Workstream</span>
-      <div class="filter-group" id="ws-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-      <div class="toolbar-divider"></div>
-      <span class="toolbar-label">Status</span>
-      <div class="filter-group" id="status-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-      <div class="toolbar-divider"></div>
-      <span class="toolbar-label">Owner</span>
-      <div class="filter-group" id="owner-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-      <button class="btn btn-sm btn-ghost" onclick="clearFilters()" style="margin-left:auto;">Reset</button>
+    <div class="filters-bar">
+      <div class="filter-group-block">
+        <span class="toolbar-label">Workstream</span>
+        <div class="filter-group filter-group-ws" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="filter-group-block">
+        <span class="toolbar-label">Status</span>
+        <div class="filter-group filter-group-status" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      </div>
+      <div class="filter-group-block">
+        <span class="toolbar-label">Owner</span>
+        <div class="filter-group filter-group-owner" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title"><h2>Portfolio</h2><span class="section-count" id="board-count">0</span></div>
     </div>
     <div class="board" id="board"></div>
   </div>
@@ -741,28 +774,25 @@
           <span class="q-cell-months">Oct–Dec</span>
         </button>
       </div>
-      <div id="q-2027-wrap" style="display:none;">
-        <div class="q-picker-year-label" style="margin-top:8px;">2027</div>
-        <div class="q-picker">
-          <button type="button" class="q-cell" data-q="5">
-            <span class="q-cell-label">Q1</span>
-            <span class="q-cell-months">Jan–Mar</span>
-          </button>
-          <button type="button" class="q-cell" data-q="6">
-            <span class="q-cell-label">Q2</span>
-            <span class="q-cell-months">Apr–Jun</span>
-          </button>
-          <button type="button" class="q-cell" data-q="7">
-            <span class="q-cell-label">Q3</span>
-            <span class="q-cell-months">Jul–Sep</span>
-          </button>
-          <button type="button" class="q-cell" data-q="8">
-            <span class="q-cell-label">Q4</span>
-            <span class="q-cell-months">Oct–Dec</span>
-          </button>
-        </div>
+      <div class="q-picker-year-label" style="margin-top:8px;">2027</div>
+      <div class="q-picker">
+        <button type="button" class="q-cell" data-q="5">
+          <span class="q-cell-label">Q1</span>
+          <span class="q-cell-months">Jan–Mar</span>
+        </button>
+        <button type="button" class="q-cell" data-q="6">
+          <span class="q-cell-label">Q2</span>
+          <span class="q-cell-months">Apr–Jun</span>
+        </button>
+        <button type="button" class="q-cell" data-q="7">
+          <span class="q-cell-label">Q3</span>
+          <span class="q-cell-months">Jul–Sep</span>
+        </button>
+        <button type="button" class="q-cell" data-q="8">
+          <span class="q-cell-label">Q4</span>
+          <span class="q-cell-months">Oct–Dec</span>
+        </button>
       </div>
-      <button type="button" class="q-toggle-link" id="q-toggle-2027" onclick="toggle2027()">+ Show 2027 quarters</button>
       <div class="field-hint" id="q-picker-hint">Click a quarter to set when this lands. Click another quarter to span multiple.</div>
       <input type="hidden" id="f-startq" value="2">
       <input type="hidden" id="f-endq" value="2">
@@ -906,14 +936,38 @@
 
   async function apiPost(body) {
     if (!isConfigured()) throw new Error('Backend URL not configured');
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      // Use text/plain to avoid CORS preflight; Apps Script will parse it
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body),
-    });
+    let res;
+    try {
+      res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body),
+        redirect: 'follow',
+      });
+    } catch (fetchErr) {
+      // Network/CORS-level failure. The write may or may not have gone through.
+      // Re-read the data and let the caller decide what to do.
+      console.warn('POST fetch error, attempting re-read:', fetchErr);
+      try {
+        const data = await apiRead();
+        // Signal to callers: write may have succeeded but response was unreadable.
+        // Return the freshly-read data so the page can update.
+        return { ok: true, _maybe: true, initiatives: data.initiatives, snapshots: data.snapshots };
+      } catch (readErr) {
+        throw new Error('Network error — please refresh and check the Sheet');
+      }
+    }
     if (!res.ok) throw new Error('Write failed: HTTP ' + res.status);
-    const json = await res.json();
+    let json;
+    try {
+      json = await res.json();
+    } catch (parseErr) {
+      // Response wasn't JSON — Apps Script can return HTML error pages or redirects.
+      // Re-read to see what actually happened.
+      console.warn('POST response not JSON, attempting re-read:', parseErr);
+      const data = await apiRead();
+      return { ok: true, _maybe: true, initiatives: data.initiatives, snapshots: data.snapshots };
+    }
     if (!json.ok) throw new Error(json.error || 'Write failed');
     return json;
   }
@@ -930,7 +984,7 @@
     setConnStatus('loading', 'Loading…');
     try {
       const data = await apiRead();
-      INITIATIVES = data.initiatives || [];
+      INITIATIVES = (data.initiatives || []).filter(isValidInitiative);
       SNAPSHOTS = data.snapshots || [];
       saveCache();
       setConnStatus('online', 'Synced');
@@ -939,9 +993,21 @@
       console.error(e);
       setConnStatus('offline', 'Offline — using cache');
       loadCache();
+      INITIATIVES = (INITIATIVES || []).filter(isValidInitiative);
       renderAll();
       toast('Could not reach the Sheet. Showing cached data.', true);
     }
+  }
+
+  // Defensive: filter out hint-row leaks and malformed rows
+  function isValidInitiative(i) {
+    if (!i || typeof i !== 'object') return false;
+    if (!i.id || typeof i.id !== 'string' || !i.id.startsWith('i_')) return false;
+    // Drop hint-row pattern leaks
+    const ownerStr = String(i.owner || '').toLowerCase();
+    if (ownerStr.includes('team or person')) return false;
+    if (ownerStr === '(auto)' || ownerStr === '(auto-generated)') return false;
+    return true;
   }
 
   // ---------- Helpers ----------
@@ -1218,26 +1284,36 @@
 
   // ---------- Filters & Board ----------
   function renderFilters() {
-    document.getElementById('ws-filters').innerHTML = WORKSTREAMS.map(w =>
-      `<button class="filter-chip ${state.wsFilter.has(w.id) ? 'active' : ''}" onclick="toggleFilter('ws','${w.id}')">
+    const wsHtml = WORKSTREAMS.map(w =>
+      `<button class="filter-chip ${state.wsFilter.has(w.id) ? 'active' : ''}" data-filter-kind="ws" data-filter-val="${escapeAttr(w.id)}">
         <span class="filter-chip-dot" style="--chip-color: ${w.color}"></span>${w.label}
       </button>`
     ).join('');
-    document.getElementById('status-filters').innerHTML = STATUSES.map(s => {
+    const statusHtml = STATUSES.map(s => {
       const c = STATUS_STYLES[s.id];
-      return `<button class="filter-chip ${state.statusFilter.has(s.id) ? 'active' : ''}" onclick="toggleFilter('status','${s.id}')">
+      return `<button class="filter-chip ${state.statusFilter.has(s.id) ? 'active' : ''}" data-filter-kind="status" data-filter-val="${escapeAttr(s.id)}">
         <span class="filter-chip-dot" style="--chip-color: ${c.fg}"></span>${s.label}
       </button>`;
     }).join('');
     // Owner filter — derived from data, sorted by count descending
     const ownerCounts = {};
-    INITIATIVES.forEach(i => { ownerCounts[i.owner] = (ownerCounts[i.owner] || 0) + 1; });
+    INITIATIVES.forEach(i => {
+      if (!i.owner) return;
+      ownerCounts[i.owner] = (ownerCounts[i.owner] || 0) + 1;
+    });
     const owners = Object.entries(ownerCounts).sort((a, b) => b[1] - a[1]).map(([o]) => o);
-    document.getElementById('owner-filters').innerHTML = owners.map(o =>
-      `<button class="filter-chip ${state.ownerFilter.has(o) ? 'active' : ''}" onclick="toggleFilter('owner', ${JSON.stringify(o)})">
-        ${o} <span style="opacity:.6;margin-left:2px">${ownerCounts[o]}</span>
+    const ownerHtml = owners.map(o =>
+      `<button class="filter-chip ${state.ownerFilter.has(o) ? 'active' : ''}" data-filter-kind="owner" data-filter-val="${escapeAttr(o)}">
+        ${escapeHtml(o)} <span style="opacity:.6;margin-left:2px">${ownerCounts[o]}</span>
       </button>`
     ).join('');
+    // Write to all instances of each filter group (we have one above Timeline and one above Portfolio)
+    document.querySelectorAll('.filter-group-ws').forEach(el => el.innerHTML = wsHtml);
+    document.querySelectorAll('.filter-group-status').forEach(el => el.innerHTML = statusHtml);
+    document.querySelectorAll('.filter-group-owner').forEach(el => el.innerHTML = ownerHtml);
+  }
+  function escapeAttr(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
   function toggleFilter(kind, val) {
     let s;
@@ -1247,6 +1323,20 @@
     else return;
     if (s.has(val)) s.delete(val); else s.add(val);
     renderAll();
+  }
+  // Event delegation for filter chips — wires up every filter group container (multiple instances supported)
+  function setupFilterDelegation() {
+    document.querySelectorAll('.filter-group-ws, .filter-group-status, .filter-group-owner').forEach(root => {
+      if (root._delegated) return;
+      root.addEventListener('click', (e) => {
+        const chip = e.target.closest('.filter-chip');
+        if (!chip) return;
+        const kind = chip.getAttribute('data-filter-kind');
+        const val = chip.getAttribute('data-filter-val');
+        if (kind && val !== null) toggleFilter(kind, val);
+      });
+      root._delegated = true;
+    });
   }
   function clearFilters() {
     state.wsFilter.clear();
@@ -1352,7 +1442,6 @@
     document.getElementById('f-ws').value = 'sales';
     document.getElementById('f-status').value = 'not_started';
     document.getElementById('f-effort').value = 'M';
-    show2027(false);
     setQuarterRange(2, 2);
     updateStatusPreview();
     updateEffortHint();
@@ -1426,8 +1515,6 @@
   function setQuarterRange(startQ, endQ) {
     document.getElementById('f-startq').value = String(startQ);
     document.getElementById('f-endq').value = String(endQ);
-    // Auto-expand 2027 row if range touches 2027
-    if (endQ > 4 || startQ > 4) show2027(true);
     document.querySelectorAll('.q-cell').forEach(cell => {
       const q = parseInt(cell.dataset.q, 10);
       cell.classList.remove('in-range', 'endpoint');
@@ -1496,23 +1583,6 @@
     document.getElementById('f-effort-hint').textContent = EFFORT_HINTS[eff] || '';
   }
 
-  // ---------- Year toggle (2027 quarters) ----------
-  function show2027(show) {
-    const wrap = document.getElementById('q-2027-wrap');
-    const link = document.getElementById('q-toggle-2027');
-    if (show) {
-      wrap.style.display = '';
-      link.textContent = '– Hide 2027 quarters';
-    } else {
-      wrap.style.display = 'none';
-      link.textContent = '+ Show 2027 quarters';
-    }
-  }
-  function toggle2027() {
-    const wrap = document.getElementById('q-2027-wrap');
-    show2027(wrap.style.display === 'none');
-  }
-
   // ---------- Owner autocomplete (combobox) ----------
   let ownerComboActiveIdx = -1;
 
@@ -1534,14 +1604,14 @@
       html = `<div class="combobox-empty">No owners yet — start typing to create the first one.</div>`;
     } else {
       html = filtered.map((o, idx) =>
-        `<div class="combobox-item ${idx === ownerComboActiveIdx ? 'active' : ''}" onmousedown="pickOwner(${JSON.stringify(o.name)})">
+        `<div class="combobox-item ${idx === ownerComboActiveIdx ? 'active' : ''}" data-owner="${escapeHtml(o.name).replace(/"/g, '&quot;')}">
           <span>${escapeHtml(o.name)}</span>
           <span class="combobox-item-count">${o.count}</span>
         </div>`
       ).join('');
       // Offer to create new if there's input that doesn't exactly match
       if (q && !exactMatch) {
-        html += `<div class="combobox-item combobox-item-new" onmousedown="pickOwner(${JSON.stringify(query.trim())})">
+        html += `<div class="combobox-item combobox-item-new" data-owner="${escapeHtml(query.trim()).replace(/"/g, '&quot;')}">
           + Create "${escapeHtml(query.trim())}" as a new owner
         </div>`;
       }
@@ -1556,10 +1626,11 @@
   }
 
   function hideOwnerSuggestions() {
-    // Small delay so onmousedown on items fires before the menu closes
+    // Small delay so the mousedown→click sequence on items fires before the menu closes
     setTimeout(() => {
-      document.getElementById('owner-suggestions').style.display = 'none';
-    }, 150);
+      const menu = document.getElementById('owner-suggestions');
+      if (menu) menu.style.display = 'none';
+    }, 200);
   }
 
   function filterOwnerSuggestions() {
@@ -1568,8 +1639,27 @@
   }
 
   function pickOwner(name) {
-    document.getElementById('f-owner').value = name;
+    // Decode the HTML entities we escaped when rendering data-owner
+    const txt = document.createElement('textarea');
+    txt.innerHTML = name;
+    document.getElementById('f-owner').value = txt.value;
     document.getElementById('owner-suggestions').style.display = 'none';
+  }
+
+  // Wire up event delegation once — captures mousedown on suggestion items
+  // and prevents blur on the input, so the value reliably commits.
+  function setupOwnerComboboxDelegation() {
+    const menu = document.getElementById('owner-suggestions');
+    if (!menu || menu._delegated) return;
+    menu.addEventListener('mousedown', (e) => {
+      const item = e.target.closest('.combobox-item');
+      if (!item) return;
+      const owner = item.getAttribute('data-owner');
+      if (owner === null) return; // empty-state row
+      e.preventDefault(); // keep focus on the input, prevent blur
+      pickOwner(owner);
+    });
+    menu._delegated = true;
   }
 
   function ownerKeydown(e) {
@@ -1587,7 +1677,8 @@
     } else if (e.key === 'Enter') {
       if (ownerComboActiveIdx >= 0 && items[ownerComboActiveIdx]) {
         e.preventDefault();
-        items[ownerComboActiveIdx].dispatchEvent(new Event('mousedown'));
+        const owner = items[ownerComboActiveIdx].getAttribute('data-owner');
+        if (owner !== null) pickOwner(owner);
       }
     } else if (e.key === 'Escape') {
       menu.style.display = 'none';
@@ -1642,7 +1733,7 @@
     btn.disabled = true; btn.textContent = 'Adding…';
     try {
       const res = await apiPost({ action: 'addNote', id: state.currentId, author, text });
-      INITIATIVES = res.initiatives;
+      INITIATIVES = (res.initiatives || []).filter(isValidInitiative);
       saveCache();
       // Refresh the open drawer
       const updated = INITIATIVES.find(x => x.id === state.currentId);
@@ -1683,7 +1774,7 @@
     saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
     try {
       const res = await apiPost({ action: 'upsert', item });
-      INITIATIVES = res.initiatives;
+      INITIATIVES = (res.initiatives || []).filter(isValidInitiative);
       saveCache();
       // Find the saved item — for new items, it's the one with our title + ws + owner most recently
       let saved;
@@ -1695,7 +1786,7 @@
       state.isNew = false;
       state.currentId = saved ? saved.id : null;
       renderAll();
-      toast('Saved');
+      toast(res._maybe ? 'Saved (verified via reload)' : 'Saved');
       if (saved) openDrawer(saved.id); else closeDrawer();
     } catch (e) {
       console.error(e);
@@ -1712,7 +1803,7 @@
     if (!confirm(`Delete "${i.title}"? This can't be undone.`)) return;
     try {
       const res = await apiPost({ action: 'delete', id: state.currentId });
-      INITIATIVES = res.initiatives;
+      INITIATIVES = (res.initiatives || []).filter(isValidInitiative);
       saveCache();
       closeDrawer();
       renderAll();
@@ -1860,7 +1951,7 @@
     if (!confirm('Reset the Sheet to the original seed data? This will delete all current initiatives AND all snapshots.')) return;
     try {
       const res = await apiPost({ action: 'reset' });
-      INITIATIVES = res.initiatives;
+      INITIATIVES = (res.initiatives || []).filter(isValidInitiative);
       SNAPSHOTS = res.snapshots;
       saveCache();
       renderAll();
@@ -1890,6 +1981,8 @@
   document.getElementById('updated-date').textContent = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   document.getElementById('footer-year').textContent = today.getFullYear();
   initQPicker();
+  setupOwnerComboboxDelegation();
+  setupFilterDelegation();
   refresh();
 </script>
 
