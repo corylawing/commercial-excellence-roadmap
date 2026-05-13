@@ -345,53 +345,108 @@
 
   .board-toolbar { background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: var(--r-lg) var(--r-lg) 0 0; padding: 10px 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-  /* Sticky filter bar — compact, horizontal, sits just below app bar when scrolled past */
-  .filter-bar-wrap {
-    position: sticky;
-    top: 52px; /* sits right under app-bar (height 52px) */
-    z-index: 40;
-    background: rgba(250, 250, 250, 0.92);
-    backdrop-filter: saturate(180%) blur(10px);
-    -webkit-backdrop-filter: saturate(180%) blur(10px);
-    margin: -12px -24px 24px;
-    padding: 10px 24px;
+  /* Filter dropdown menu — anchored to a button in the app bar */
+  .filter-menu-wrap { position: relative; }
+  .filter-menu-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 100px;
+    margin-left: 4px;
+  }
+  #filter-menu-btn.has-active { background: var(--surface-2); border-color: var(--border-strong); }
+  .filter-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 480px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 80px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+    z-index: 60;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .filter-menu.open { display: flex; }
+  .filter-menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
     border-bottom: 1px solid var(--border);
   }
-  .filter-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    max-width: 1440px;
-    margin: 0 auto;
-  }
-  .filter-bar-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .filter-bar-label {
-    font-size: 11px;
+  .filter-menu-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .filter-menu-close {
+    background: none;
+    border: none;
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
     color: var(--text-3);
-    font-weight: 500;
-    margin-right: 2px;
-    white-space: nowrap;
+    display: inline-flex;
   }
-  .filter-bar-divider {
-    width: 1px;
-    height: 16px;
-    background: var(--border);
-    flex-shrink: 0;
+  .filter-menu-close:hover { background: var(--surface-2); color: var(--text); }
+  .filter-menu-body {
+    padding: 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
-  .filter-bar-spacer { flex: 1; }
-  .filter-bar .filter-group { display: inline-flex; gap: 4px; flex-wrap: wrap; }
-  .filter-reset-btn { color: var(--text-3); }
-  .filter-reset-btn:hover { color: var(--danger); background: var(--danger-bg); }
+  .filter-menu-group { display: flex; flex-direction: column; gap: 6px; }
+  .filter-menu-label { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .filter-menu-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .filter-menu-hint { font-size: 11px; color: var(--text-4); font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .filter-owner-search {
+    width: 100%;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    outline: none;
+    transition: border-color .12s, box-shadow .12s;
+  }
+  .filter-owner-search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.05); }
+  .filter-owner-search::placeholder { color: var(--text-4); }
+  .filter-owner-search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+  .filter-quarter-chip { font-family: 'Geist Mono', monospace; }
+  .filter-quarter-chip .qchip-divider { color: var(--text-4); margin: 0 4px; }
+  .filter-quarter-chip.active .qchip-divider { color: rgba(255, 255, 255, 0.6); }
+  .filter-no-results { font-size: 12px; color: var(--text-4); font-style: italic; padding: 4px 0; }
+  .filter-menu-group .filter-group { display: flex; flex-wrap: wrap; gap: 4px; }
+  .filter-menu-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    gap: 8px;
+  }
+  .filter-menu-foot .btn-ghost { color: var(--text-3); }
 
-  @media (max-width: 900px) {
-    .filter-bar-wrap { margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; }
-    .filter-bar-divider { display: none; }
+  @media (max-width: 640px) {
+    .filter-menu {
+      width: calc(100vw - 16px);
+      right: -8px;
+      max-height: 75vh;
+    }
   }
   .toolbar-divider { width: 1px; height: 18px; background: var(--border); }
   .toolbar-label { font-size: 11px; color: var(--text-3); font-weight: 500; margin-right: 2px; }
@@ -616,6 +671,48 @@
 
   <div class="app-bar-actions">
     <span class="conn-status loading" id="conn-status">Loading…</span>
+    <div class="filter-menu-wrap">
+      <button class="btn btn-sm" onclick="toggleFilterMenu(event)" id="filter-menu-btn" title="Filter the portfolio">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filters<span class="filter-menu-badge" id="filter-menu-badge" style="display:none;">0</span>
+      </button>
+      <div class="filter-menu" id="filter-menu">
+        <div class="filter-menu-head">
+          <span class="filter-menu-title">Filter portfolio</span>
+          <button class="filter-menu-close" onclick="closeFilterMenu()" title="Close">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="filter-menu-body">
+          <div class="filter-menu-group">
+            <span class="filter-menu-label">Workstream</span>
+            <div class="filter-group filter-group-ws"></div>
+          </div>
+          <div class="filter-menu-group">
+            <span class="filter-menu-label">Status</span>
+            <div class="filter-group filter-group-status"></div>
+          </div>
+          <div class="filter-menu-group">
+            <span class="filter-menu-label">Quarter</span>
+            <div class="filter-group filter-group-quarter"></div>
+          </div>
+          <div class="filter-menu-group">
+            <div class="filter-menu-label-row">
+              <span class="filter-menu-label">Owner</span>
+              <span class="filter-menu-hint" id="owner-filter-count"></span>
+            </div>
+            <input type="search" class="filter-owner-search" id="owner-filter-search" placeholder="Search owners…" oninput="renderOwnerFilterChips()" autocomplete="off">
+            <div class="filter-group filter-group-owner"></div>
+          </div>
+        </div>
+        <div class="filter-menu-foot">
+          <button class="btn btn-sm btn-ghost" onclick="clearFilters()" id="filter-menu-reset" style="display:none;">Reset all</button>
+          <button class="btn btn-sm btn-primary" onclick="closeFilterMenu()">Done</button>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-ghost btn-sm" onclick="exportData()" title="Download current filter as JSON">
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -723,30 +820,6 @@
       <span class="page-sub" style="font-size:12px;">What we've already delivered →</span>
     </div>
     <div class="shipped-strip" id="shipped-strip"></div>
-  </div>
-
-  <div class="filter-bar-wrap" id="filter-bar">
-    <div class="filter-bar">
-      <div class="filter-bar-group">
-        <span class="filter-bar-label">Workstream</span>
-        <div class="filter-group filter-group-ws"></div>
-      </div>
-      <div class="filter-bar-divider"></div>
-      <div class="filter-bar-group">
-        <span class="filter-bar-label">Status</span>
-        <div class="filter-group filter-group-status"></div>
-      </div>
-      <div class="filter-bar-divider"></div>
-      <div class="filter-bar-group">
-        <span class="filter-bar-label">Owner</span>
-        <div class="filter-group filter-group-owner"></div>
-      </div>
-      <div class="filter-bar-spacer"></div>
-      <button class="btn btn-sm btn-ghost filter-reset-btn" onclick="clearFilters()" id="filter-reset-btn" style="display:none;">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        Reset
-      </button>
-    </div>
   </div>
 
   <div class="section">
@@ -1458,17 +1531,33 @@
     const arr = Object.entries(owners).map(([owner, data]) => ({ owner, ...data })).sort((a, b) => b.total - a.total);
     const max = arr[0]?.total || 1;
     document.getElementById('workload-count').textContent = arr.length;
+
+    // Key-person-risk thresholds (tunable)
+    const SOLO_RISK_THRESHOLD = 50;       // single owner carrying >= this % of work
+    const PAIR_RISK_THRESHOLD = 80;       // top 2 owners carrying >= this % combined
+    const flagEl = document.getElementById('workload-flag');
+    const flagTextEl = document.getElementById('workload-flag-text');
     if (arr.length > 0 && active.length > 0) {
       const topShare = Math.round((arr[0].total / active.length) * 100);
-      if (topShare >= 50) {
-        document.getElementById('workload-flag').style.display = '';
-        const scope = nonOwnerFiltersActive ? 'this view' : 'the portfolio';
-        document.getElementById('workload-flag-text').textContent = `${arr[0].owner} carries ${topShare}% of ${scope} — key-person risk`;
+      const pairShare = arr.length >= 2 ? Math.round(((arr[0].total + arr[1].total) / active.length) * 100) : topShare;
+      // Scope wording — clearer than "this view"
+      let scope;
+      if (nonOwnerFiltersActive) {
+        scope = 'the filtered view';
       } else {
-        document.getElementById('workload-flag').style.display = 'none';
+        scope = 'the active portfolio';
+      }
+      if (topShare >= SOLO_RISK_THRESHOLD) {
+        flagEl.style.display = '';
+        flagTextEl.textContent = `${arr[0].owner} carries ${topShare}% of ${scope} — key-person risk`;
+      } else if (arr.length >= 2 && pairShare >= PAIR_RISK_THRESHOLD) {
+        flagEl.style.display = '';
+        flagTextEl.textContent = `${arr[0].owner} + ${arr[1].owner} together carry ${pairShare}% of ${scope} — concentration risk`;
+      } else {
+        flagEl.style.display = 'none';
       }
     } else {
-      document.getElementById('workload-flag').style.display = 'none';
+      flagEl.style.display = 'none';
     }
     if (arr.length === 0) {
       root.innerHTML = `<div style="padding:24px;color:var(--text-3);font-size:13px;">No owners match the current filter.</div>`;
@@ -1687,42 +1776,71 @@
         <span class="filter-chip-dot" style="--chip-color: ${c.fg}"></span>${s.label}
       </button>`;
     }).join('');
-    // Owner filter — derived from data, sorted by count descending
+    // Quarter filter — chips for the quarters in the current year mode
+    const quarters = quartersForYearMode();
+    const quarterHtml = quarters.map(q => {
+      const year = q <= 4 ? 2026 : 2027;
+      const qNum = ((q - 1) % 4) + 1;
+      return `<button class="filter-chip filter-quarter-chip ${state.quarterFilter.has(q) ? 'active' : ''}" data-filter-kind="quarter" data-filter-val="${q}">
+        Q${qNum}<span class="qchip-divider">·</span>${year}
+      </button>`;
+    }).join('');
+    // Write all three to all instances
+    document.querySelectorAll('.filter-group-ws').forEach(el => el.innerHTML = wsHtml);
+    document.querySelectorAll('.filter-group-status').forEach(el => el.innerHTML = statusHtml);
+    document.querySelectorAll('.filter-group-quarter').forEach(el => el.innerHTML = quarterHtml);
+    // Owner chips render through their own function (because they filter on the search input)
+    renderOwnerFilterChips();
+    // Update the Filters button badge in the app bar
+    updateFilterMenuBadge();
+  }
+
+  // Owner chips — filterable via the search input inside the menu
+  function renderOwnerFilterChips() {
     const ownerCounts = {};
     INITIATIVES.forEach(i => {
       if (!i.owner) return;
       ownerCounts[i.owner] = (ownerCounts[i.owner] || 0) + 1;
     });
-    const owners = Object.entries(ownerCounts).sort((a, b) => b[1] - a[1]).map(([o]) => o);
-    const ownerHtml = owners.map(o =>
-      `<button class="filter-chip ${state.ownerFilter.has(o) ? 'active' : ''}" data-filter-kind="owner" data-filter-val="${escapeAttr(o)}">
-        ${escapeHtml(o)} <span style="opacity:.6;margin-left:2px">${ownerCounts[o]}</span>
-      </button>`
-    ).join('');
-    // Write to all instances of each filter group (we have one above Timeline and one above Portfolio)
-    document.querySelectorAll('.filter-group-ws').forEach(el => el.innerHTML = wsHtml);
-    document.querySelectorAll('.filter-group-status').forEach(el => el.innerHTML = statusHtml);
-    document.querySelectorAll('.filter-group-owner').forEach(el => el.innerHTML = ownerHtml);
-    // Show Reset button only when at least one filter is active
-    const hasActive = anyFiltersActive();
-    const resetBtn = document.getElementById('filter-reset-btn');
-    if (resetBtn) resetBtn.style.display = hasActive ? '' : 'none';
+    const allOwners = Object.entries(ownerCounts).sort((a, b) => b[1] - a[1]).map(([o]) => o);
+    const totalOwners = allOwners.length;
+    const searchEl = document.getElementById('owner-filter-search');
+    const q = (searchEl?.value || '').trim().toLowerCase();
+    let owners = q
+      ? allOwners.filter(o => o.toLowerCase().includes(q))
+      : allOwners;
+    const html = owners.length === 0
+      ? `<div class="filter-no-results">No owners match "${escapeHtml(q)}"</div>`
+      : owners.map(o =>
+        `<button class="filter-chip ${state.ownerFilter.has(o) ? 'active' : ''}" data-filter-kind="owner" data-filter-val="${escapeAttr(o)}">
+          ${escapeHtml(o)} <span style="opacity:.6;margin-left:2px">${ownerCounts[o]}</span>
+        </button>`
+      ).join('');
+    document.querySelectorAll('.filter-group-owner').forEach(el => el.innerHTML = html);
+    // Update hint text — "12 of 18" when searching, just count when not
+    const hint = document.getElementById('owner-filter-count');
+    if (hint) {
+      if (q && owners.length !== totalOwners) hint.textContent = `${owners.length} of ${totalOwners}`;
+      else if (totalOwners > 0) hint.textContent = `${totalOwners} total`;
+      else hint.textContent = '';
+    }
   }
   function escapeAttr(s) {
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
   function toggleFilter(kind, val) {
-    let s;
+    let s, v = val;
     if (kind === 'ws') s = state.wsFilter;
     else if (kind === 'status') s = state.statusFilter;
     else if (kind === 'owner') s = state.ownerFilter;
+    else if (kind === 'quarter') { s = state.quarterFilter; v = Number(val); }
     else return;
-    if (s.has(val)) s.delete(val); else s.add(val);
+    if (s.has(v)) s.delete(v); else s.add(v);
     renderAll();
   }
   // Event delegation for filter chips — wires up every filter group container (multiple instances supported)
   function setupFilterDelegation() {
-    document.querySelectorAll('.filter-group-ws, .filter-group-status, .filter-group-owner').forEach(root => {
+    document.querySelectorAll('.filter-group-ws, .filter-group-status, .filter-group-owner, .filter-group-quarter').forEach(root => {
       if (root._delegated) return;
       root.addEventListener('click', (e) => {
         const chip = e.target.closest('.filter-chip');
@@ -1742,6 +1860,47 @@
     state.search = '';
     document.getElementById('search').value = '';
     renderAll();
+  }
+
+  // ---------- Filter dropdown menu (in app bar) ----------
+  function toggleFilterMenu(e) {
+    e && e.stopPropagation();
+    const menu = document.getElementById('filter-menu');
+    if (!menu) return;
+    if (menu.classList.contains('open')) closeFilterMenu();
+    else openFilterMenu();
+  }
+  function openFilterMenu() {
+    const menu = document.getElementById('filter-menu');
+    if (menu) menu.classList.add('open');
+  }
+  function closeFilterMenu() {
+    const menu = document.getElementById('filter-menu');
+    if (menu) menu.classList.remove('open');
+  }
+  // Click outside closes; Esc closes
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('filter-menu');
+    if (!menu || !menu.classList.contains('open')) return;
+    const wrap = e.target.closest('.filter-menu-wrap');
+    if (!wrap) closeFilterMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeFilterMenu();
+  });
+
+  // Update the Filters button badge with the active filter count
+  function updateFilterMenuBadge() {
+    const count = state.wsFilter.size + state.statusFilter.size + state.ownerFilter.size + state.quarterFilter.size + (state.search ? 1 : 0);
+    const badge = document.getElementById('filter-menu-badge');
+    const btn = document.getElementById('filter-menu-btn');
+    const reset = document.getElementById('filter-menu-reset');
+    if (badge) {
+      if (count > 0) { badge.textContent = count; badge.style.display = ''; }
+      else { badge.style.display = 'none'; }
+    }
+    if (btn) btn.classList.toggle('has-active', count > 0);
+    if (reset) reset.style.display = count > 0 ? '' : 'none';
   }
   function renderBoard() {
     const root = document.getElementById('board');
@@ -2024,11 +2183,17 @@
   }
 
   function hideOwnerSuggestions() {
-    // Small delay so the mousedown→click sequence on items fires before the menu closes
-    setTimeout(() => {
+    // Use a microtask via requestAnimationFrame: after the focus transition completes,
+    // check if focus is still within the combobox. If yes, keep menu open.
+    // The mousedown handler on suggestions calls preventDefault(), which keeps focus
+    // on the input — so this branch handles all other blur causes (tab away, etc.) instantly.
+    requestAnimationFrame(() => {
+      const combobox = document.getElementById('owner-combobox');
+      if (!combobox) return;
+      if (combobox.contains(document.activeElement)) return; // focus still inside, don't hide
       const menu = document.getElementById('owner-suggestions');
       if (menu) menu.style.display = 'none';
-    }, 200);
+    });
   }
 
   function filterOwnerSuggestions() {
@@ -2127,8 +2292,8 @@
     if (!text) { alert('Note text is required.'); document.getElementById('note-text').focus(); return; }
     setAuthor(author); // remember for next time
 
-    // OPTIMISTIC UI: append the note locally and render IMMEDIATELY.
-    // The API call runs in the background; we roll back on failure.
+    // OPTIMISTIC UI: append the note locally, render IMMEDIATELY, persist as pending.
+    // If the user reloads the page mid-save, we'll retry the queued note.
     const initiative = INITIATIVES.find(x => x.id === state.currentId);
     if (!initiative) { toast('Initiative not found', true); return; }
     const tempNote = { ts: Date.now(), author, text, _pending: true };
@@ -2137,31 +2302,74 @@
     renderNotesLog(initiative.notes);
     document.getElementById('note-text').value = '';
 
+    // Persist this as a pending note for crash/reload recovery
+    addPendingNote({ id: state.currentId, ts: tempNote.ts, author, text });
+
     const btn = document.getElementById('add-note-btn');
     btn.disabled = true; btn.textContent = 'Saving…';
 
-    // Fire the API call without blocking the UI.
     try {
       const res = await apiPost({ action: 'addNote', id: state.currentId, author, text });
-      // Replace the pending placeholder with the server-confirmed note (same content, no _pending flag).
       const idx = initiative.notes.findIndex(n => n._pending && n.ts === tempNote.ts);
       if (idx >= 0) {
         initiative.notes[idx] = res.note || { ts: tempNote.ts, author, text };
       }
+      removePendingNote(state.currentId, tempNote.ts);
       saveCache();
-      // Only re-render if the drawer is still showing this initiative
       if (state.currentId === initiative.id) renderNotesLog(initiative.notes);
     } catch (e) {
-      // Roll back: remove the pending note we optimistically added
       console.error('Note save failed:', e);
       const idx = initiative.notes.findIndex(n => n._pending && n.ts === tempNote.ts);
       if (idx >= 0) initiative.notes.splice(idx, 1);
+      removePendingNote(state.currentId, tempNote.ts);
       if (state.currentId === initiative.id) renderNotesLog(initiative.notes);
-      // Restore the text in the input so the user doesn't lose it
       document.getElementById('note-text').value = text;
       toast('Failed to add note: ' + e.message, true);
     } finally {
       btn.disabled = false; btn.textContent = 'Add note';
+    }
+  }
+
+  // ---------- Pending notes (crash/reload recovery) ----------
+  const PENDING_NOTES_KEY = 'roadmap.pendingNotes.v1';
+  function getPendingNotes() {
+    try { return JSON.parse(localStorage.getItem(PENDING_NOTES_KEY) || '[]'); }
+    catch (_) { return []; }
+  }
+  function setPendingNotes(arr) {
+    try { localStorage.setItem(PENDING_NOTES_KEY, JSON.stringify(arr)); } catch (_) {}
+  }
+  function addPendingNote(note) {
+    const arr = getPendingNotes();
+    arr.push(note);
+    setPendingNotes(arr);
+  }
+  function removePendingNote(id, ts) {
+    const arr = getPendingNotes().filter(n => !(n.id === id && n.ts === ts));
+    setPendingNotes(arr);
+  }
+  // Replay queued pending notes on page load — retries any notes that didn't make it to the server
+  async function replayPendingNotes() {
+    const queue = getPendingNotes();
+    if (queue.length === 0) return;
+    let successCount = 0, failCount = 0;
+    for (const note of queue) {
+      try {
+        await apiPost({ action: 'addNote', id: note.id, author: note.author, text: note.text });
+        removePendingNote(note.id, note.ts);
+        successCount++;
+      } catch (e) {
+        console.warn('Pending note replay failed for ' + note.id + ':', e);
+        failCount++;
+      }
+    }
+    if (successCount > 0) {
+      // Refresh data so the replayed notes show up
+      try { await refresh(); } catch (_) {}
+      toast(`Recovered ${successCount} pending note${successCount > 1 ? 's' : ''}`);
+    }
+    if (failCount > 0) {
+      toast(`${failCount} pending note${failCount > 1 ? 's' : ''} could not be saved`, true);
     }
   }
 
@@ -2201,8 +2409,17 @@
       state.isNew = false;
       state.currentId = saved ? saved.id : null;
       renderAll();
-      toast(res._maybe ? 'Saved (verified via reload)' : 'Saved');
-      if (saved) openDrawer(saved.id); else closeDrawer();
+      // If we found the item in the data, the save definitely worked
+      if (saved) {
+        toast('Saved');
+        openDrawer(saved.id);
+      } else if (res._maybe) {
+        toast('Save may not have completed — please refresh and check', true);
+        closeDrawer();
+      } else {
+        toast('Saved, but couldn\'t locate the item in the response', true);
+        closeDrawer();
+      }
     } catch (e) {
       console.error(e);
       toast('Save failed: ' + e.message, true);
@@ -2400,7 +2617,10 @@
   setupFilterDelegation();
   setupQuarterStripDelegation();
   setupTimelineHeaderDelegation();
-  refresh();
+  refresh().then(() => {
+    // After initial data load, retry any notes that were queued but not confirmed
+    replayPendingNotes();
+  });
 </script>
 
 </body>
