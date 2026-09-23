@@ -16,11 +16,18 @@ the only client.
 - **Team** — a profile per person with photo, role and their work. *Who are you?* (top right)
   sets the author for updates and powers the *My work* filter.
 
+## Sub-projects
+
+An initiative can be a sub-project of a bigger one (`parentId`). It stays a full initiative with
+its own owner, status, dates and notes, and shows on every view; the Tracker nests it under its
+parent (collapsible), the parent's drawer lists its sub-projects with *Add sub-project*, and the
+parent's progress is the average of its sub-projects. KPI tiles count top-level initiatives.
+
 ## Item fields
 
 `title · workstream · status · priority (P1–P3) · owner · effort · startQ/endQ (1–4 = 2026,
 5–8 = 2027) · dueDate · progress (0–100) · nextStep · blocker · checklist · description ·
-business value · notes (append-only)`. Status and owner changes post a line into the item's
+business value · parentId · notes (append-only)`. Status and owner changes post a line into the item's
 activity automatically.
 
 ## Backend protocol

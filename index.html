@@ -231,7 +231,7 @@
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
   .table-scroll { overflow-x: auto; }
   table.tracker { width: 100%; border-collapse: collapse; min-width: 980px; }
-  table.tracker th { position: sticky; top: 52px; z-index: 5; background: var(--surface-2); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; user-select: none; }
+  table.tracker th { position: sticky; top: 0; z-index: 5; background: var(--surface-2); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--text-3); text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; user-select: none; }
   table.tracker th.sortable { cursor: pointer; }
   table.tracker th.sortable:hover { color: var(--text); }
   table.tracker th .sort-ind { display: inline-block; width: 10px; margin-left: 4px; color: var(--text-4); font-family: 'Geist Mono', monospace; }
@@ -257,6 +257,29 @@
   .group-row td .section-count { margin-left: 8px; }
   .table-empty { padding: 48px; text-align: center; color: var(--text-3); font-size: 13px; }
   .table-foot { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-3); background: var(--surface-2); }
+
+  /* Sub-projects */
+  .sub-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-3); font-weight: 500; white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+  .sub-tag b { font-weight: 600; color: var(--text-2); }
+  .sub-count { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-2); white-space: nowrap; }
+  table.tracker tr.row-child td:first-child { padding-left: 28px; }
+  table.tracker tr.row-child .t-title-text { font-weight: 500; }
+  table.tracker tr.row-child { background: #FCFCFD; }
+  .tw-toggle { width: 18px; height: 18px; border: none; background: transparent; color: var(--text-4); display: inline-grid; place-items: center; border-radius: 4px; cursor: pointer; margin-left: -4px; }
+  .tw-toggle:hover { background: var(--surface-2); color: var(--text); }
+  .tw-toggle svg { transition: transform .12s; }
+  .tw-toggle.open svg { transform: rotate(90deg); }
+  .parent-line { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-3); margin: -8px 0 14px; }
+  .parent-line a { color: var(--info); font-weight: 500; cursor: pointer; text-decoration: none; }
+  .parent-line a:hover { text-decoration: underline; }
+  .subs { display: flex; flex-direction: column; gap: 4px; }
+  .sub-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; font-size: 13px; background: var(--surface); }
+  .sub-row:hover { background: var(--surface-2); }
+  .sub-row .t { font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sub-row .pbar-mini { width: 70px; }
+  .subs-empty { font-size: 12.5px; color: var(--text-4); font-style: italic; padding: 4px 0; }
+  .kcard-parent { font-size: 11px; color: var(--text-3); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tl-row-title.child::before { content: '↳ '; color: var(--text-4); }
 
   /* ---------- Attention list ---------- */
   .attn-list { display: flex; flex-direction: column; }
@@ -827,6 +850,7 @@
 
   <div class="drawer-body" id="drawer-view">
     <h3 class="drawer-title" id="drawer-title">—</h3>
+    <div class="parent-line" id="drawer-parent" style="display:none;"></div>
     <div class="drawer-meta-grid">
       <div class="drawer-meta-item"><span class="drawer-meta-label">Status</span><span class="drawer-meta-value" id="drawer-status">—</span></div>
       <div class="drawer-meta-item"><span class="drawer-meta-label">Priority</span><span class="drawer-meta-value" id="drawer-prio">—</span></div>
@@ -861,6 +885,11 @@
       </div>
     </div>
 
+    <div class="drawer-section" id="drawer-subs-wrap">
+      <div class="drawer-section-label">Sub-projects <span class="check-sum" id="subs-sum"></span><button class="btn btn-xs" style="margin-left:auto" onclick="addSubProject()">+ Add sub-project</button></div>
+      <div class="subs" id="drawer-subs"></div>
+    </div>
+
     <div class="drawer-section"><div class="drawer-section-label">Description</div><div class="drawer-section-body" id="drawer-desc">—</div></div>
     <div class="drawer-section"><div class="drawer-section-label">Business value</div><div class="drawer-section-body" id="drawer-value">—</div></div>
 
@@ -885,6 +914,12 @@
     <div class="field">
       <label class="field-label" for="f-title">Title</label>
       <input class="field-input field-input-lg" id="f-title" type="text" placeholder="What is this initiative called?" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="f-parent">Part of <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+      <select class="field-select" id="f-parent"></select>
+      <div class="field-hint">Make this a sub-project of a bigger initiative. The parent's progress becomes the average of its sub-projects.</div>
     </div>
 
     <div class="field">
@@ -1119,6 +1154,7 @@
     sortKey: 'smart', sortDir: 1,
     groupBy: 'none',
     editMode: false, currentId: null, isNew: false,
+    collapsed: new Set(), newParentId: null,
     profileEditing: null,  // profile object being edited
     pendingPhoto: undefined,
   };
@@ -1163,9 +1199,21 @@
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
   function touchesQuarter(i, q) { const s = Number(i.startQ) || 0, e = Number(i.endQ) || s; return q >= s && q <= e; }
-  function progressOf(i) { const p = Number(i.progress); if (i.status === 'complete') return 100; return isNaN(p) ? 0 : Math.max(0, Math.min(100, p)); }
+  function progressOf(i) {
+    if (i.status === 'complete') return 100;
+    const kids = childrenOf(i.id);
+    if (kids.length) return Math.round(kids.reduce((a, k) => a + ownProgress(k), 0) / kids.length);
+    return ownProgress(i);
+  }
   function prioOf(i) { return PRIO_RANK[i.priority] ? i.priority : 'P2'; }
   function checklistOf(i) { return Array.isArray(i.checklist) ? i.checklist : []; }
+  // Sub-projects: a child carries parentId. A dangling parentId (parent deleted) means top-level.
+  function parentOf(i) { return i && i.parentId ? (INITIATIVES.find(x => x.id === i.parentId && x.id !== i.id) || null) : null; }
+  function childrenOf(id) { if (!id) return []; return INITIATIVES.filter(x => x.parentId === id && x.status !== 'killed'); }
+  const isTopLevel = (i) => !parentOf(i);
+  function ownProgress(i) { const p = Number(i.progress); if (i.status === 'complete') return 100; return isNaN(p) ? 0 : Math.max(0, Math.min(100, p)); }
+  function subTag(i) { const p = parentOf(i); return p ? `<span class="sub-tag" title="Part of ${escapeAttr(p.title)}">↳ <b>${escapeHtml(p.title)}</b></span>` : ''; }
+  function subCountTag(i) { const kids = childrenOf(i.id); if (!kids.length) return ''; const done = kids.filter(k => k.status === 'complete').length; return `<span class="sub-count" title="${done} of ${kids.length} sub-projects complete">⌸ ${done}/${kids.length}</span>`; }
   function lastTouched(i) {
     let t = i.updatedAt ? new Date(i.updatedAt).getTime() : 0;
     (i.notes || []).forEach(n => { if (n.ts && n.ts > t) t = n.ts; });
@@ -1308,7 +1356,7 @@
       target: quarterRangeLabel(Number(i.startQ) || 1, Number(i.endQ) || Number(i.startQ) || 1),
       desc: i.desc || '', value: i.value || '',
       priority: prioOf(i), progress: progressOf(i), nextStep: i.nextStep || '', blocker: i.blocker || '',
-      dueDate: i.dueDate || '', checklist: checklistOf(i),
+      dueDate: i.dueDate || '', checklist: checklistOf(i), parentId: i.parentId || '',
     };
   }
   async function saveFields(id, changes, opts = {}) {
@@ -1416,14 +1464,15 @@
 
   // ---------- Overview ----------
   function renderKpis() {
-    const all = INITIATIVES.filter(i => i.status !== 'killed');
+    const all = INITIATIVES.filter(i => i.status !== 'killed' && isTopLevel(i));
+    const subs = INITIATIVES.filter(i => i.status !== 'killed' && !isTopLevel(i)).length;
     const by = { complete: 0, on_track: 0, at_risk: 0, blocked: 0, not_started: 0 };
     all.forEach(i => { if (by[i.status] !== undefined) by[i.status]++; });
     const overdue = all.filter(i => isOverdue(i) || isPastTarget(i)).length;
     const total = all.length || 1;
     const pct = (n) => Math.round((n / total) * 100) + '%';
     const tiles = [
-      { k: 'all', label: 'Portfolio', v: all.length, d: `${INITIATIVES.filter(isOpen).length} open`, fill: '100%', color: 'var(--accent)', tone: '', icon: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', act: () => { clearFilters(); setView('tracker'); } },
+      { k: 'all', label: 'Portfolio', v: all.length, d: `${all.filter(isOpen).length} open${subs ? ` · ${subs} sub-projects` : ''}`, fill: '100%', color: 'var(--accent)', tone: '', icon: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>', act: () => { clearFilters(); setView('tracker'); } },
       { k: 'complete', label: 'Shipped', v: by.complete, d: pct(by.complete), fill: pct(by.complete), color: 'var(--info)', tone: 'tone-info', icon: '<polyline points="20 6 9 17 4 12"/>', act: () => focusStatus('complete') },
       { k: 'on_track', label: 'On track', v: by.on_track, d: pct(by.on_track), fill: pct(by.on_track), color: 'var(--success)', tone: 'tone-success', icon: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>', act: () => focusStatus('on_track') },
       { k: 'risk', label: 'At risk / blocked', v: by.at_risk + by.blocked, d: `${by.blocked} blocked`, fill: pct(by.at_risk + by.blocked), color: 'var(--warning)', tone: 'tone-warning', icon: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', act: () => { clearFilters(); state.statusFilter.add('at_risk'); state.statusFilter.add('blocked'); setView('tracker'); renderAll(); } },
@@ -1437,7 +1486,7 @@
       <div class="kpi-bar"><div class="kpi-bar-fill" style="--fill:${t.fill}; --bar-color:${t.color};"></div></div>
     </button>`).join('');
     root.querySelectorAll('.kpi-card').forEach(b => b.addEventListener('click', () => tiles[Number(b.dataset.kpi)].act()));
-    document.getElementById('page-count').textContent = `${all.length} initiatives`;
+    document.getElementById('page-count').textContent = `${all.length} initiatives${subs ? ` · ${subs} sub-projects` : ''}`;
     const me = profileByName(getMe());
     const h = new Date().getHours();
     document.getElementById('ov-greeting').textContent = me ? `${h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'}, ${me.name.split(' ')[0]}` : 'Revenue Operations';
@@ -1616,15 +1665,22 @@
     return out.join('');
   }
   function renderTracker() {
-    const rows = sortedRows(portfolio().filter(matches));
+    const matched = portfolio().filter(matches);
+    const nest = state.sortKey === 'smart' && state.groupBy === 'none';
+    const matchedIds = new Set(matched.map(i => i.id));
+    // Nested: top-level rows (and children whose parent is not in view) are the rows; matching children ride under their parent.
+    const rows = nest ? sortedRows(matched.filter(i => isTopLevel(i) || !matchedIds.has(i.parentId))) : sortedRows(matched);
     const table = document.getElementById('tracker-table');
     const th = COLUMNS.map(c => `<th class="sortable ${state.sortKey === c.k ? 'sorted' : ''}" data-sort="${c.k}">${c.label}<span class="sort-ind">${state.sortKey === c.k ? (state.sortDir === 1 ? '↑' : '↓') : ''}</span></th>`).join('');
     let body = '';
-    const rowHtml = (i) => {
+    const rowHtml = (i, asChild) => {
       const s = statusOf(i.status); const p = progressOf(i); const cl = checklistOf(i); const done = cl.filter(c => c.done).length;
-      return `<tr data-id="${i.id}" class="${i.status === 'complete' ? 'row-done' : ''} ${i.status === 'killed' ? 'row-killed' : ''}">
-        <td class="t-code">${escapeHtml(i.code || '')}</td>
-        <td><div class="t-title"><span class="ws-dot" style="--ws-color:${wsOf(i.ws).color}" title="${wsOf(i.ws).label}"></span><span class="t-title-text" title="${escapeAttr(i.title)}">${escapeHtml(i.title)}</span>${flagsHtml(i)}</div>${i.blocker && i.status === 'blocked' ? `<div class="t-sub" style="color:var(--blocked)">⛔ ${escapeHtml(i.blocker)}</div>` : (i.desc ? `<div class="t-sub">${escapeHtml(i.desc)}</div>` : '')}</td>
+      const kids = nest ? childrenOf(i.id).filter(k => matchedIds.has(k.id)) : [];
+      const collapsed = state.collapsed.has(i.id);
+      const toggle = kids.length ? `<button class="tw-toggle ${collapsed ? '' : 'open'}" data-tw="${i.id}" title="${collapsed ? 'Show' : 'Hide'} ${kids.length} sub-project${kids.length > 1 ? 's' : ''}"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>` : '';
+      let html = `<tr data-id="${i.id}" class="${i.status === 'complete' ? 'row-done' : ''} ${i.status === 'killed' ? 'row-killed' : ''} ${asChild ? 'row-child' : ''}">
+        <td class="t-code">${asChild ? '↳ ' : ''}${escapeHtml(i.code || '')}</td>
+        <td><div class="t-title">${toggle}<span class="ws-dot" style="--ws-color:${wsOf(i.ws).color}" title="${wsOf(i.ws).label}"></span><span class="t-title-text" title="${escapeAttr(i.title)}">${escapeHtml(i.title)}</span>${subCountTag(i)}${!nest || (!asChild && parentOf(i)) ? subTag(i) : ''}${flagsHtml(i)}</div>${i.blocker && i.status === 'blocked' ? `<div class="t-sub" style="color:var(--blocked)">⛔ ${escapeHtml(i.blocker)}</div>` : (i.desc ? `<div class="t-sub">${escapeHtml(i.desc)}</div>` : '')}</td>
         <td>${ownerChip(i.owner, 'av-sm')}</td>
         <td><select class="inline-select" data-inline="status" data-id="${i.id}" style="color:${s.color}">${STATUSES.map(x => `<option value="${x.id}" ${x.id === i.status ? 'selected' : ''}>${x.label}</option>`).join('')}</select></td>
         <td><select class="inline-select prio prio-${prioOf(i)}" data-inline="priority" data-id="${i.id}">${PRIORITIES.map(x => `<option value="${x.id}" ${x.id === prioOf(i) ? 'selected' : ''}>${x.id}</option>`).join('')}</select></td>
@@ -1634,6 +1690,8 @@
         <td><div class="t-next ${i.nextStep ? '' : 'empty'}" title="${escapeAttr(i.nextStep || '')}">${i.nextStep ? escapeHtml(i.nextStep) : 'No next step'}</div></td>
         <td class="t-upd" title="${lastTouched(i) ? new Date(lastTouched(i)).toLocaleString() : ''}">${lastTouched(i) ? relTime(lastTouched(i)) : '—'}</td>
       </tr>`;
+      if (kids.length && !collapsed) kids.sort(smartCompare).forEach(k => html += rowHtml(k, true));
+      return html;
     };
     if (!rows.length) {
       body = `<tr><td colspan="${COLUMNS.length}"><div class="table-empty">${anyFiltersActive() ? 'Nothing matches these filters.' : 'No initiatives yet. Add the first one with New.'}</div></td></tr>`;
@@ -1647,7 +1705,7 @@
     } else rows.forEach(i => body += rowHtml(i));
     table.innerHTML = `<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
     const total = INITIATIVES.filter(i => i.status !== 'killed').length;
-    document.getElementById('tracker-foot').textContent = `${rows.length} of ${total} initiatives${state.statusFilter.has('killed') ? ' (killed shown)' : ''}`;
+    document.getElementById('tracker-foot').textContent = `${matched.length} of ${total} initiatives${state.statusFilter.has('killed') ? ' (killed shown)' : ''}`;
     document.getElementById('tracker-foot-r').textContent = state.sortKey === 'smart' ? 'Sorted by what needs you first: blocked, at risk, on track, then priority' : `Sorted by ${COLUMNS.find(c => c.k === state.sortKey).label}`;
     const fn = document.getElementById('tracker-filtered');
     if (anyFiltersActive()) { fn.style.display = ''; fn.innerHTML = `<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filtered <span>· ${rows.length} of ${total}</span><button data-act="clear" title="Clear filters">×</button>`; }
@@ -1674,9 +1732,10 @@
     const p = progressOf(i); const s = statusOf(i.status); const cl = checklistOf(i); const done = cl.filter(c => c.done).length;
     return `<div class="kcard" draggable="true" data-id="${i.id}" style="${i.status === 'killed' ? 'width:260px;opacity:.7' : ''}">
       <div class="kcard-head"><span class="kcard-code">${escapeHtml(i.code || '')}</span><span style="display:flex;gap:4px;align-items:center;">${flagsHtml(i)}<span class="prio prio-${prioOf(i)}">${prioOf(i)}</span></span></div>
+      ${parentOf(i) ? `<div class="kcard-parent">↳ ${escapeHtml(parentOf(i).title)}</div>` : ''}
       <div class="kcard-title">${escapeHtml(i.title)}</div>
       ${i.status === 'blocked' && i.blocker ? `<div class="kcard-next" style="color:var(--blocked)">⛔ ${escapeHtml(i.blocker)}</div>` : (i.nextStep ? `<div class="kcard-next">→ ${escapeHtml(i.nextStep)}</div>` : '')}
-      <div class="kcard-foot"><div class="left">${avatarHtml(i.owner, 'av-sm')}<span class="ws-pill" style="--ws-color:${wsOf(i.ws).color}">${wsOf(i.ws).code}</span>${cl.length ? `<span class="tag tag-mono" title="Checklist">${done}/${cl.length}</span>` : ''}</div><span class="t-upd">${i.dueDate ? fmtDate(i.dueDate) : escapeHtml(quarterRangeLabel(i.startQ, i.endQ))}</span></div>
+      <div class="kcard-foot"><div class="left">${avatarHtml(i.owner, 'av-sm')}<span class="ws-pill" style="--ws-color:${wsOf(i.ws).color}">${wsOf(i.ws).code}</span>${subCountTag(i)}${cl.length ? `<span class="tag tag-mono" title="Checklist">${done}/${cl.length}</span>` : ''}</div><span class="t-upd">${i.dueDate ? fmtDate(i.dueDate) : escapeHtml(quarterRangeLabel(i.startQ, i.endQ))}</span></div>
       ${isOpen(i) && p > 0 ? `<div class="kcard-progress"><div class="progress"><i style="--p:${p}%;--pc:${s.color}"></i></div></div>` : ''}
     </div>`;
   }
@@ -1724,7 +1783,7 @@
         else { cs = Math.max(1, Math.min(4, Math.max(5, rs) - 4)); ce = Math.max(cs + 1, Math.min(5, Math.min(8, re) - 4 + 1)); before = rs < 5; }
         const p = progressOf(i);
         html += `<div class="tl-row" data-id="${i.id}">
-          <div class="tl-row-label" data-open="${i.id}"><span class="tl-row-code">${escapeHtml(i.code || '')}</span><span class="tl-row-title" style="${i.status === 'killed' ? 'text-decoration:line-through;color:var(--text-3)' : ''}">${escapeHtml(i.title)}</span></div>
+          <div class="tl-row-label" data-open="${i.id}"><span class="tl-row-code">${escapeHtml(i.code || '')}</span><span class="tl-row-title ${parentOf(i) ? 'child' : ''}" style="${i.status === 'killed' ? 'text-decoration:line-through;color:var(--text-3)' : ''}" title="${parentOf(i) ? 'Part of ' + escapeAttr(parentOf(i).title) : ''}">${escapeHtml(i.title)}</span></div>
           <div class="tl-row-track"><div class="tl-bar${i.status === 'killed' ? ' tl-bar-killed' : ''}" data-open="${i.id}" style="grid-column:${cs} / ${ce}; --bar-bg:${st.bg}; --bar-fg:${st.fg}; --bar-border:${st.border};" title="${s.label} · ${escapeAttr(quarterRangeLabel(rs, re))} · ${escapeAttr(i.owner || 'Unassigned')} · ${p}%">
             <span class="tl-bar-progress" style="--p:${p}%"></span>
             <span style="position:relative;display:flex;align-items:center;gap:6px;">${avatarHtml(i.owner, 'av-sm')}${s.label}${isOpen(i) && p ? ` · ${p}%` : ''}</span>
@@ -1841,15 +1900,30 @@
     const d = document.getElementById('drawer-desc'); d.innerHTML = i.desc ? linkify(i.desc) : 'No description'; d.classList.toggle('empty', !i.desc);
     const v = document.getElementById('drawer-value'); v.innerHTML = i.value ? linkify(i.value) : 'Not stated'; v.classList.toggle('empty', !i.value);
     renderChecklist(i); renderNotesLog(i.notes || []);
+    const pl = document.getElementById('drawer-parent'); const par = parentOf(i);
+    if (par) { pl.style.display = ''; pl.innerHTML = `↳ Part of <a data-open="${par.id}">${escapeHtml(par.title)}</a>`; } else pl.style.display = 'none';
+    renderSubs(i);
+  }
+  function renderSubs(i) {
+    const kids = childrenOf(i.id).sort(smartCompare);
+    document.getElementById('subs-sum').textContent = kids.length ? `· ${kids.filter(k => k.status === 'complete').length} of ${kids.length} complete · progress is their average` : '';
+    document.getElementById('drawer-subs').innerHTML = kids.length ? kids.map(k => `<div class="sub-row" data-open="${k.id}"><span class="t">${escapeHtml(k.title)}<span class="t-code" style="margin-left:6px">${escapeHtml(k.code || '')}</span></span><span class="pbar pbar-mini"><i style="--p:${progressOf(k)}%;--pc:${statusOf(k.status).color}"></i></span><span class="badge badge-${statusOf(k.status).badge}">${statusOf(k.status).label}</span></div>`).join('')
+      : `<div class="subs-empty">No sub-projects yet. Add one to break this initiative into pieces with their own owner, status and dates.</div>`;
+  }
+  function addSubProject() {
+    const parent = INITIATIVES.find(x => x.id === state.currentId); if (!parent) return;
+    openNewDrawer({ parentId: parent.id, ws: parent.ws, owner: parent.owner, startQ: parent.startQ, endQ: parent.endQ });
   }
   function previewProgress(v) { document.getElementById('drawer-progress-num').textContent = `· ${v}%`; }
   async function commitProgress(v) { if (!state.currentId) return; const i = INITIATIVES.find(x => x.id === state.currentId); if (!i) return; const changes = { progress: Number(v) }; if (Number(v) === 100 && isOpen(i)) { if (confirm('Mark it as shipped too?')) changes.status = 'complete'; } try { await saveFields(state.currentId, changes, { toast: 'Progress saved' }); } catch (_) {} }
-  function openNewDrawer() {
+  function openNewDrawer(defaults = {}) {
     state.currentId = null; state.isNew = true; state.editMode = true;
     document.getElementById('drawer-code').textContent = 'NEW';
     const pill = document.getElementById('drawer-ws'); pill.textContent = 'New initiative'; pill.style.setProperty('--ws-color', 'var(--accent)');
     document.getElementById('drawer-flags').innerHTML = '';
-    fillForm({ title: '', ws: 'sales', status: 'not_started', owner: getMe() || '', effort: 'M', startQ: Math.min(8, Math.max(1, currentQuarterIndex() || 1)), endQ: Math.min(8, Math.max(1, currentQuarterIndex() || 1)), desc: '', value: '', priority: 'P2', progress: 0, nextStep: '', blocker: '', dueDate: '' });
+    const q = Math.min(8, Math.max(1, currentQuarterIndex() || 1));
+    fillForm(Object.assign({ title: '', ws: 'sales', status: 'not_started', owner: getMe() || '', effort: 'M', startQ: q, endQ: q, desc: '', value: '', priority: 'P2', progress: 0, nextStep: '', blocker: '', dueDate: '', parentId: '' }, defaults));
+    if (defaults.parentId) { const p = INITIATIVES.find(x => x.id === defaults.parentId); pill.textContent = p ? `Sub-project of ${p.title}` : 'New sub-project'; }
     showEditMode();
     document.getElementById('delete-btn').style.display = 'none';
     document.getElementById('drawer-backdrop').classList.add('open'); document.getElementById('drawer').classList.add('open'); document.body.style.overflow = 'hidden';
@@ -1874,6 +1948,14 @@
     setQuarterRange(Number(i.startQ) || 1, Number(i.endQ) || Number(i.startQ) || 1);
     document.getElementById('f-next').value = i.nextStep || ''; document.getElementById('f-blocker').value = i.blocker || '';
     document.getElementById('f-desc').value = i.desc || ''; document.getElementById('f-value').value = i.value || '';
+    fillParentSelect(i);
+  }
+  function fillParentSelect(i) {
+    const sel = document.getElementById('f-parent'); const selfId = i.id || null;
+    const descendants = new Set(); (function walk(id) { childrenOf(id).forEach(k => { descendants.add(k.id); walk(k.id); }); })(selfId);
+    const opts = INITIATIVES.filter(x => x.id !== selfId && !descendants.has(x.id) && isTopLevel(x) && x.status !== 'killed').sort((a, b) => String(a.code || '').localeCompare(String(b.code || '')));
+    sel.innerHTML = `<option value="">— none, this is its own initiative —</option>` + opts.map(x => `<option value="${x.id}" ${x.id === (i.parentId || '') ? 'selected' : ''}>${escapeHtml(x.code || '')} · ${escapeHtml(x.title)}</option>`).join('');
+    sel.value = i.parentId && opts.some(x => x.id === i.parentId) ? i.parentId : '';
   }
   function setStatusSeg(v) { document.getElementById('f-status').value = v; document.getElementById('f-status-seg').innerHTML = STATUSES.map(s => `<span class="badge badge-${s.badge} ${s.id === v ? 'sel' : ''}" data-set-status="${s.id}">${s.label}</span>`).join(''); }
   function setPrioSeg(v) { document.getElementById('f-prio').value = v; document.getElementById('f-prio-seg').innerHTML = PRIORITIES.map(p => `<span class="prio prio-${p.id} ${p.id === v ? 'sel' : ''}" data-set-prio="${p.id}" title="${p.label}">${p.label.replace(' · ', ' ')}</span>`).join(''); }
@@ -1891,6 +1973,7 @@
       priority: document.getElementById('f-prio').value, progress: Number(document.getElementById('f-progress').value),
       nextStep: document.getElementById('f-next').value.trim(), blocker: document.getElementById('f-blocker').value.trim(), dueDate: document.getElementById('f-due').value || '',
       checklist: state.isNew ? [] : checklistOf(INITIATIVES.find(x => x.id === state.currentId) || {}),
+      parentId: document.getElementById('f-parent').value || '',
     };
     if (item.status === 'complete' && item.progress < 100) item.progress = 100;
     const btn = document.getElementById('save-btn'); btn.disabled = true; btn.textContent = 'Saving…';
@@ -2115,16 +2198,17 @@
   function download(name, mime, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
   function exportJson() { download(`revops-tracker-${todayIso()}.json`, 'application/json', JSON.stringify(currentRows().map(i => ({ ...i, kind: undefined })), null, 2)); toast('JSON downloaded'); }
   function exportCsv() {
-    const cols = ['code', 'title', 'workstream', 'owner', 'status', 'priority', 'progress', 'target', 'dueDate', 'nextStep', 'blocker', 'effort', 'description', 'businessValue', 'updated'];
+    const cols = ['code', 'title', 'partOf', 'workstream', 'owner', 'status', 'priority', 'progress', 'target', 'dueDate', 'nextStep', 'blocker', 'effort', 'description', 'businessValue', 'updated'];
     const esc = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
-    const lines = [cols.join(',')].concat(currentRows().map(i => [i.code, i.title, wsOf(i.ws).label, i.owner, statusOf(i.status).label, prioOf(i), progressOf(i), quarterRangeLabel(i.startQ, i.endQ), i.dueDate || '', i.nextStep || '', i.blocker || '', i.effort, i.desc, i.value, lastTouched(i) ? new Date(lastTouched(i)).toISOString() : ''].map(esc).join(',')));
+    const lines = [cols.join(',')].concat(currentRows().map(i => [i.code, i.title, parentOf(i) ? parentOf(i).title : '', wsOf(i.ws).label, i.owner, statusOf(i.status).label, prioOf(i), progressOf(i), quarterRangeLabel(i.startQ, i.endQ), i.dueDate || '', i.nextStep || '', i.blocker || '', i.effort, i.desc, i.value, lastTouched(i) ? new Date(lastTouched(i)).toISOString() : ''].map(esc).join(',')));
     download(`revops-tracker-${todayIso()}.csv`, 'text/csv;charset=utf-8', '﻿' + lines.join('\n')); toast('CSV downloaded');
   }
 
   // ---------- Global event delegation ----------
   document.addEventListener('click', async (e) => {
     const t = e.target;
-    const inSelect = t.closest('select, input, textarea, a, .inline-select');
+    const inSelect = t.closest('select, input, textarea, .inline-select');
+    const tw = t.closest('[data-tw]'); if (tw) { const id = tw.dataset.tw; if (state.collapsed.has(id)) state.collapsed.delete(id); else state.collapsed.add(id); renderTracker(); return; }
     // Open an item
     const open = t.closest('[data-open]');
     if (open && !inSelect) { openDrawer(open.dataset.open); return; }
