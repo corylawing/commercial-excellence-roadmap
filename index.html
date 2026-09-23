@@ -1270,6 +1270,30 @@
   }
 
   // ---------- Data plumbing ----------
+  // THE SHEET KEEPS ONLY ITS ORIGINAL COLUMNS. Every field the tracker added (priority, progress, next
+  // step, blocker, due/done dates, checklist, sub-project link, and a profile's kind/name/role/email/
+  // photo) rides INSIDE the description column behind a marker, and is unpacked on read. The upsert
+  // response echoes unknown keys, so only a fresh read proves persistence — which is how this was found.
+  const EXTRA_MARK = '\n\n@@tracker:';
+  const EXTRA_KEYS = ['priority', 'progress', 'nextStep', 'blocker', 'dueDate', 'doneDate', 'checklist', 'parentId', 'kind', 'name', 'role', 'email', 'photo'];
+  function unpackRow(r) {
+    if (!r || typeof r !== 'object') return r;
+    const d = String(r.desc || '');
+    const at = d.indexOf(EXTRA_MARK);
+    if (at >= 0) {
+      try { const extra = JSON.parse(d.slice(at + EXTRA_MARK.length)); EXTRA_KEYS.forEach(k => { if (extra[k] !== undefined && extra[k] !== '' && extra[k] !== null) r[k] = extra[k]; }); } catch (_) {}
+      r.desc = d.slice(0, at);
+    }
+    // A profile row saved before the packing existed lost its kind on the way into the Sheet.
+    if (!r.kind && /^Profile · /.test(String(r.title || '')) && /^Team profile row/.test(String(r.desc || ''))) { r.kind = 'profile'; r.name = r.name || String(r.title).slice('Profile · '.length); }
+    return r;
+  }
+  function packDesc(desc, extras) {
+    const clean = String(desc || '').split(EXTRA_MARK)[0];
+    const keep = {};
+    EXTRA_KEYS.forEach(k => { const v = extras[k]; if (v === undefined || v === null || v === '') return; if (Array.isArray(v) && !v.length) return; keep[k] = v; });
+    return Object.keys(keep).length ? clean + EXTRA_MARK + JSON.stringify(keep) : clean;
+  }
   function isValidRow(i) {
     if (!i || typeof i !== 'object') return false;
     if (!i.id || typeof i.id !== 'string' || !i.id.startsWith('i_')) return false;
@@ -1278,7 +1302,7 @@
     return true;
   }
   function ingest(rows, snapshots) {
-    RAW_ROWS = (rows || []).filter(isValidRow);
+    RAW_ROWS = (rows || []).map(r => unpackRow(r && typeof r === 'object' ? { ...r } : r)).filter(isValidRow);
     INITIATIVES = RAW_ROWS.filter(r => r.kind !== 'profile');
     PROFILES = buildProfiles(RAW_ROWS);
     if (snapshots) SNAPSHOTS = snapshots;
@@ -1337,8 +1361,9 @@
   const VERIFY_FIELDS = ['title', 'status', 'owner', 'priority', 'progress', 'nextStep', 'blocker', 'dueDate', 'doneDate', 'startQ', 'endQ', 'parentId', 'desc', 'value'];
   function landed(res, payload) {
     if (!res || !res._maybe) return true;
-    const row = (res.initiatives || []).find(r => r.id === payload.id); if (!row) return false;
-    return VERIFY_FIELDS.every(k => String(row[k] == null ? '' : row[k]) === String(payload[k] == null ? '' : payload[k])) && JSON.stringify(row.checklist || []) === JSON.stringify(payload.checklist || []);
+    const raw = (res.initiatives || []).find(r => r.id === payload.id); if (!raw) return false; const row = unpackRow({ ...raw });
+    const want = { ...payload, desc: String(payload.desc || '').split(EXTRA_MARK)[0] };
+    return VERIFY_FIELDS.every(k => String(row[k] == null ? '' : row[k]) === String(want[k] == null ? '' : want[k])) && JSON.stringify(row.checklist || []) === JSON.stringify(want.checklist || []);
   }
   function applyWriteResult(res) {
     if (res && Array.isArray(res.initiatives)) ingest(res.initiatives, res.snapshots || SNAPSHOTS);
@@ -1372,15 +1397,17 @@
   // Full payload for an upsert. The server keeps whatever keys it is sent, so every save carries the
   // whole tracker shape; notes/code/h/createdAt are the server's to manage and are never sent.
   function payloadFor(i) {
-    return {
+    const p = {
       id: i.id || null,
       title: i.title || '', ws: i.ws || 'sales', status: i.status || 'not_started', owner: i.owner || 'Unassigned',
       effort: i.effort || 'M', startQ: Number(i.startQ) || 1, endQ: Number(i.endQ) || Number(i.startQ) || 1,
       target: quarterRangeLabel(Number(i.startQ) || 1, Number(i.endQ) || Number(i.startQ) || 1),
-      desc: i.desc || '', value: i.value || '',
-      priority: prioOf(i), progress: progressOf(i), nextStep: i.nextStep || '', blocker: i.blocker || '',
+      value: i.value || '',
+      priority: prioOf(i), progress: ownProgress(i), nextStep: i.nextStep || '', blocker: i.blocker || '',
       dueDate: i.dueDate || '', doneDate: i.doneDate || '', checklist: checklistOf(i), parentId: i.parentId || '',
     };
+    p.desc = packDesc(i.desc, p);
+    return p;
   }
   async function saveFields(id, changes, opts = {}) {
     const i = INITIATIVES.find(x => x.id === id);
@@ -2151,7 +2178,7 @@
   function profilePayload(p) {
     return { id: p.id || null, kind: 'profile', name: p.name, role: p.role || '', email: p.email || '', photo: p.photo || '',
       title: `Profile · ${p.name}`, ws: 'optimization', status: 'not_started', owner: p.name, effort: 'S', startQ: 1, endQ: 1, target: '',
-      desc: 'Team profile row, managed from the tracker’s Team page. Not an initiative.', value: '' };
+      desc: packDesc('Team profile row, managed from the tracker’s Team page. Not an initiative.', { kind: 'profile', name: p.name, role: p.role || '', email: p.email || '', photo: p.photo || '' }), value: '' };
   }
   async function saveProfile() {
     const p = state.profileEditing; if (!p) return;
@@ -2219,7 +2246,7 @@
   }
 
   // ---------- Snapshots ----------
-  const snapRows = (s) => (Array.isArray(s.data) ? s.data : (s.data && s.data.initiatives) || []).filter(r => r && r.kind !== 'profile');
+  const snapRows = (s) => (Array.isArray(s.data) ? s.data : (s.data && s.data.initiatives) || []).map(r => unpackRow(r && typeof r === 'object' ? { ...r } : r)).filter(r => r && r.kind !== 'profile');
   async function takeSnapshot() {
     const name = prompt('Snapshot name', `Snapshot ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`); if (!name) return;
     try { const res = await apiPost({ action: 'snapshot', name }); applyWriteResult(res); renderSnapshots(); toast('Snapshot saved'); } catch (e) { toast('Snapshot failed: ' + e.message, true); }

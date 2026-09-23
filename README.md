@@ -36,9 +36,14 @@ activity automatically.
 - `POST { action: 'upsert', item }` · `{ action: 'delete', id }` · `{ action: 'addNote', id, author, text }`
   · `{ action: 'snapshot', name }` · `{ action: 'deleteSnapshot', id }`
 
-The Sheet keeps every key an upsert sends, so new fields need no backend change. Team profiles are
-stored as rows with `kind: 'profile'` (photo as a small data URL); the page filters them out of
-every initiative view. Codes (`SLS-01`…) are assigned by the server from row order and shift when
+The Sheet keeps ONLY its original columns and drops any other key (the upsert response echoes
+them, which is misleading; only a fresh read tells the truth). So every field the tracker added
+(priority, progress, next step, blocker, due/done dates, checklist, sub-project link) travels inside
+the `desc` column behind a `@@tracker:` marker followed by JSON, packed on save (`packDesc`) and
+unpacked on read (`unpackRow`). Team profiles are rows titled `Profile · <name>` whose `desc` carries
+`kind: 'profile'`, name, role, email and the photo (a ≤24 KB JPEG data URL); the page filters them out
+of every initiative view. **Do not edit the description column by hand in the Sheet** — the tail is
+where those fields live. Codes (`SLS-01`…) are assigned by the server from row order and shift when
 rows are added or removed — the `id` is the stable key.
 
 ## Running locally
