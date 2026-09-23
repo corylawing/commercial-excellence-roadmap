@@ -1290,16 +1290,17 @@
   let toastTimer;
   function toast(msg, isError = false) { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'toast show' + (isError ? ' error' : ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.className = 'toast' + (isError ? ' error' : ''); }, 2600); }
 
-  async function apiRead() {
+  async function apiRead(attempt = 0) {
     if (PREVIEW) return { ok: true, initiatives: window.__PREVIEW_DATA__.initiatives || [], snapshots: window.__PREVIEW_DATA__.snapshots || [] };
     if (!isConfigured()) return null;
     const res = await fetch(APPS_SCRIPT_URL + '?action=read', { method: 'GET' });
-    if (!res.ok) throw new Error('Read failed: HTTP ' + res.status);
+    if (!res.ok) { if (attempt === 0) { await sleep(700); return apiRead(1); } throw new Error('Read failed: HTTP ' + res.status); }
     const json = await res.json();
     if (!json.ok) throw new Error(json.error || 'Read failed');
     return json;
   }
-  async function apiPost(body) {
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+  async function apiPost(body, attempt = 0) {
     if (PREVIEW) throw new Error('This is a read-only preview');
     if (!isConfigured()) throw new Error('Backend URL not configured');
     setConnStatus('saving', 'Saving…');
@@ -1313,7 +1314,16 @@
         try { const data = await apiRead(); return { ok: true, _maybe: true, initiatives: data.initiatives, snapshots: data.snapshots }; }
         catch (readErr) { throw new Error('Network error. Refresh and check the Sheet.'); }
       }
-      if (!res.ok) throw new Error('Write failed: HTTP ' + res.status);
+      if (!res.ok) {
+        // Google's script host sometimes answers the post-write redirect with a 404 or 5xx although
+        // the write landed. Updates and deletes are safe to send twice, so retry once; then re-read and
+        // let the caller check whether the change is there instead of reporting a failure it cannot see.
+        const idempotent = (body.action === 'upsert' && body.item && body.item.id) || body.action === 'delete' || body.action === 'deleteSnapshot';
+        if (idempotent && attempt === 0) { await sleep(700); return apiPost(body, 1); }
+        console.warn('POST HTTP ' + res.status + ', re-reading to verify');
+        const data = await apiRead();
+        return { ok: true, _maybe: true, httpStatus: res.status, initiatives: data.initiatives, snapshots: data.snapshots };
+      }
       let json;
       try { json = await res.json(); }
       catch (parseErr) { console.warn('POST response not JSON, re-reading:', parseErr); const data = await apiRead(); return { ok: true, _maybe: true, initiatives: data.initiatives, snapshots: data.snapshots }; }
@@ -1322,6 +1332,13 @@
     } finally {
       setConnStatus('online', 'Synced');
     }
+  }
+  // After an unconfirmed write (_maybe), compare what we sent with what the Sheet now holds.
+  const VERIFY_FIELDS = ['title', 'status', 'owner', 'priority', 'progress', 'nextStep', 'blocker', 'dueDate', 'doneDate', 'startQ', 'endQ', 'parentId', 'desc', 'value'];
+  function landed(res, payload) {
+    if (!res || !res._maybe) return true;
+    const row = (res.initiatives || []).find(r => r.id === payload.id); if (!row) return false;
+    return VERIFY_FIELDS.every(k => String(row[k] == null ? '' : row[k]) === String(payload[k] == null ? '' : payload[k])) && JSON.stringify(row.checklist || []) === JSON.stringify(payload.checklist || []);
   }
   function applyWriteResult(res) {
     if (res && Array.isArray(res.initiatives)) ingest(res.initiatives, res.snapshots || SNAPSHOTS);
@@ -1376,10 +1393,12 @@
     renderAll();
     if (state.currentId === id && !state.editMode) fillDrawerView(i);
     try {
-      const res = await apiPost({ action: 'upsert', item: payloadFor(merged) });
+      const payload = payloadFor(merged);
+      const res = await apiPost({ action: 'upsert', item: payload });
+      if (!landed(res, payload)) throw new Error('the Sheet did not confirm the change. Try again.');
       applyWriteResult(res);
-      await postSystemNotes(id, before, merged, opts.silent);
       renderAll();
+      postSystemNotes(id, before, merged, opts.silent);
       if (state.currentId === id && !state.editMode) { const cur = INITIATIVES.find(x => x.id === id); if (cur) fillDrawerView(cur); }
       if (opts.toast !== false) toast(opts.toast || 'Saved');
     } catch (e) {
@@ -1990,25 +2009,46 @@
     };
     if (item.status === 'complete' && item.progress < 100) item.progress = 100;
     stampDone(item);
-    const btn = document.getElementById('save-btn'); btn.disabled = true; btn.textContent = 'Saving…';
-    const before = state.isNew ? null : { ...(INITIATIVES.find(x => x.id === state.currentId) || {}) };
+    item.target = quarterRangeLabel(item.startQ, item.endQ);
+    const payload = payloadFor(item);
+
+    // OPTIMISTIC: the screen moves now; the Sheet catches up in the background (2-4s per call).
+    if (!state.isNew) {
+      const cur = INITIATIVES.find(x => x.id === state.currentId); if (!cur) return;
+      const before = { ...cur };
+      Object.assign(cur, item, { updatedAt: new Date().toISOString() });
+      renderAll(); openDrawer(cur.id); toast('Saved · syncing…');
+      try {
+        const res = await apiPost({ action: 'upsert', item: payload });
+        if (!landed(res, payload)) throw new Error('the Sheet did not confirm the change. Try again.');
+        applyWriteResult(res); renderAll();
+        if (state.currentId === cur.id && !state.editMode) { const fresh = INITIATIVES.find(x => x.id === cur.id); if (fresh) fillDrawerView(fresh); }
+        postSystemNotes(cur.id, before, item); // not awaited: the log line lands a moment later
+      } catch (e) {
+        const back = INITIATIVES.find(x => x.id === before.id); if (back) Object.assign(back, before);
+        renderAll(); if (state.currentId === before.id && !state.editMode) fillDrawerView(back);
+        toast('Save failed, changes rolled back: ' + e.message, true);
+      }
+      return;
+    }
+    // New item: show it at once under a temporary id, swap in the server's row when it answers.
+    const temp = { ...item, id: 'i_tmp_' + Date.now().toString(36), code: '…', notes: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    INITIATIVES.push(temp); state.isNew = false; closeDrawer(); renderAll(); toast('Created · syncing…');
     try {
-      const res = await apiPost({ action: 'upsert', item: payloadFor(item) });
-      applyWriteResult(res);
-      let saved = state.isNew ? INITIATIVES.filter(x => x.title === title && x.ws === item.ws).sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')))[0] : INITIATIVES.find(x => x.id === state.currentId);
-      if (saved && before) await postSystemNotes(saved.id, before, saved);
-      state.isNew = false; state.currentId = saved ? saved.id : null;
-      renderAll();
-      if (saved) { toast('Saved'); openDrawer(saved.id); }
-      else if (res._maybe) { toast('Save may not have completed. Refresh to check.', true); closeDrawer(); }
-      else { toast('Saved, but the item could not be located in the response', true); closeDrawer(); }
-    } catch (e) { toast('Save failed: ' + e.message, true); }
-    finally { btn.disabled = false; btn.textContent = 'Save'; }
+      const res = await apiPost({ action: 'upsert', item: payload });
+      applyWriteResult(res); renderAll();
+      const saved = INITIATIVES.filter(x => x.title === title && x.ws === item.ws && !String(x.id).startsWith('i_tmp_')).sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')))[0];
+      if (!saved) throw new Error('the Sheet did not confirm it was created');
+    } catch (e) {
+      INITIATIVES = INITIATIVES.filter(x => x.id !== temp.id); renderAll();
+      toast('Could not create it: ' + e.message + '. Reopening the form.', true);
+      openNewDrawer(item);
+    }
   }
   async function deleteInitiative() {
     if (!state.currentId || state.isNew) return; const i = INITIATIVES.find(x => x.id === state.currentId); if (!i) return;
     if (!confirm(`Delete "${i.title}"? Consider marking it Killed instead, which keeps the history.`)) return;
-    try { const res = await apiPost({ action: 'delete', id: state.currentId }); applyWriteResult(res); closeDrawer(); renderAll(); toast('Deleted'); } catch (e) { toast('Delete failed: ' + e.message, true); }
+    try { const res = await apiPost({ action: 'delete', id: state.currentId }); if (res._maybe && (res.initiatives || []).some(r => r.id === state.currentId)) throw new Error('the Sheet did not confirm the delete'); applyWriteResult(res); closeDrawer(); renderAll(); toast('Deleted'); } catch (e) { toast('Delete failed: ' + e.message, true); }
   }
 
   // Owner combobox
