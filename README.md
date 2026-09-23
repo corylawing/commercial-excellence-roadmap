@@ -26,7 +26,7 @@ parent's progress is the average of its sub-projects. KPI tiles count top-level 
 ## Item fields
 
 `title · workstream · status · priority (P1–P3) · owner · effort · startQ/endQ (1–4 = 2026,
-5–8 = 2027) · dueDate · progress (0–100) · nextStep · blocker · checklist · description ·
+5–8 = 2027) · dueDate · doneDate (set to the day an item is marked Shipped when empty; never overwritten; editable) · progress (0–100) · nextStep · blocker · checklist · description ·
 business value · parentId · notes (append-only)`. Status and owner changes post a line into the item's
 activity automatically.
 

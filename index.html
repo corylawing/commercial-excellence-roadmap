@@ -857,6 +857,7 @@
       <div class="drawer-meta-item"><span class="drawer-meta-label">Owner</span><span class="drawer-meta-value" id="drawer-owner">—</span></div>
       <div class="drawer-meta-item"><span class="drawer-meta-label">Target</span><span class="drawer-meta-value" id="drawer-target">—</span></div>
       <div class="drawer-meta-item"><span class="drawer-meta-label">Due</span><span class="drawer-meta-value" id="drawer-due">—</span></div>
+      <div class="drawer-meta-item"><span class="drawer-meta-label">Done</span><span class="drawer-meta-value" id="drawer-done">—</span></div>
       <div class="drawer-meta-item"><span class="drawer-meta-label">Effort</span><span class="drawer-meta-value" id="drawer-effort">—</span></div>
     </div>
 
@@ -959,11 +960,16 @@
       </div>
     </div>
 
-    <div class="field-row">
+    <div class="field-row-3">
       <div class="field">
         <label class="field-label" for="f-due">Due date <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
         <input class="field-input" id="f-due" type="date">
-        <div class="field-hint">A hard date. The quarter range below is the plan; this is the commitment.</div>
+        <div class="field-hint">The commitment. The quarter range below is the plan.</div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="f-done">Done date</label>
+        <input class="field-input" id="f-done" type="date">
+        <div class="field-hint">Set to the day it is marked Shipped, if empty. Change it if the real date differs.</div>
       </div>
       <div class="field">
         <label class="field-label">Progress</label>
@@ -1356,7 +1362,7 @@
       target: quarterRangeLabel(Number(i.startQ) || 1, Number(i.endQ) || Number(i.startQ) || 1),
       desc: i.desc || '', value: i.value || '',
       priority: prioOf(i), progress: progressOf(i), nextStep: i.nextStep || '', blocker: i.blocker || '',
-      dueDate: i.dueDate || '', checklist: checklistOf(i), parentId: i.parentId || '',
+      dueDate: i.dueDate || '', doneDate: i.doneDate || '', checklist: checklistOf(i), parentId: i.parentId || '',
     };
   }
   async function saveFields(id, changes, opts = {}) {
@@ -1365,6 +1371,7 @@
     const before = { ...i };
     const merged = { ...i, ...changes };
     if (changes.status === 'complete' && progressOf(merged) < 100) merged.progress = 100;
+    stampDone(merged);
     Object.assign(i, merged); // optimistic
     renderAll();
     if (state.currentId === id && !state.editMode) fillDrawerView(i);
@@ -1399,6 +1406,8 @@
     }
     saveCache();
   }
+  // Done date: written once, the day an item becomes Shipped, and only when it is empty. Never overwritten.
+  function stampDone(i) { if (i.status === 'complete' && !i.doneDate) i.doneDate = todayIso(); return i; }
   const isSystemNote = (n) => /^(Status|Owner): .+ → .+$/.test(String(n.text || ''));
 
   // ---------- Filtering ----------
@@ -1570,7 +1579,7 @@
     const root = document.getElementById('shipped-list');
     if (!list.length) { root.innerHTML = `<div class="feed-empty">Nothing shipped yet this year.</div>`; return; }
     root.innerHTML = list.map(i => `<div class="person-item" data-open="${i.id}" style="padding:8px 14px;border-bottom:1px solid var(--border);border-radius:0;">
-      <span class="ws-dot" style="--ws-color:${wsOf(i.ws).color}"></span><span class="t">${escapeHtml(i.title)}</span><span class="t-code">${escapeHtml(i.target)}</span>
+      <span class="ws-dot" style="--ws-color:${wsOf(i.ws).color}"></span><span class="t">${escapeHtml(i.title)}</span><span class="t-code" title="${i.doneDate ? 'Done ' + escapeAttr(fmtDate(i.doneDate, { month: 'short', day: 'numeric', year: 'numeric' })) : 'Target quarter; done date not recorded'}">${i.doneDate ? 'done ' + fmtDate(i.doneDate) : escapeHtml(i.target)}</span>
     </div>`).join('');
   }
 
@@ -1632,6 +1641,7 @@
     { k: 'progress', label: 'Progress', sort: (i) => progressOf(i) },
     { k: 'target', label: 'Target', sort: (i) => Number(i.startQ) || 99 },
     { k: 'due', label: 'Due', sort: (i) => i.dueDate || '9999' },
+    { k: 'done', label: 'Done', sort: (i) => i.doneDate || '9999' },
     { k: 'next', label: 'Next step', sort: (i) => norm(i.nextStep || 'zzz') },
     { k: 'updated', label: 'Updated', sort: (i) => -lastTouched(i) },
   ];
@@ -1687,6 +1697,7 @@
         <td><div class="progress-wrap" title="${cl.length ? `${done} of ${cl.length} checklist items done` : ''}"><div class="progress"><i style="--p:${p}%;--pc:${s.color}"></i></div><span class="progress-num">${p}%</span></div></td>
         <td class="t-upd">${escapeHtml(quarterRangeLabel(i.startQ, i.endQ))}<span class="tag tag-mono" style="margin-left:6px" title="Effort">${escapeHtml(i.effort || '')}</span></td>
         <td class="t-upd" style="${isOverdue(i) ? 'color:var(--danger);font-weight:600' : ''}">${i.dueDate ? fmtDate(i.dueDate) : '<span class="muted">—</span>'}</td>
+        <td class="t-upd" style="${i.doneDate ? 'color:var(--info);font-weight:600' : ''}">${i.doneDate ? fmtDate(i.doneDate) : '<span class="muted">—</span>'}</td>
         <td><div class="t-next ${i.nextStep ? '' : 'empty'}" title="${escapeAttr(i.nextStep || '')}">${i.nextStep ? escapeHtml(i.nextStep) : 'No next step'}</div></td>
         <td class="t-upd" title="${lastTouched(i) ? new Date(lastTouched(i)).toLocaleString() : ''}">${lastTouched(i) ? relTime(lastTouched(i)) : '—'}</td>
       </tr>`;
@@ -1735,7 +1746,7 @@
       ${parentOf(i) ? `<div class="kcard-parent">↳ ${escapeHtml(parentOf(i).title)}</div>` : ''}
       <div class="kcard-title">${escapeHtml(i.title)}</div>
       ${i.status === 'blocked' && i.blocker ? `<div class="kcard-next" style="color:var(--blocked)">⛔ ${escapeHtml(i.blocker)}</div>` : (i.nextStep ? `<div class="kcard-next">→ ${escapeHtml(i.nextStep)}</div>` : '')}
-      <div class="kcard-foot"><div class="left">${avatarHtml(i.owner, 'av-sm')}<span class="ws-pill" style="--ws-color:${wsOf(i.ws).color}">${wsOf(i.ws).code}</span>${subCountTag(i)}${cl.length ? `<span class="tag tag-mono" title="Checklist">${done}/${cl.length}</span>` : ''}</div><span class="t-upd">${i.dueDate ? fmtDate(i.dueDate) : escapeHtml(quarterRangeLabel(i.startQ, i.endQ))}</span></div>
+      <div class="kcard-foot"><div class="left">${avatarHtml(i.owner, 'av-sm')}<span class="ws-pill" style="--ws-color:${wsOf(i.ws).color}">${wsOf(i.ws).code}</span>${subCountTag(i)}${cl.length ? `<span class="tag tag-mono" title="Checklist">${done}/${cl.length}</span>` : ''}</div><span class="t-upd">${i.doneDate ? 'done ' + fmtDate(i.doneDate) : (i.dueDate ? fmtDate(i.dueDate) : escapeHtml(quarterRangeLabel(i.startQ, i.endQ)))}</span></div>
       ${isOpen(i) && p > 0 ? `<div class="kcard-progress"><div class="progress"><i style="--p:${p}%;--pc:${s.color}"></i></div></div>` : ''}
     </div>`;
   }
@@ -1893,6 +1904,7 @@
     document.getElementById('drawer-owner').innerHTML = ownerChip(i.owner, 'av-sm');
     document.getElementById('drawer-target').textContent = quarterRangeLabel(i.startQ, i.endQ);
     document.getElementById('drawer-due').innerHTML = i.dueDate ? `<span style="${isOverdue(i) ? 'color:var(--danger);font-weight:600' : ''}">${fmtDate(i.dueDate, { month: 'short', day: 'numeric', year: 'numeric' })}</span>` : '<span class="muted">Not set</span>';
+    document.getElementById('drawer-done').innerHTML = i.doneDate ? fmtDate(i.doneDate, { month: 'short', day: 'numeric', year: 'numeric' }) : (i.status === 'complete' ? '<span style="color:var(--text-4)">Not recorded</span>' : '<span style="color:var(--text-4)">—</span>');
     document.getElementById('drawer-effort').innerHTML = `<span class="tag tag-mono">${escapeHtml(i.effort || '—')}</span>`;
     const p = progressOf(i); document.getElementById('drawer-progress-range').value = p; document.getElementById('drawer-progress-num').textContent = `· ${p}%`;
     const nb = document.getElementById('drawer-next'); nb.textContent = i.nextStep || 'No next step set. Edit to add one.'; nb.classList.toggle('empty', !i.nextStep);
@@ -1922,7 +1934,7 @@
     const pill = document.getElementById('drawer-ws'); pill.textContent = 'New initiative'; pill.style.setProperty('--ws-color', 'var(--accent)');
     document.getElementById('drawer-flags').innerHTML = '';
     const q = Math.min(8, Math.max(1, currentQuarterIndex() || 1));
-    fillForm(Object.assign({ title: '', ws: 'sales', status: 'not_started', owner: getMe() || '', effort: 'M', startQ: q, endQ: q, desc: '', value: '', priority: 'P2', progress: 0, nextStep: '', blocker: '', dueDate: '', parentId: '' }, defaults));
+    fillForm(Object.assign({ title: '', ws: 'sales', status: 'not_started', owner: getMe() || '', effort: 'M', startQ: q, endQ: q, desc: '', value: '', priority: 'P2', progress: 0, nextStep: '', blocker: '', dueDate: '', doneDate: '', parentId: '' }, defaults));
     if (defaults.parentId) { const p = INITIATIVES.find(x => x.id === defaults.parentId); pill.textContent = p ? `Sub-project of ${p.title}` : 'New sub-project'; }
     showEditMode();
     document.getElementById('delete-btn').style.display = 'none';
@@ -1944,6 +1956,7 @@
     document.getElementById('f-owner').value = i.owner === 'Unassigned' ? '' : (i.owner || '');
     document.getElementById('f-effort').value = i.effort || 'M';
     document.getElementById('f-due').value = i.dueDate || '';
+    document.getElementById('f-done').value = i.doneDate || '';
     document.getElementById('f-progress').value = progressOf(i); document.getElementById('f-progress-v').textContent = progressOf(i) + '%';
     setQuarterRange(Number(i.startQ) || 1, Number(i.endQ) || Number(i.startQ) || 1);
     document.getElementById('f-next').value = i.nextStep || ''; document.getElementById('f-blocker').value = i.blocker || '';
@@ -1971,11 +1984,12 @@
       owner: document.getElementById('f-owner').value.trim() || 'Unassigned', effort: document.getElementById('f-effort').value, startQ, endQ: Math.max(startQ, endQ),
       desc: document.getElementById('f-desc').value.trim(), value: document.getElementById('f-value').value.trim(),
       priority: document.getElementById('f-prio').value, progress: Number(document.getElementById('f-progress').value),
-      nextStep: document.getElementById('f-next').value.trim(), blocker: document.getElementById('f-blocker').value.trim(), dueDate: document.getElementById('f-due').value || '',
+      nextStep: document.getElementById('f-next').value.trim(), blocker: document.getElementById('f-blocker').value.trim(), dueDate: document.getElementById('f-due').value || '', doneDate: document.getElementById('f-done').value || '',
       checklist: state.isNew ? [] : checklistOf(INITIATIVES.find(x => x.id === state.currentId) || {}),
       parentId: document.getElementById('f-parent').value || '',
     };
     if (item.status === 'complete' && item.progress < 100) item.progress = 100;
+    stampDone(item);
     const btn = document.getElementById('save-btn'); btn.disabled = true; btn.textContent = 'Saving…';
     const before = state.isNew ? null : { ...(INITIATIVES.find(x => x.id === state.currentId) || {}) };
     try {
@@ -2198,9 +2212,9 @@
   function download(name, mime, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
   function exportJson() { download(`revops-tracker-${todayIso()}.json`, 'application/json', JSON.stringify(currentRows().map(i => ({ ...i, kind: undefined })), null, 2)); toast('JSON downloaded'); }
   function exportCsv() {
-    const cols = ['code', 'title', 'partOf', 'workstream', 'owner', 'status', 'priority', 'progress', 'target', 'dueDate', 'nextStep', 'blocker', 'effort', 'description', 'businessValue', 'updated'];
+    const cols = ['code', 'title', 'partOf', 'workstream', 'owner', 'status', 'priority', 'progress', 'target', 'dueDate', 'doneDate', 'nextStep', 'blocker', 'effort', 'description', 'businessValue', 'updated'];
     const esc = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
-    const lines = [cols.join(',')].concat(currentRows().map(i => [i.code, i.title, parentOf(i) ? parentOf(i).title : '', wsOf(i.ws).label, i.owner, statusOf(i.status).label, prioOf(i), progressOf(i), quarterRangeLabel(i.startQ, i.endQ), i.dueDate || '', i.nextStep || '', i.blocker || '', i.effort, i.desc, i.value, lastTouched(i) ? new Date(lastTouched(i)).toISOString() : ''].map(esc).join(',')));
+    const lines = [cols.join(',')].concat(currentRows().map(i => [i.code, i.title, parentOf(i) ? parentOf(i).title : '', wsOf(i.ws).label, i.owner, statusOf(i.status).label, prioOf(i), progressOf(i), quarterRangeLabel(i.startQ, i.endQ), i.dueDate || '', i.doneDate || '', i.nextStep || '', i.blocker || '', i.effort, i.desc, i.value, lastTouched(i) ? new Date(lastTouched(i)).toISOString() : ''].map(esc).join(',')));
     download(`revops-tracker-${todayIso()}.csv`, 'text/csv;charset=utf-8', '﻿' + lines.join('\n')); toast('CSV downloaded');
   }
 
