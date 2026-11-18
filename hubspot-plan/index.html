@@ -1,0 +1,1317 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>HubSpot + Salesforce Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column; the runway, the people and the walkthrough run wider. Each owner keeps one colour everywhere. */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #151a22;
+  --muted: #5b6474;
+  --line: #dde1e8;
+  --accent: #1f4fb3;
+  --accent-soft: #e6edfb;
+  --ok: #2c7a35;
+  --ok-soft: #e4f2e5;
+  --daria: #2b63d9;
+  --daria-soft: #e8eefc;
+  --sergio: #c9501b;
+  --sergio-soft: #fcece3;
+  --cory: #0f7a8c;
+  --cory-soft: #e0f1f4;
+  --on-lane: #ffffff;
+  --phase: #e6ebf3;
+  --phase-late: #f6eadb;
+  --note: #fff4d8;
+  --note-ink: #7a5600;
+  --nurture: #cfd5df;
+  --warm: #f1b54d;
+  --hot: #d8462a;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1218; --surface: #171b23; --ink: #e7eaf0; --muted: #9ba4b3; --line: #2a303b; --accent: #8db0ff; --accent-soft: #1b2744;
+    --ok: #74c47d; --ok-soft: #17301b;
+    --daria: #79a2ff; --daria-soft: #1a2645; --sergio: #ff8e5c; --sergio-soft: #39211a; --cory: #4fc3d6; --cory-soft: #10303a;
+    --on-lane: #0f1218; --phase: #222a37; --phase-late: #382c1d; --note: #352c14; --note-ink: #f2cd70;
+    --nurture: #4a5263; --warm: #d99c33; --hot: #e45a3d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1218; --surface: #171b23; --ink: #e7eaf0; --muted: #9ba4b3; --line: #2a303b; --accent: #8db0ff; --accent-soft: #1b2744;
+  --ok: #74c47d; --ok-soft: #17301b;
+  --daria: #79a2ff; --daria-soft: #1a2645; --sergio: #ff8e5c; --sergio-soft: #39211a; --cory: #4fc3d6; --cory-soft: #10303a;
+  --on-lane: #0f1218; --phase: #222a37; --phase-late: #382c1d; --note: #352c14; --note-ink: #f2cd70;
+  --nurture: #4a5263; --warm: #d99c33; --hot: #e45a3d;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+strong { font-weight: 600; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+p { margin: 0; }
+ul, ol { margin: 0; padding: 0; }
+code { font-family: var(--font-mono); font-size: .88em; }
+
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.prose { max-width: 68ch; }
+.stack { display: grid; gap: 14px; }
+.why { color: var(--muted); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* Header */
+.top { padding-block: 40px 32px; }
+.top .wrap { display: grid; gap: 18px; }
+.eyebrow { font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(1.9rem, 4.2vw, 2.7rem); font-weight: 700; letter-spacing: -.01em; }
+.byline { color: var(--muted); font-size: .95rem; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.next { background: var(--surface); border: 2px solid var(--ink); border-radius: 12px; padding: 16px 18px; display: grid; gap: 6px; max-width: 72ch; }
+.next-label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.next p { font-size: 1.1rem; font-weight: 500; }
+.goal { font-size: 1.05rem; max-width: 68ch; }
+
+/* Section nav */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-block: 1px solid var(--line); }
+.nav ul { list-style: none; display: flex; gap: 4px; overflow-x: auto; padding-block: 8px; scrollbar-width: none; }
+.nav ul::-webkit-scrollbar { display: none; }
+.nav a { display: block; white-space: nowrap; padding: 6px 10px; border-radius: 999px; color: var(--muted); text-decoration: none; font-size: .88rem; font-weight: 500; }
+.nav a:hover { background: var(--surface); color: var(--ink); }
+
+/* Sections */
+section { padding-block: 44px; border-bottom: 1px solid var(--line); scroll-margin-top: 52px; }
+section > .wrap { display: grid; gap: 20px; }
+h2 { font-size: 1.55rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+.sub { font-size: .78rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+
+.points { list-style: none; display: grid; gap: 12px; max-width: 72ch; }
+.points li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; }
+.points li::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--ink); margin-top: .55em; justify-self: center; }
+.steps { list-style: none; counter-reset: s; display: grid; gap: 14px; max-width: 74ch; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 30px 1fr; gap: 10px; }
+.steps li::before {
+  content: counter(s); font-family: var(--font-mono); font-size: .85rem; font-weight: 500;
+  width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; color: var(--muted);
+}
+.note { background: var(--note); border-radius: 10px; padding: 12px 14px; max-width: 74ch; font-size: .95rem; }
+.note strong { color: var(--note-ink); }
+
+/* How Claude reaches each system */
+.reach { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.reach > div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.reach h3 { font-size: .98rem; }
+.reach p { font-size: .92rem; }
+.reach .no { border-style: dashed; }
+
+/* Owners */
+.avatar { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--on-lane); }
+.daria .avatar, .dot.daria, .av.daria { background: var(--daria); }
+.sergio .avatar, .dot.sergio, .av.sergio { background: var(--sergio); }
+.cory .avatar, .dot.cory, .av.cory { background: var(--cory); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: .05em; }
+.own {
+  display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; font-weight: 600;
+  padding: 2px 9px 2px 3px; border-radius: 999px;
+}
+.own .av { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: .64rem; color: var(--on-lane); }
+.own.daria { background: var(--daria-soft); color: var(--daria); }
+.own.sergio { background: var(--sergio-soft); color: var(--sergio); }
+.own.cory { background: var(--cory-soft); color: var(--cory); }
+
+/* Runway */
+.runway-scroll { overflow-x: auto; padding-bottom: 6px; }
+.runway {
+  min-width: 660px; display: grid; row-gap: 8px;
+  grid-template-columns: 1fr 1fr 1fr .45fr 1fr 1fr 1fr 1fr 1fr .45fr 1fr 1fr 1fr 1fr 1fr .45fr 1fr 1fr;
+}
+.ph { grid-row: 1; position: relative; background: var(--phase); border-radius: 8px; margin-right: 14px; padding: 8px 10px; min-height: 56px; display: grid; align-content: center; gap: 1px; color: var(--ink); text-decoration: none; }
+.ph:hover { outline: 1.5px solid var(--line); }
+.ph.late { background: var(--phase-late); }
+.ph b { font-size: .9rem; font-weight: 600; line-height: 1.2; }
+.ph span { font-family: var(--font-mono); font-size: .74rem; color: var(--muted); }
+.ph::after { content: ""; position: absolute; right: -7px; top: 50%; transform: translate(50%, -50%) rotate(45deg); width: 13px; height: 13px; background: var(--ink); border-radius: 3px; }
+.ph.done::after { background: var(--ok); }
+.day { grid-row: 2; text-align: center; display: grid; border-top: 2px solid var(--line); padding-top: 6px; }
+.day .n { font-family: var(--font-mono); font-size: .82rem; font-weight: 500; }
+.day .d { font-family: var(--font-mono); font-size: .7rem; color: var(--muted); }
+.wknd { grid-row: 2; border-top: 2px dotted var(--line); }
+.runway-key { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .88rem; color: var(--muted); }
+.key-diamond { display: inline-block; width: 10px; height: 10px; background: var(--ink); transform: rotate(45deg); border-radius: 2px; margin-right: 8px; vertical-align: .05em; }
+
+/* Where everyone is */
+.now { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.now-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.now-top { display: flex; align-items: center; gap: 10px; }
+.now-top .avatar { width: 32px; height: 32px; font-size: .9rem; }
+.now-top b { font-size: 1rem; }
+.now-top div span { color: var(--muted); font-size: .85rem; display: block; }
+.now-step { font-size: .95rem; }
+.now-step a { color: var(--ink); text-decoration: none; font-weight: 600; }
+.now-step a:hover { text-decoration: underline; }
+.progress { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--ok); width: 0; }
+.now-count { font-family: var(--font-mono); font-size: .76rem; color: var(--muted); }
+
+/* Walkthrough controls */
+.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.filter { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter button {
+  font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 12px;
+}
+.filter button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sync-status { font-size: .86rem; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.sync-status i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); display: inline-block; }
+.sync-status.live i { background: var(--ok); }
+.sync-status.off i { background: var(--hot); }
+
+/* Steps */
+.phase-block { display: grid; gap: 0; scroll-margin-top: 60px; }
+.phase-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
+.phase-head h3 { font-size: 1.2rem; }
+.phase-head span { font-family: var(--font-mono); font-size: .82rem; color: var(--muted); }
+.step { display: grid; grid-template-columns: 2.6rem minmax(0, 1fr); gap: 14px; padding-block: 18px; border-bottom: 1px solid var(--line); scroll-margin-top: 60px; }
+.step[hidden] { display: none !important; }
+.num {
+  width: 2.1rem; height: 2.1rem; border-radius: 50%; border: 1.5px solid var(--line);
+  display: grid; place-items: center; font-family: var(--font-mono); font-size: .9rem; font-weight: 500; color: var(--muted); background: var(--surface);
+}
+.step.ready .num { border-color: var(--accent); color: var(--accent); }
+.step.done .num { background: var(--ok); border-color: var(--ok); color: var(--bg); }
+.step.gate .num { border-radius: 6px; transform: rotate(45deg) scale(.86); }
+.step.gate .num span { transform: rotate(-45deg); font-size: .78rem; }
+.step-body { display: grid; gap: 10px; min-width: 0; }
+.step-title { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.step-title h4 { margin: 0; font-size: 1.05rem; font-weight: 600; line-height: 1.3; }
+.step.done .step-title h4 { color: var(--muted); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: .85rem; color: var(--muted); }
+.meta .where::before { content: "·"; margin-right: 10px; }
+.meta .time { font-family: var(--font-mono); font-size: .8rem; }
+.meta .time::before { content: "·"; margin-right: 10px; font-family: var(--font-body); }
+.status { font-size: .76rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; }
+.status.ready { background: var(--accent-soft); color: var(--accent); }
+.status.waiting { background: transparent; color: var(--muted); border: 1px solid var(--line); text-transform: none; letter-spacing: 0; font-weight: 600; }
+.status.done { background: var(--ok-soft); color: var(--ok); }
+.status.waiting a { color: inherit; }
+.step-text { max-width: 76ch; }
+.tell { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; max-width: 80ch; }
+.tell-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--line); }
+.tell-head span { font-size: .72rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.tell pre { margin: 0; padding: 10px 12px; font-family: var(--font-mono); font-size: .82rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.copy-sm { font: inherit; font-size: .8rem; font-weight: 600; background: transparent; color: var(--accent); border: 0; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+.copy-sm:hover { background: var(--accent-soft); }
+.donewhen { font-size: .95rem; max-width: 76ch; }
+.donewhen b { font-weight: 600; }
+.tick-row { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.tick {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 7px 12px 7px 10px; font-size: .9rem;
+}
+.tick input { width: 18px; height: 18px; margin: 0; accent-color: var(--ok); cursor: pointer; }
+.tick input:disabled { cursor: not-allowed; }
+.tick.on { border-color: var(--ok); background: var(--ok-soft); }
+.tick .who { font-weight: 600; }
+.tick .by { color: var(--muted); font-size: .8rem; }
+
+/* People */
+.people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.person { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.person-top { display: flex; gap: 12px; align-items: center; }
+.person h3 { font-size: 1.2rem; }
+.role { color: var(--muted); font-size: .92rem; }
+.lane-tag { justify-self: start; font-family: var(--font-mono); font-size: .8rem; font-weight: 500; padding: 3px 9px; border-radius: 999px; }
+.person dl { margin: 0; display: grid; gap: 4px; }
+.person dt { font-size: .72rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.person dd { margin: 0 0 8px; }
+.daria .lane-tag { background: var(--daria-soft); color: var(--daria); }
+.sergio .lane-tag { background: var(--sergio-soft); color: var(--sergio); }
+.cory .lane-tag { background: var(--cory-soft); color: var(--cory); }
+.lead-line { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; border: 1px dashed var(--line); border-radius: 12px; padding: 12px 16px; }
+
+/* Score */
+.scale-box { display: grid; gap: 8px; max-width: 760px; }
+.scale { display: flex; height: 40px; border-radius: 8px; overflow: hidden; }
+.band { display: flex; align-items: center; padding-left: 10px; font-size: .85rem; font-weight: 600; white-space: nowrap; overflow: hidden; }
+.band.nurture { background: var(--nurture); color: var(--ink); }
+.band.warm { background: var(--warm); color: #1b1407; }
+.band.hot { background: var(--hot); color: #ffffff; }
+.ticks { position: relative; height: 20px; font-family: var(--font-mono); font-size: .76rem; color: var(--muted); }
+.ticks span { position: absolute; top: 0; transform: translateX(-50%); }
+.ticks span:first-child { transform: none; }
+.ticks span:last-child { transform: translateX(-100%); }
+.scale-cap { font-size: .9rem; color: var(--muted); }
+.bands { list-style: none; display: grid; border-top: 1px solid var(--line); max-width: 900px; }
+.bands li { display: grid; grid-template-columns: 7rem 5rem minmax(0, 1fr) minmax(0, 1.2fr); gap: 14px; padding-block: 12px; border-bottom: 1px solid var(--line); align-items: start; }
+.chip { justify-self: start; font-size: .8rem; font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+.chip.nurture { background: var(--nurture); color: var(--ink); }
+.chip.warm { background: var(--warm); color: #1b1407; }
+.chip.hot { background: var(--hot); color: #ffffff; }
+.bands .range { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.bands .where { color: var(--muted); }
+
+/* Tables */
+.tbl-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.tbl th { text-align: left; font-size: .74rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: bottom; }
+.tbl td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl td:first-child { font-weight: 500; }
+.tbl th:first-child, .tbl td:first-child { padding-left: 0; }
+
+/* Decided and open */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 32px; align-items: start; }
+.checks { list-style: none; display: grid; gap: 10px; }
+.checks li { display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+.checks svg { width: 18px; height: 18px; margin-top: .2em; color: var(--ok); fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.open-group { display: grid; gap: 10px; }
+.open-group + .open-group { margin-top: 18px; }
+.q { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; }
+.q .rec { color: var(--muted); }
+.q .rec b { color: var(--ink); font-weight: 600; }
+
+/* Briefs */
+.brief { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.brief-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.brief-head h3 { display: flex; align-items: center; gap: 10px; }
+.brief-head .avatar { width: 30px; height: 30px; font-size: .85rem; }
+.copy { font: inherit; font-size: .88rem; font-weight: 600; background: var(--ink); color: var(--bg); border: 0; border-radius: 8px; padding: 7px 14px; cursor: pointer; }
+.copy:hover { opacity: .88; }
+.brief pre { margin: 0; padding: 16px; font-family: var(--font-mono); font-size: .82rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 440px; overflow-y: auto; }
+
+.sources p { max-width: 80ch; font-size: .92rem; color: var(--muted); }
+footer { padding-block: 28px 48px; color: var(--muted); font-size: .88rem; }
+
+@media (max-width: 860px) {
+  .people, .now, .split { grid-template-columns: 1fr; }
+  .reach { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .reach { grid-template-columns: 1fr; }
+  .step { grid-template-columns: 2.2rem minmax(0, 1fr); gap: 10px; }
+  .num { width: 1.9rem; height: 1.9rem; font-size: .82rem; }
+  .bands li { grid-template-columns: auto 1fr; gap: 6px 12px; }
+  .bands li > :nth-child(3), .bands li > :nth-child(4) { grid-column: 1 / -1; }
+  .tbl thead { display: none; }
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
+  .tbl tr { padding-block: 12px; border-bottom: 1px solid var(--line); }
+  .tbl td { border: 0; padding: 3px 0; }
+  .tbl td::before { content: attr(data-label); display: block; font-size: .7rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .tbl td:first-child::before { display: none; }
+  .tbl td:first-child { font-weight: 600; padding-bottom: 6px; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Marketing moves from Pardot to HubSpot, connected to Salesforce</p>
+    <h1>HubSpot + Salesforce: two-week plan</h1>
+    <p class="byline"><span>Written 18 November 2026</span><span>Daria · Sergio · Cory</span></p>
+    <div class="next">
+      <span class="next-label">Start here, today</span>
+      <p>Sergio takes <a href="#s1">steps 1–3</a> and Cory <a href="#s4">step 4</a>. Then all three do <a href="#s5">step 5</a>. From there, each of you follows your next step in <a href="#walkthrough">the walkthrough</a>.</p>
+    </div>
+    <p class="goal">By <strong>Tuesday 1 December (day 10)</strong>, HubSpot and Salesforce hold the same people with zero sync errors, Pardot's history sits in HubSpot, and reps see HubSpot engagement in Salesforce. Pardot keeps running throughout. Lead scoring and the release of leads to Salesforce go live in days 11 to 15.</p>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <ul>
+      <li><a href="#walkthrough">Walkthrough</a></li>
+      <li><a href="#claude">How Claude connects</a></li>
+      <li><a href="#minute">In one minute</a></li>
+      <li><a href="#who">Who does what</a></li>
+      <li><a href="#release">Lead release</a></li>
+      <li><a href="#campaigns">Campaigns</a></li>
+      <li><a href="#it">IT and web</a></li>
+      <li><a href="#rules">Out of each other's way</a></li>
+      <li><a href="#why">Why this way</a></li>
+      <li><a href="#history">Pardot history</a></li>
+      <li><a href="#visible">Shown in Salesforce</a></li>
+      <li><a href="#decided">Decided and open</a></li>
+      <li><a href="#briefs">Kickoff briefs</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section id="walkthrough">
+    <div class="wrap">
+      <h2>Walkthrough</h2>
+      <p class="prose">Do the steps in order. A step turns <strong>Ready</strong> once the steps it waits for are ticked, so nobody starts on something another person hasn't finished. Tick your box when the step is done and checked.</p>
+
+      <div class="runway-scroll" role="img" aria-label="Fifteen working days: Connect days 1 to 2, Pilot days 3 to 5, Full sync days 6 to 8, Visible days 9 to 10, Score and release days 11 to 15, with a gate at the end of each phase.">
+        <div class="runway">
+          <a class="ph" id="ph-A" href="#phase-A" style="grid-column: 1 / 3;"><b>Connect</b><span>days 1–2</span></a>
+          <a class="ph" id="ph-B" href="#phase-B" style="grid-column: 3 / 7;"><b>Pilot</b><span>days 3–5</span></a>
+          <a class="ph" id="ph-C" href="#phase-C" style="grid-column: 7 / 10;"><b>Full sync</b><span>days 6–8</span></a>
+          <a class="ph" id="ph-D" href="#phase-D" style="grid-column: 11 / 13;"><b>Visible</b><span>days 9–10</span></a>
+          <a class="ph late" id="ph-E" href="#phase-E" style="grid-column: 13 / 19;"><b>Score and release</b><span>days 11–15</span></a>
+          <div class="day" style="grid-column: 1;"><span class="n">1</span><span class="d">18 Nov</span></div>
+          <div class="day" style="grid-column: 2;"><span class="n">2</span><span class="d">19</span></div>
+          <div class="day" style="grid-column: 3;"><span class="n">3</span><span class="d">20</span></div>
+          <div class="wknd" style="grid-column: 4;"></div>
+          <div class="day" style="grid-column: 5;"><span class="n">4</span><span class="d">23</span></div>
+          <div class="day" style="grid-column: 6;"><span class="n">5</span><span class="d">24</span></div>
+          <div class="day" style="grid-column: 7;"><span class="n">6</span><span class="d">25</span></div>
+          <div class="day" style="grid-column: 8;"><span class="n">7</span><span class="d">26</span></div>
+          <div class="day" style="grid-column: 9;"><span class="n">8</span><span class="d">27</span></div>
+          <div class="wknd" style="grid-column: 10;"></div>
+          <div class="day" style="grid-column: 11;"><span class="n">9</span><span class="d">30</span></div>
+          <div class="day" style="grid-column: 12;"><span class="n">10</span><span class="d">1 Dec</span></div>
+          <div class="day" style="grid-column: 13;"><span class="n">11</span><span class="d">2</span></div>
+          <div class="day" style="grid-column: 14;"><span class="n">12</span><span class="d">3</span></div>
+          <div class="day" style="grid-column: 15;"><span class="n">13</span><span class="d">4</span></div>
+          <div class="wknd" style="grid-column: 16;"></div>
+          <div class="day" style="grid-column: 17;"><span class="n">14</span><span class="d">7</span></div>
+          <div class="day" style="grid-column: 18;"><span class="n">15</span><span class="d">8</span></div>
+        </div>
+      </div>
+      <p class="runway-key"><span><span class="key-diamond" aria-hidden="true"></span>A gate closes each phase; it turns green when ticked</span><span>Dotted gaps are weekends</span></p>
+
+      <div class="stack">
+        <p class="sub">Where everyone is</p>
+        <div class="now" id="now"></div>
+      </div>
+
+      <div class="controls">
+        <div class="filter" role="group" aria-label="Show steps for">
+          <button type="button" id="f-all" data-filter="all" aria-pressed="true">Everyone</button>
+          <button type="button" id="f-daria" data-filter="daria" aria-pressed="false">Daria</button>
+          <button type="button" id="f-sergio" data-filter="sergio" aria-pressed="false">Sergio</button>
+          <button type="button" id="f-cory" data-filter="cory" aria-pressed="false">Cory</button>
+        </div>
+        <p class="sync-status" id="sync-status"><i></i><span>Connecting the shared ticks…</span></p>
+      </div>
+
+      <div class="stack" id="steps" style="gap: 32px;"></div>
+    </div>
+  </section>
+
+  <section id="claude">
+    <div class="wrap">
+      <h2>How Claude Code reaches each system</h2>
+      <div class="reach">
+        <div><h3>Salesforce</h3><p>The Salesforce command line, logged in to production as the person (Daria, Cory). Claude deploys small changes and reads back what landed.</p></div>
+        <div><h3>HubSpot</h3><p>Two ways. Looking things up: the HubSpot connector in Claude, signed in as the person. Building: the lane's own HubSpot key, kept in a file only its owner can read and never pasted into a chat.</p></div>
+        <div><h3>Pardot</h3><p>Cory's existing Pardot access, read only. Nothing in Pardot changes until switch-off.</p></div>
+        <div class="no"><h3>What Claude cannot do</h3><p>Click through HubSpot's connector set-up or Salesforce's package install. People click those (step 13); Claude checks the result afterwards.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="minute">
+    <div class="wrap">
+      <h2>In one minute</h2>
+      <ul class="points">
+        <li><span><strong>Three lanes, one per person:</strong> Daria on Salesforce, Sergio on HubSpot, Cory on the connection between them. Each system has one owner.</span></li>
+        <li><span><strong>HubSpot's own Salesforce connector does the sync,</strong> and Salesforce stays the master for everyone it already holds. HubSpot writes only into its own fields there.</span></li>
+        <li><span><strong>Campaigns and their members live in Salesforce,</strong> because Sales works there. HubSpot writes its registrations into them and reads attendance back.</span></li>
+        <li><span><strong>New prospects live in HubSpot</strong> and are handed to Sales by score: Hot (100+) at once, Warm (70–99) when Marketing releases them.</span></li>
+        <li><span><strong>Four gates in ten days,</strong> then scoring and release in days 11 to 15. Forms, automation and switching Pardot off follow.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="who">
+    <div class="wrap">
+      <h2>Who does what</h2>
+      <div class="people">
+        <article class="person daria">
+          <div class="person-top"><span class="avatar" aria-hidden="true">D</span><div><h3>Daria</h3><p class="role">Salesforce and RevOps lead</p></div></div>
+          <span class="lane-tag">Lane 1 · Salesforce</span>
+          <dl>
+            <dt>Owns</dt>
+            <dd>Every Salesforce change: HubSpot's own login, new fields, sharing, page changes, the sales handoff, our engagement card</dd>
+            <dt>Asks its owner before touching</dt>
+            <dd>HubSpot</dd>
+          </dl>
+        </article>
+        <article class="person sergio">
+          <div class="person-top"><span class="avatar" aria-hidden="true">S</span><div><h3>Sergio</h3><p class="role">The main HubSpot owner, who runs HubSpot after the project</p></div></div>
+          <span class="lane-tag">Lane 2 · HubSpot</span>
+          <dl>
+            <dt>Owns</dt>
+            <dd>Everything in HubSpot: account set-up, domains, keys, properties, unsubscribe types, lists, emails, the score. Also the IT requests</dd>
+            <dt>Asks its owner before touching</dt>
+            <dd>Salesforce</dd>
+          </dl>
+        </article>
+        <article class="person cory">
+          <div class="person-top"><span class="avatar" aria-hidden="true">C</span><div><h3>Cory</h3><p class="role">Built Salesforce and Pardot and knows the business</p></div></div>
+          <span class="lane-tag">Lane 3 · Connection and data</span>
+          <dl>
+            <dt>Owns</dt>
+            <dd>Everything that crosses between the two: the connector's settings, the field map, the release and campaign rules, the Pardot history move, the count checks. Cory oversees the project, builds on it, verifies it and ticks the gates</dd>
+            <dt>Asks its owner before touching</dt>
+            <dd>Salesforce and HubSpot beyond the connection</dd>
+          </dl>
+        </article>
+      </div>
+      <p class="lead-line"><strong>Lead: Fable 5.2, in Cory's session.</strong> <span>Owns this plan and every gate check. It builds nothing.</span></p>
+      <div class="stack prose">
+        <p><strong>Why this split:</strong> Sergio will run HubSpot afterwards, so Sergio builds it. Daria leads Salesforce and RevOps, so Salesforce changes are Daria's. Cory built Salesforce and Pardot, so Cory owns the part where the two systems meet and checks all of it.</p>
+        <p>Builders run on a lower model (Sonnet 5.5). Only the lead session runs on Fable 5.2. HubSpot is on Enterprise, which includes the Salesforce connector, lead scoring, custom events and single sign-on.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="release">
+    <div class="wrap">
+      <h2>When a lead is released to Salesforce</h2>
+      <p class="prose">A new prospect lives in HubSpot and is handed to Sales only when the scoring model releases it.</p>
+      <div class="scale-box">
+        <div class="scale" role="img" aria-label="Total score from 0 to 160: Nurture 0 to 69, Warm 70 to 99, Hot 100 and above">
+          <div class="band nurture" style="flex: 70;">Nurture</div>
+          <div class="band warm" style="flex: 30;">Warm</div>
+          <div class="band hot" style="flex: 60;">Hot</div>
+        </div>
+        <div class="ticks" aria-hidden="true">
+          <span style="left: 0%;">0</span><span style="left: 43.75%;">70</span><span style="left: 62.5%;">100</span><span style="left: 100%;">160</span>
+        </div>
+        <p class="scale-cap">Total score = Fit (up to 60) + Engagement (up to 100, last 90 days), so 160 at most.</p>
+      </div>
+      <ul class="bands">
+        <li><span class="chip nurture">Nurture</span><span class="range">0–69</span><span>No release. Marketing keeps nurturing.</span><span class="where">Lives in HubSpot. In Salesforce only as an unreleased lead, if they join a campaign</span></li>
+        <li><span class="chip warm">Warm</span><span class="range">70–99</span><span>Marketing may release, with one tick.</span><span class="where">HubSpot, then Salesforce once released</span></li>
+        <li><span class="chip hot">Hot</span><span class="range">100+</span><span>Released automatically, within 15 minutes.</span><span class="where">Salesforce, as MQL</span></li>
+      </ul>
+      <ol class="steps">
+        <li><span><strong>HubSpot computes the score.</strong> <span class="why">Why HubSpot: clicks, visits and downloads happen there, and its scoring tool already has group limits, a 90-day window and Hot/Warm labels. Scoring in Salesforce would mean copying every event in.</span></span></li>
+        <li><span><strong>Salesforce shows three fields:</strong> Fit Score, Engagement Score and Total Score. Sales sees all three, as the model asks.</span></li>
+        <li><span><strong>The release gate is one HubSpot list.</strong> Only people on it sync to Salesforce: Hot automatically, Warm on Marketing's tick, campaign responders as unreleased leads, plus everyone Salesforce already holds. <span class="why">Why: this list is the connector's own filter, so release needs no custom code.</span></span></li>
+        <li><span><strong>A released lead arrives as MQL.</strong> Within one business day Sales accepts it as SQL or returns it with a required reason. The queue will sit in Noodle's Today.</span></li>
+        <li><span><strong>A returned or Closed Lost lead</strong> keeps its fit points, loses its engagement points and must qualify again.</span></li>
+      </ol>
+      <p class="prose">The tracking code goes on the website in week 1 because the engagement score counts the last 90 days. The sooner it collects, the sooner a score means something.</p>
+    </div>
+  </section>
+
+  <section id="campaigns">
+    <div class="wrap">
+      <h2>Campaigns</h2>
+      <p class="prose">Salesforce stays the one place campaigns and their members live, because Sales has no HubSpot access. HubSpot writes its registrations into them and reads attendance back.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>What</th><th>Where it is made</th><th>How the other side gets it</th></tr></thead>
+          <tbody>
+            <tr><td>The campaign</td><td data-label="Where it is made">Salesforce for events, webinars and Sales campaigns; HubSpot for email, digital and paid</td><td data-label="How the other side gets it">A small job makes its twin in the other system</td></tr>
+            <tr><td>A registration or response HubSpot captures</td><td data-label="Where it is made">HubSpot</td><td data-label="How the other side gets it">A HubSpot rule adds the person to the Salesforce campaign with the right status</td></tr>
+            <tr><td>Webinar attendance</td><td data-label="Where it is made">Zoom writes it to Salesforce, as today</td><td data-label="How the other side gets it">Fields on the person carry it to HubSpot</td></tr>
+            <tr><td>In-person attendance, uploaded lists, members reps add</td><td data-label="Where it is made">Salesforce, as today</td><td data-label="How the other side gets it">Fields on the person carry it to HubSpot</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ol class="steps">
+        <li><span><strong>Two doors, one per kind of campaign.</strong> Events, webinars and Sales campaigns are created in Salesforce, as today: they need attendance, the partner and the parent event, which only Salesforce holds. Email, digital and paid campaigns are created in HubSpot, from the forms phase. <span class="why">Why one door per kind: the same campaign created in both tools is a duplicate nobody can untangle.</span></span></li>
+        <li><span><strong>Each member has one writer.</strong> HubSpot writes what it captures. Zoom, the Attendance button and reps keep writing what they write today. <span class="why">Why: two tools setting the same member's status is where campaign counts drift.</span></span></li>
+        <li><span><strong>A member must exist in Salesforce.</strong> So a campaign response creates the person there as an unreleased lead: no alert, no rep's queue, not MQL. Release still follows the score.</span></li>
+        <li><span><strong>HubSpot writes only the campaign's own statuses.</strong> Salesforce silently ignores a status the campaign lacks and leaves the member on Invited. That already happens with webinar sign-ups.</span></li>
+        <li><span><strong>Email sends and opens stop becoming members (recommended).</strong> They are 83% of new members today, most of them written by Pardot. Email results stay in HubSpot; Salesforce campaigns keep the responses Sales acts on.</span></li>
+      </ol>
+      <div class="stack prose">
+        <p>Whichever door is used, a small job makes the twin in the other system and ties the two together. The job is ours to build, in the forms phase: HubSpot's connector only uses Salesforce campaigns that already exist. Until then every campaign is created in Salesforce, which Pardot needs anyway.</p>
+        <p>The round trip is proven on one test campaign in the pilot (step 15). It is then switched on campaign by campaign, as each one's emails and forms move to HubSpot. Until then Pardot keeps writing members as today.</p>
+      </div>
+      <p class="note"><strong>Not confirmed in HubSpot's pages:</strong> that its rule can choose the member status. A HubSpot form on its own always writes "Responded". Step 15 settles it; the fallback is a small Salesforce rule that sets the status.</p>
+    </div>
+  </section>
+
+  <section id="it">
+    <div class="wrap">
+      <h2>IT and web set-up</h2>
+      <p class="prose">These are the only tasks that wait on people outside the three of us, so they are asked for on day 1 (steps 1, 2 and 21). Sergio owns the chasing.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>What</th><th>Who does it</th><th>Needed by</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td>Email sending domain: the DNS records HubSpot gives us, on a new sending subdomain</td><td data-label="Who does it">IT</td><td data-label="Needed by" class="mono">Day 8 · 27 Nov</td><td data-label="Why">Our domain is set to reject any email that fails its checks. Until these records exist, every HubSpot email from our address is refused.</td></tr>
+            <tr><td>Page and link domain: a new subdomain pointed at HubSpot</td><td data-label="Who does it">IT</td><td data-label="Needed by" class="mono">Day 8 · 27 Nov</td><td data-label="Why">The current one (go.) belongs to Pardot until switch-off, and a subdomain can serve only one tool.</td></tr>
+            <tr><td>Website tracking code, behind the cookie banner</td><td data-label="Who does it">Web team</td><td data-label="Needed by" class="mono">Day 5 · 24 Nov</td><td data-label="Why">The engagement score counts visits only from the day the code is live. Visitors must agree before they are tracked.</td></tr>
+            <tr><td>Sign-in for Marketing: named HubSpot users with two-step sign-in and single sign-on</td><td data-label="Who does it">IT</td><td data-label="Needed by" class="mono">Day 8 · 27 Nov</td><td data-label="Why">Shared logins make changes untraceable.</td></tr>
+            <tr><td>Privacy: HubSpot named in the privacy notice and cookie banner</td><td data-label="Who does it">Legal</td><td data-label="Needed by">Before the first external send</td><td data-label="Why">About 83,000 people's details move to a new tool. The account is hosted in the EU.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="prose"><strong>Why a new sending subdomain:</strong> HubSpot asks for a sending domain that does not also host a website, and ours does. It also keeps HubSpot's start as a new sender apart from everyday company mail and from Pardot's sending. First sends stay small and go to the most engaged people.</p>
+      <div class="stack">
+        <h3>Later, before Pardot is switched off</h3>
+        <ul class="points">
+          <li><span>Website forms move to HubSpot (web team).</span></li>
+          <li><span>Eventbrite sign-ups need a new route; they reach Salesforce through Pardot today.</span></li>
+          <li><span>The website-form reply and the rep alerts Pardot raises are rebuilt.</span></li>
+          <li><span>The go. subdomain is handed over or retired.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="wrap">
+      <h2>How we stay out of each other's way</h2>
+      <ol class="steps">
+        <li><span><strong>One owner per system.</strong> Daria owns Salesforce, Sergio owns HubSpot, and Cory owns what crosses between them: the connector's settings, the field map and the data moves. Anyone building in another owner's system tells them first. <span class="why">Why: neither system merges two people's changes; the last save wins silently.</span></span></li>
+        <li><span><strong>Start only when you are Ready.</strong> Begin a step only once the steps it waits for are ticked here. Tick yours when it is done and checked, not when Claude says it is. Cory's lead session reads both systems before ticking a gate. <span class="why">Why: everyone can see who is free to start, and a Claude session reports success more easily than it proves it.</span></span></li>
+        <li><span><strong>One field map, one editor.</strong> It lists every synced field, its direction and which system wins. Cory's lead session edits it; Daria and Sergio ask for changes. <span class="why">Why: the sync is only as good as this table, and three editors make three versions.</span></span></li>
+        <li><span><strong>Separate folders, separate keys.</strong> The project gets its own shared folder, one sub-folder per lane, and each lane its own HubSpot key. <span class="why">Why: the Salesforce code folder has no shared copy and other sessions already work in it; one key per lane means every change traces to one lane and can be switched off alone.</span></span></li>
+        <li><span><strong>Pilot before volume.</strong> Every setting and load runs on the pilot first. <span class="why">Why: a wrong mapping on 50 people is a fix; on 83,000 it is a clean-up project.</span></span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="wrap">
+      <h2>Why we build it this way</h2>
+      <ol class="steps">
+        <li><span><strong>HubSpot's own connector, not a sync we write.</strong> HubSpot maintains it, and it already handles retries, limits and matching people by email. A hand-built sync is the part that takes months.</span></li>
+        <li><span><strong>Salesforce wins on every shared field.</strong> Sync problems come from two systems editing the same field. So each field has one owner, and HubSpot writes only into its own Salesforce fields: the three scores, last marketing touch, bounced, release status.</span></li>
+        <li><span><strong>HubSpot gets its own Salesforce login, never Cory's.</strong> What that login can see is what HubSpot receives, so it doubles as our filter. Cory's login also skips our automation, and its changes could not be told apart from Cory's own.</span></li>
+        <li><span><strong>HubSpot email events never become interactions in Salesforce.</strong> That setting writes one entry per open and per click, with no de-duplication. Pardot did the same, and we now delete 2.4 million of those entries. They would also inflate Engagement and Overall activity.</span></li>
+        <li><span><strong>While both tools run, unsubscribes travel through Salesforce.</strong> Pardot and HubSpot do not talk to each other. Both read and write the same opt-out box in Salesforce, so an unsubscribe in one stops email from the other.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="history">
+    <div class="wrap">
+      <h2>Pardot history into HubSpot</h2>
+      <p class="prose">History moves in three layers, most important first.</p>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Layer</th><th>What</th><th>How it gets there</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td>1 · Must-have</td><td data-label="What">Unsubscribes (about 9,700 people) and hard bounces</td><td data-label="How it gets there">Through the sync from Salesforce, plus a direct load as a second check</td><td data-label="When">Before any HubSpot send (step 14, then step 18)</td></tr>
+            <tr><td>2 · Summary</td><td data-label="What">Pardot score and last marketing touch per person</td><td data-label="How it gets there">Through the sync; both already sit on the person in Salesforce</td><td data-label="When">Day 6, free with the full sync</td></tr>
+            <tr><td>3 · Event by event</td><td data-label="What">Form fills, email clicks and page visits, with their original dates</td><td data-label="How it gets there">Pardot export, loaded as HubSpot custom events such as "Pardot form filled"</td><td data-label="When">Days 6–8 (step 20), after the 10-event test (step 16)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="stack prose">
+        <p><strong>Recommended depth:</strong> 24 months, with sends and opens left out as noise.</p>
+        <p>Loaded events show on each person's timeline and can trigger automation. They will not appear in HubSpot's own email reports, which count only emails HubSpot sent.</p>
+      </div>
+      <p class="note"><strong>Not confirmed:</strong> whether loaded Pardot events can count in HubSpot's score. If they cannot, click and visit points build up from week 1 only.</p>
+    </div>
+  </section>
+
+  <section id="visible">
+    <div class="wrap">
+      <h2>HubSpot shown in Salesforce</h2>
+      <ol class="steps">
+        <li><span><strong>Day 9, no build:</strong> HubSpot's own window on the lead and doctor pages (step 22). It shows the person's HubSpot timeline, loaded Pardot history included. Not yet checked on our pages or on phones.</span></li>
+        <li><span><strong>Ready by day 10, switched on the day sends move:</strong> 32 classes and 5 automations mention Pardot today, mostly through three of its fields (score, last marketing touch, bounced). They move to the HubSpot-fed fields in one change. <span class="why">Why wait: Pardot stays the sender until then, so its fields stay the truth.</span></span></li>
+        <li><span><strong>After day 10:</strong> our own engagement card, reading HubSpot live, on desktop, phone and Noodle (picture first, step 23). <span class="why">Why live: copying every event into Salesforce repeats the Pardot email-log problem.</span></span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="decided">
+    <div class="wrap">
+      <h2>Decided and open</h2>
+      <div class="split">
+        <div class="stack">
+          <h3>Decided</h3>
+          <ul class="checks">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Pardot keeps running until HubSpot is proven.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>A clean sync comes first, scoring and release next, forms and automation after.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Daria owns Salesforce, Sergio owns HubSpot, Cory owns the connection. Fable 5.2 leads and checks; a lower model builds.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>HubSpot is on Enterprise: the connector, scoring, custom events and single sign-on are included.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>The pilot is 50 doctors and a test practice. Leads join on day 6: everyone in Salesforce can see leads, so they cannot be held to a pilot.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Leads are handed to Sales by the scoring model: Hot at once, Warm by Marketing, Nurture never.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Sales has no HubSpot access, so every campaign and its members exist in Salesforce, whichever tool created it.</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin-bottom: 14px;">Open, each with a recommendation</h3>
+          <div class="open-group">
+            <p class="sub">Campaigns</p>
+            <div class="q"><p>Do email sends and opens keep becoming campaign members?</p><p class="rec"><b>Recommended: no.</b> They are 83% of new members, and Noodle's marketing label already ignores them.</p></div>
+          </div>
+          <div class="open-group">
+            <p class="sub">Set-up</p>
+            <div class="q"><p>Which address does HubSpot send from?</p><p class="rec"><b>Recommended: a new sending subdomain,</b> so HubSpot's start as a new sender cannot hurt everyday company mail.</p></div>
+            <div class="q"><p>1,447 email addresses sit on two or more doctors, likely shared practice inboxes. HubSpot keeps one person per email.</p><p class="rec"><b>Recommended:</b> the practice's main doctor keeps it and the others stay out of the sync.</p></div>
+          </div>
+          <div class="open-group">
+            <p class="sub">Before scoring goes live</p>
+            <div class="q"><p>Social DMs and comments (up to 30 points) are recorded nowhere.</p><p class="rec"><b>Recommended:</b> Marketing decides where they are logged before those points count.</p></div>
+            <div class="q"><p>HubSpot's scoring page describes no way to reset one person's score.</p><p class="rec"><b>Recommended: a re-qualify date,</b> so only engagement after a return or Closed Lost counts toward release.</p></div>
+          </div>
+        </div>
+      </div>
+      <p class="note"><strong>Known limit:</strong> about 36,000 doctors and staff have no email. HubSpot matches people by email, so expect them to stay in Salesforce only. The pilot includes one, to confirm it.</p>
+    </div>
+  </section>
+
+  <section id="briefs">
+    <div class="wrap">
+      <h2>Kickoff briefs</h2>
+      <p class="prose">Step 5: paste your lane's brief as the first message of a new Claude Code session, on Sonnet 5.5, opened in your lane's folder. Each brief covers days 1 to 5; the lead session writes the next one after gate 2.</p>
+
+      <article class="brief daria">
+        <div class="brief-head">
+          <h3><span class="avatar" aria-hidden="true">D</span>Lane 1: Salesforce (Daria)</h3>
+          <button class="copy" type="button" id="copy-lane1" data-copy="brief-lane1" data-label="Copy brief">Copy brief</button>
+        </div>
+<pre id="brief-lane1">You are the builder for Lane 1, Salesforce, in the HubSpot + Salesforce project. Your owner is Daria, the Salesforce and RevOps lead.
+Plan: HubSpot-Salesforce-Plan.html, saved in this folder. Read it first; the step numbers below are its walkthrough's.
+
+Goal: Salesforce is ready for HubSpot's own connector and stays the master. Pardot keeps running; do not touch it.
+
+You own: every Salesforce change for this project.
+Ask the owner first: anything in HubSpot (Sergio); the connector's settings and the field map (Cory).
+
+Your steps for days 1-5, in order:
+5. Confirm you can read Salesforce production, and HubSpot read-only with Lane 1's key.
+6. Create HubSpot's own Salesforce login: a dedicated user and a HubSpot Integration permission set with API access, read and edit on doctors (Contact), read on campaigns, edit on campaign members, and only the fields in field-map.csv. No View All. No access to leads yet. Show every permission before deploying, then read it back.
+10. Add the HubSpot fields from field-map.csv to Lead and Contact, every name starting with HubSpot. Reps can read them; only HubSpot's login can edit them. Deploy, then check as a rep.
+12. Add a HubSpot Pilot tick to the practice (Account), tick the practices in pilot.csv, and share ticked practices with HubSpot's login through a sharing rule. Then count the doctors and leads it can see: pilot doctors only, no leads.
+13. When Cory's connector set-up asks, install HubSpot's package in Salesforce for admins only.
+
+Before each step, check in the plan that the steps it waits for are done. When a step is done and checked, tell Daria, who ticks it in the plan.
+
+Rules: follow your Salesforce project's own rules: deploy small and read back what landed. Tell Cory before each production deploy, so two deploys never cross. Never use a real doctor for a test that sends or unsubscribes. Ask before anything not listed here.</pre>
+      </article>
+
+      <article class="brief sergio">
+        <div class="brief-head">
+          <h3><span class="avatar" aria-hidden="true">S</span>Lane 2: HubSpot (Sergio)</h3>
+          <button class="copy" type="button" id="copy-lane2" data-copy="brief-lane2" data-label="Copy brief">Copy brief</button>
+        </div>
+<pre id="brief-lane2">You are the builder for Lane 2, HubSpot, in the HubSpot + Salesforce project. Your owner is Sergio, the main HubSpot owner, who runs HubSpot after the project. HubSpot is on Enterprise.
+Plan: HubSpot-Salesforce-Plan.html, saved in this folder. Read it first; the step numbers below are its walkthrough's.
+
+Goal: HubSpot is built from empty so that Marketing can work in it and it holds the same people as Salesforce. Pardot keeps running; do not touch it.
+
+You own: everything in HubSpot except the Salesforce connector's settings.
+Ask the owner first: anything in Salesforce (Daria); the connector's settings, the field map and data loads (Cory).
+
+Your steps for days 1-5, in order:
+1. Sergio starts a new email sending subdomain and a new page subdomain in HubSpot's domain settings (never go., which Pardot keeps). Read dental-monitoring.com's public DNS and say whether HubSpot's records fit our SPF, DMARC and mail records.
+2. Draft the requests to IT, the web team and Legal from the plan's IT section, each with its date.
+3. List the smallest set of scopes each lane's HubSpot private app needs for its steps. Sergio creates the apps and sends each token to its owner through the password manager.
+5. Confirm you can read HubSpot with Lane 2's key.
+11. Create the HubSpot properties field-map.csv names that do not exist yet, the subscription types Marketing agrees, and a list "Do not email: Pardot hard bounce" that every send excludes. Show the list before creating anything.
+15. Build the test workflow: test form submitted, then Set Salesforce campaign with status Registered, on the test campaign Cory names.
+21. Until both domains are live, check public DNS each morning and list what IT still has to add.
+
+Before each step, check in the plan that the steps it waits for are done. When a step is done and checked, tell Sergio, who ticks it in the plan.
+
+Rules: never ask for a key in chat and never print one. Never create a Salesforce campaign from HubSpot. Send no email to real people before step 14 is ticked. Show each proposed change and wait for a yes before writing. Write down what you build and why in lane2-hubspot/, so Sergio can run HubSpot alone later.</pre>
+      </article>
+
+      <article class="brief cory">
+        <div class="brief-head">
+          <h3><span class="avatar" aria-hidden="true">C</span>Lane 3: Connection and data (Cory)</h3>
+          <button class="copy" type="button" id="copy-lane3" data-copy="brief-lane3" data-label="Copy brief">Copy brief</button>
+        </div>
+<pre id="brief-lane3">You are the builder for Lane 3, connection and data, in the HubSpot + Salesforce project. Your owner is Cory, who built Salesforce and Pardot and oversees the project.
+Plan: HubSpot-Salesforce-Plan.html, saved in this folder. Read it first; the step numbers below are its walkthrough's.
+
+Goal: HubSpot's own connector keeps the two systems in step with zero sync errors, and Pardot's history and every unsubscribe and bounce are in HubSpot. Pardot keeps running; read from it, never change it.
+
+You own: the connector's settings, the field map, loads into HubSpot, count checks.
+Ask the owner first: any other Salesforce change (Daria); any other HubSpot change (Sergio).
+
+Your steps for days 1-5, in order:
+4. Create the hubspot-sync project: lane1-salesforce, lane2-hubspot, lane3-connection, field-map.csv (columns: Salesforce object, Salesforce field, HubSpot property, type, direction, sync rule, owner) and a CLAUDE.md holding the plan's rules.
+5. Confirm you can read Salesforce production, Pardot (read only) and HubSpot with Lane 3's key.
+7. Fill field-map.csv: every lead and doctor field Pardot syncs today, the Fit inputs (Ortho Case Starts per year, position, doctor role), Sales Area, Global Region, client type and owner. Shared fields: Always use Salesforce. HubSpot's own fields (scores, last marketing touch, bounced, release status): Two-way, read-only in Salesforce.
+8. Count Pardot form fills, email clicks and page visits by month for 24 months. List every email on two or more Salesforce people, with each practice. Save both in lane3-connection; never paste personal data into chat.
+9. Propose 50 pilot doctors across two or three Sales Areas (some unsubscribed, a hard bounce, a shared practice inbox, one with no email) plus one test practice with two test doctors on our own addresses. Save pilot.csv on Cory's yes.
+13. After Cory finishes the connector set-up: compare the pilot doctors in both systems field by field.
+14. Compare opt-outs and hard bounces for the pilot, load any missing, and run the two-way unsubscribe test on the two test doctors only.
+15. Check the test campaign: the member, its status, and Last Event Attended in HubSpot.
+16. Create three custom events (Pardot form filled, Pardot email clicked, Pardot page visit), send 10 past events for the test doctors with their original dates, and read the timeline back.
+
+Before each step, check in the plan that the steps it waits for are done. When a step is done and checked, tell Cory, who ticks it in the plan.
+
+Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot first. Exports hold personal data: keep them out of shared folders and chats. Show the row count and a sample and wait for a yes before each load.</pre>
+      </article>
+    </div>
+  </section>
+
+  <section id="sources" class="sources">
+    <div class="wrap">
+      <h2>Sources</h2>
+      <p>HubSpot pages opened for this plan: <a href="https://knowledge.hubspot.com/integrations/plan-your-hubspot-salesforce-implementation">Plan your HubSpot–Salesforce implementation</a> · <a href="https://knowledge.hubspot.com/salesforce/salesforce-integration-sync-triggers">Import and sync Salesforce records</a> · <a href="https://knowledge.hubspot.com/salesforce/duplicate-salesforce-leads-or-contacts-syncing-to-hubspot">Resolve duplicate Salesforce records</a> · <a href="https://knowledge.hubspot.com/salesforce/sync-activities-and-tasks-between-hubspot-and-salesforce">Sync activities and tasks</a> · <a href="https://knowledge.hubspot.com/reports/create-custom-events">Create custom events</a> · <a href="https://knowledge.hubspot.com/scoring/build-lead-scores">Build lead scores</a> · <a href="https://developers.hubspot.com/docs/build-with-ai/remote-mcp-server">Remote MCP server</a></p>
+      <p>Campaign pages: <a href="https://knowledge.hubspot.com/forms/how-do-i-associate-a-form-with-a-salesforce-campaign">Associate forms with Salesforce campaigns</a> · <a href="https://knowledge.hubspot.com/workflows-user-guide-v2/how-to-use-workflows-with-salesforce">Workflow actions, Set Salesforce campaign</a>. IT: <a href="https://knowledge.hubspot.com/marketing-email/manage-email-authentication-in-hubspot">Manage your email authentication</a>.</p>
+      <p>Salesforce figures, campaign counts, sharing defaults and API use were read in production on 18 November 2026; the domain's mail and web records from public DNS the same day. The scoring model is the deck "Salesforce Lead Scoring", v2.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Written 18 November 2026 for Daria, Sergio and Cory. On the claude.ai page, ticks are shared live; opened as a file, they save in that browser only.</div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var PEOPLE = {
+    daria: { name: "Daria", lane: "Salesforce", init: "D" },
+    sergio: { name: "Sergio", lane: "HubSpot", init: "S" },
+    cory: { name: "Cory", lane: "Connection and data", init: "C" }
+  };
+  var ORDER = ["daria", "sergio", "cory"];
+
+  var PHASES = [
+    { id: "A", name: "Connect", days: "Days 1–2 · 18–19 Nov" },
+    { id: "B", name: "Pilot", days: "Days 3–5 · 20–24 Nov" },
+    { id: "C", name: "Full sync", days: "Days 6–8 · 25–27 Nov" },
+    { id: "D", name: "Visible", days: "Days 9–10 · 30 Nov – 1 Dec" },
+    { id: "E", name: "Score and release", days: "Days 11–15 · 2–8 Dec" }
+  ];
+
+  var STEPS = [
+    { id: "1", phase: "A", owners: ["sergio"], where: "HubSpot settings", time: "30 min", waits: [],
+      title: "Start both domains in HubSpot and collect their DNS records",
+      text: "In HubSpot's domain settings, start a new email sending subdomain and a new page subdomain. Not go., which Pardot keeps until switch-off. HubSpot then shows the DNS records each one needs.",
+      tell: "Read dental-monitoring.com's public DNS and check that these HubSpot records fit with our SPF, DMARC and mail records. List anything IT must change.",
+      done: "You hold the DNS records for both subdomains.",
+      why: "Our domain rejects any email that fails its checks, so HubSpot cannot send until IT adds these." },
+    { id: "2", phase: "A", owners: ["sergio"], where: "Email", time: "20 min", waits: ["1"],
+      title: "Send the day-1 requests to IT, the web team and Legal",
+      text: "IT: the DNS records from step 1, and named HubSpot sign-ins with two-step sign-in and single sign-on. Web team: HubSpot's tracking code behind the cookie banner. Legal: HubSpot named in the privacy notice and the cookie banner.",
+      tell: "Draft the three requests from the plan's IT section, each with its date.",
+      done: "All three are sent with their dates: web team 24 Nov (day 5), IT 27 Nov (day 8), Legal before the first outside send." },
+    { id: "3", phase: "A", owners: ["sergio"], where: "HubSpot settings", time: "30 min", waits: [],
+      title: "Create one HubSpot key per lane",
+      text: "One HubSpot private app per lane. Lane 1 only reads; Lane 2 writes properties, lists and emails; Lane 3 writes contacts, imports and custom events. Send each token to its owner through the password manager.",
+      tell: "List the smallest set of HubSpot private-app scopes each lane needs for its steps on the plan page.",
+      done: "Daria and Cory confirm they have their token.",
+      why: "Every change in HubSpot then traces to one lane, and one key can be switched off alone." },
+    { id: "4", phase: "A", owners: ["cory"], where: "Claude Code", time: "15 min", waits: [],
+      title: "Create the shared project folder",
+      text: "One shared repository, hubspot-sync, with a folder per lane, an empty field-map.csv and a CLAUDE.md holding the plan's rules. Only Cory's lead session edits field-map.csv.",
+      tell: "Create the hubspot-sync project: lane1-salesforce, lane2-hubspot, lane3-connection, field-map.csv (columns: Salesforce object, Salesforce field, HubSpot property, type, direction, sync rule, owner) and a CLAUDE.md holding the plan's rules.",
+      done: "Daria and Sergio can open it." },
+    { id: "5", phase: "A", owners: ["daria", "sergio", "cory"], where: "Claude Code", time: "15 min each", waits: ["3", "4"],
+      title: "Set up your Claude Code",
+      text: "Save this plan as HubSpot-Salesforce-Plan.html in your lane's folder and open a Claude Code session there. Put your HubSpot key in a file only you can read (for example ~/.config/hubspot/lane.env), never in a chat. Daria and Cory: log the Salesforce command line in to production. Then paste your kickoff brief.",
+      tell: "Paste your kickoff brief from the bottom of this page.",
+      done: "Your Claude reads your systems: one HubSpot contact count, and for Daria and Cory one Salesforce lead count. Each of you ticks your own box." },
+    { id: "6", phase: "A", owners: ["daria"], where: "Salesforce", time: "1 h", waits: ["5"],
+      title: "Create HubSpot's own Salesforce login",
+      text: "A dedicated user and a HubSpot Integration permission set: API access, read and edit on doctors, read on campaigns, edit on campaign members, and only the fields in the field map. No View All, and no access to leads yet.",
+      tell: "Create the HubSpot integration user and permission set from step 6 of the plan. Show me every permission before deploying, then read it back.",
+      done: "The login works and sees no leads and no practices yet. Cory has its password through the password manager.",
+      why: "What this login can see is exactly what HubSpot receives. Leads are open to everyone in Salesforce, so lead access would send all 27,700 at once; it comes on day 6." },
+    { id: "7", phase: "A", owners: ["cory"], where: "Claude Code", time: "2 h", waits: ["5"],
+      title: "Draft the field map",
+      text: "One row per synced field: Salesforce field, HubSpot property, direction and HubSpot's sync rule. Shared fields use “Always use Salesforce”. HubSpot's own fields (three scores, last marketing touch, bounced, release status) use “Two-way” and are read-only in Salesforce for everyone except HubSpot's login.",
+      tell: "Fill field-map.csv: every lead and doctor field Pardot syncs today, the Fit inputs (Ortho Case Starts per year, position, doctor role), Sales Area, Global Region, client type and owner. One row each, with direction and sync rule.",
+      done: "Daria and Sergio have read it, and their changes are in.",
+      why: "HubSpot has no “HubSpot always wins” rule, so locking the Salesforce side is what makes HubSpot the only writer of its own fields." },
+    { id: "8", phase: "A", owners: ["cory"], where: "Claude Code", time: "1 h", waits: ["5"],
+      title: "Count Pardot's history and list shared emails",
+      text: "Pardot form fills, email clicks and page visits by month for 24 months, and every email address that sits on two or more people in Salesforce.",
+      tell: "Count Pardot form fills, email clicks and page visits by month for the last 24 months. Then list every email on two or more Salesforce people, with each person's practice. Save both in lane3-connection; never paste personal data into chat.",
+      done: "Both files are saved. The totals are what step 20 must match." },
+    { id: "G1", gate: true, phase: "A", owners: ["cory"], where: "Lead session", time: "30 min", waits: ["2", "6", "7", "8"],
+      title: "Gate 1: everyone connected, field map agreed",
+      text: "Every lane's Claude reads its systems. Every field-map row has a direction and a sync rule, and Daria and Sergio agree it.",
+      tell: "Gate 1 check: confirm each lane can read its systems, and every field-map row has a direction and a sync rule.",
+      done: "Cory ticks the gate. The pilot starts." },
+
+    { id: "9", phase: "B", owners: ["cory"], where: "Claude Code", time: "30 min", waits: ["G1"],
+      title: "Pick the pilot: 50 doctors and one test practice",
+      text: "Real practices across two or three Sales Areas, including doctors who unsubscribed, a hard bounce, a shared practice inbox and one doctor with no email. Plus one test practice with two test doctors on our own email addresses, used for every test that sends or unsubscribes.",
+      tell: "Propose 50 pilot doctors with that mix, plus the test practice, and list them for my yes. Save as lane3-connection/pilot.csv.",
+      done: "pilot.csv is saved.",
+      why: "Tests that send or unsubscribe use our own test doctors, never a real doctor." },
+    { id: "10", phase: "B", owners: ["daria"], where: "Salesforce", time: "3 h", waits: ["G1"],
+      title: "Add HubSpot's fields to leads and doctors",
+      text: "Fit Score, Engagement Score, Total Score, Last Marketing Touch, Hard Bounced, Release Status, Last Event Attended and Event Points (last 90 days), the last two filled from campaign members. Every name starts with HubSpot. Reps can read them; only HubSpot's login can edit them.",
+      tell: "Add the HubSpot fields from field-map.csv to Lead and Contact with the access in step 10 of the plan. Deploy, then check as a rep that they show and cannot be edited.",
+      done: "A rep sees the fields and cannot edit them; HubSpot's login can." },
+    { id: "11", phase: "B", owners: ["sergio"], where: "HubSpot", time: "2 h", waits: ["G1"],
+      title: "Create the properties, unsubscribe types and the do-not-email list",
+      text: "Every HubSpot property the field map names that does not exist yet, the subscription types Marketing agrees, and a list “Do not email: Pardot hard bounce” that every send excludes.",
+      tell: "Create the HubSpot properties from field-map.csv that don't exist yet. Show me the list before creating anything.",
+      done: "Every field-map row has its HubSpot property." },
+    { id: "12", phase: "B", owners: ["daria"], where: "Salesforce", time: "30 min", waits: ["9", "10"],
+      title: "Share the pilot practices with HubSpot's login",
+      text: "A HubSpot Pilot tick on the practice, ticked for the practices in pilot.csv, and a sharing rule that gives HubSpot's login those practices. Their doctors follow.",
+      tell: "Add a HubSpot Pilot tick to Account, tick the practices in pilot.csv, share ticked practices with HubSpot's login, then count the doctors and leads it can see.",
+      done: "HubSpot's login sees the pilot doctors and the test doctors, and no leads.",
+      why: "Practices are private in Salesforce, so sharing them is how we hold HubSpot to the pilot." },
+    { id: "13", phase: "B", owners: ["cory", "daria"], where: "HubSpot and Salesforce, in the browser", time: "1 h", waits: ["6", "11", "12"],
+      title: "Install HubSpot's Salesforce connector",
+      text: "Cory installs Salesforce from HubSpot's app marketplace, signing in as HubSpot's Salesforce login. Daria installs HubSpot's package in Salesforce when asked, for admins only. In the set-up, Cory chooses: leads and contacts on; companies, opportunities, activities and timeline off; selective sync on; inclusion list = the pilot; field mappings from field-map.csv; HubSpot's share of Salesforce API calls capped. Claude cannot click through this; it checks afterwards.",
+      tell: "Compare the pilot doctors in Salesforce and HubSpot field by field and list every difference.",
+      done: "The pilot doctors appear in HubSpot with the right values. Cory ticks the set-up, Daria the package.",
+      why: "Salesforce allows 1.33 million API calls a day and we used 82,340 on 18 November. The cap stops HubSpot crowding out n8n and our other connections." },
+    { id: "14", phase: "B", owners: ["cory"], where: "Claude Code", time: "1 h", waits: ["13"],
+      title: "Unsubscribes and bounces: load them and prove the round trip",
+      text: "Opt-outs arrive through the sync; Claude also loads them directly as a second check, and hard bounces join the do-not-email list. Then unsubscribe one test doctor in HubSpot and watch Salesforce's opt-out box tick within 15 minutes; do the reverse with the other test doctor.",
+      tell: "For the pilot, compare Salesforce's email opt-out and Pardot hard bounce with HubSpot and load what is missing. Then run the two-way unsubscribe test on the two test doctors only.",
+      done: "Pilot counts match, and an unsubscribe crosses both ways.",
+      why: "While both tools send, the opt-out box in Salesforce is the only thing Pardot and HubSpot share." },
+    { id: "15", phase: "B", owners: ["sergio", "cory"], where: "HubSpot and Salesforce", time: "1 h", waits: ["13"],
+      title: "Campaign round trip on a test campaign",
+      text: "Cory creates a test event campaign in Salesforce with the usual screen. Sergio builds a HubSpot workflow: test form submitted, then Set Salesforce campaign with status Registered. Submit the form as a test doctor. Cory checks the member and its status in Salesforce, marks attendance with the Attendance button, and checks Last Event Attended reaches HubSpot.",
+      tell: "Check the test campaign: is the test doctor a member, with which status, and has Last Event Attended reached HubSpot?",
+      done: "Registered arrives and attendance comes back. If HubSpot cannot pick the status, Daria adds a small Salesforce rule that sets it." },
+    { id: "16", phase: "B", owners: ["cory"], where: "Claude Code", time: "1 h", waits: ["13"],
+      title: "Load 10 history events with their original dates",
+      text: "Three custom events (Pardot form filled, Pardot email clicked, Pardot page visit), then 10 past events for the test doctors.",
+      tell: "Create the three Pardot custom events in HubSpot, send 10 past events for the test doctors with their original dates, and read the timeline back.",
+      done: "The timeline shows the original dates, not today's.",
+      why: "One reported case had backdated events landing with today's date." },
+    { id: "G2", gate: true, phase: "B", owners: ["cory"], where: "Lead session", time: "30 min", waits: ["14", "15", "16"],
+      title: "Gate 2: the pilot holds",
+      text: "Pilot doctors match field by field. An unsubscribe crosses both ways. The test registration and its attendance make the round trip. HubSpot's Salesforce sync page shows zero errors for 24 hours.",
+      tell: "Gate 2 check: compare every pilot doctor field by field and list any mismatch.",
+      done: "Cory ticks the gate. The lead session writes the next briefs." },
+
+    { id: "17", phase: "C", owners: ["daria"], where: "Salesforce", time: "1 h", waits: ["G2"],
+      title: "Open Salesforce to HubSpot: leads first, then doctors",
+      text: "Give HubSpot's login access to leads. Two hours later, if the sync is clean, share every practice that is not a test practice.",
+      tell: "Give HubSpot's login read and edit on Lead. After my go, share every practice that is not a test account with it, and count what it can see.",
+      done: "HubSpot's login sees every lead and every doctor at a real practice.",
+      why: "Leads could not be piloted, so they go first, alone, and are watched." },
+    { id: "18", phase: "C", owners: ["cory"], where: "HubSpot and Claude Code", time: "3 h, then daily", waits: ["17"],
+      title: "Run the full sync and check counts every morning",
+      text: "Widen the inclusion list to everyone who has a Salesforce record, and start HubSpot's first import of Salesforce leads and doctors.",
+      tell: "Morning count check: Salesforce leads and doctors with an email (test practices out) against HubSpot contacts with a Salesforce record; opt-outs; hard bounces. List every mismatch.",
+      done: "The first full count matches." },
+    { id: "19", phase: "C", owners: ["daria"], where: "Salesforce", time: "Days 6–8", waits: ["17"],
+      title: "Watch Salesforce while the sync runs",
+      text: "API calls used, failed automation runs, and any automation that runs on HubSpot's updates and should not (assignment alerts, territory moves). Fix by leaving HubSpot's login out of that rule, never by switching the rule off.",
+      tell: "Every two hours: API calls used today, failed automation runs, and automation that ran on records HubSpot's login changed.",
+      done: "Three days with no surprise." },
+    { id: "20", phase: "C", owners: ["cory"], where: "Claude Code", time: "1 day", waits: ["16", "18"],
+      title: "Load Pardot's history (24 months)",
+      text: "Export from Pardot, match each person to HubSpot by email, and send the three custom events in batches. Sends and opens stay out.",
+      tell: "Export 24 months of Pardot form fills, email clicks and page visits, match by email, and show me the count and 10 sample rows. On my yes, load them as custom events and read back the totals.",
+      done: "Loaded totals equal the step 8 counts, less the people with no HubSpot match, who are listed." },
+    { id: "21", phase: "C", owners: ["sergio"], where: "HubSpot and IT", time: "By 27 Nov", waits: ["2"],
+      title: "Both domains live",
+      text: "Chase IT until HubSpot shows the sending and page subdomains connected.",
+      tell: "Check public DNS for the HubSpot records on both subdomains and list what is still missing.",
+      done: "HubSpot's domain checks pass for both." },
+    { id: "G3", gate: true, phase: "C", owners: ["cory"], where: "Lead session", time: "30 min", waits: ["18", "19", "20", "21"],
+      title: "Gate 3: everyone synced",
+      text: "People, opt-outs and hard bounces match Salesforce exactly. The history is loaded. The sending domain passes HubSpot's checks.",
+      tell: "Gate 3 check: full counts in both systems, opt-outs, hard bounces, history totals against step 8. List every mismatch.",
+      done: "Cory ticks the gate." },
+
+    { id: "22", phase: "D", owners: ["daria"], where: "Salesforce", time: "2 h", waits: ["G3"],
+      title: "Put HubSpot's window on the lead and doctor pages",
+      text: "Add the component from HubSpot's package to the lead and doctor record pages. Retrieve each page before editing: record pages keep no history. Check it as a rep, on desktop and on a phone.",
+      tell: "Retrieve the Lead and Contact record pages, add HubSpot's component, deploy, and check it as a rep on desktop and phone.",
+      done: "A rep sees a doctor's HubSpot timeline, Pardot history included." },
+    { id: "23", phase: "D", owners: ["daria"], where: "Picture", time: "1 h", waits: ["G3"],
+      title: "Show Cory a picture of our own engagement card",
+      text: "A mock-up, with real data, of the card that will read HubSpot live on desktop, phone and Noodle. Nothing is built until Cory says yes.",
+      tell: "",
+      done: "Cory has seen it and answered." },
+    { id: "24", phase: "D", owners: ["sergio"], where: "HubSpot", time: "1 h", waits: ["G3", "21"],
+      title: "Send the first real HubSpot email to an internal list",
+      text: "From the new sending subdomain, to an internal list only.",
+      tell: "",
+      done: "It lands in the inbox, passes its checks, and the opens show in HubSpot, not as interactions in Salesforce." },
+    { id: "25", phase: "D", owners: ["cory"], where: "Claude Code", time: "1 h", waits: ["22", "24"],
+      title: "Write the sign-off report",
+      text: "Counts, errors and anything still open, on one page.",
+      tell: "Write the sign-off report: counts in both systems, sync errors since day 6, history loaded, and what is still open.",
+      done: "Daria and Sergio have it." },
+    { id: "G4", gate: true, phase: "D", owners: ["daria", "sergio", "cory"], where: "All three", time: "15 min", waits: ["25"],
+      title: "Gate 4: all three sign off",
+      text: "Reps see HubSpot engagement in Salesforce, and the report holds no surprise.",
+      tell: "",
+      done: "Each of you ticks your own box." },
+
+    { id: "26", phase: "E", owners: ["sergio"], where: "HubSpot", time: "1 day", waits: ["G4"],
+      title: "Build the lead score from the model",
+      text: "HubSpot's lead scoring: Fit up to 60, Engagement up to 100 over the last 90 days with its group limits, Warm at 70, Hot at 100.",
+      tell: "From the scoring deck, list each rule with its points and group limit, in the order HubSpot's scoring tool asks for them.",
+      done: "Every test doctor shows a Fit, an Engagement and a Total score." },
+    { id: "27", phase: "E", owners: ["daria"], where: "Salesforce", time: "2 days", waits: ["G4"],
+      title: "Build the sales handoff",
+      text: "A released lead arrives as MQL. Sales accepts it as SQL or returns it with a required reason within one business day, from a queue on Noodle's Today. An unreleased lead gets no alert and no rep queue.",
+      tell: "Build the MQL handoff from step 27 of the plan. Show me a picture of the Today queue before building it.",
+      done: "One test lead goes MQL to accepted; another is returned with a reason." },
+    { id: "28", phase: "E", owners: ["cory"], where: "Claude Code", time: "1 day", waits: ["26"],
+      title: "Back-test the score on the last 90 days",
+      text: "Who the model would have released, against what Sales did with them.",
+      tell: "Score everyone active in the last 90 days with the model. Show how many would be Hot, Warm and Nurture, and how each group converted.",
+      done: "Marketing and Sales have the back-test." },
+    { id: "29", phase: "E", owners: ["cory"], where: "HubSpot", time: "1 h", waits: ["27", "28"],
+      title: "Switch the release on",
+      text: "Map the three score properties to Salesforce's score fields. The inclusion list becomes the release list: already in Salesforce, or Hot, or Warm with Marketing's tick, or a campaign responder (as an unreleased lead).",
+      tell: "",
+      done: "The release list is live." },
+    { id: "G5", gate: true, phase: "E", owners: ["cory"], where: "Lead session", time: "30 min", waits: ["29"],
+      title: "Gate 5: release works",
+      text: "Marketing and Sales agree the back-test, and a Hot test lead reaches a rep within 15 minutes.",
+      tell: "",
+      done: "Cory ticks the gate." }
+  ];
+
+  var byId = {};
+  STEPS.forEach(function (s) { byId[s.id] = s; });
+
+  var ticks = {};
+  var db = null, userNs = null, myId = null, writable = true, local = false;
+  var LOCAL_KEY = "hs-plan-ticks";
+  function loadLocal() { try { var raw = localStorage.getItem(LOCAL_KEY); return raw ? JSON.parse(raw) : {}; } catch (e) { return {}; } }
+  function saveLocal() { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(ticks)); return true; } catch (e) { return false; } }
+  var filter = "all";
+  try { filter = localStorage.getItem("hs-plan-filter") || "all"; } catch (e) { filter = "all"; }
+  if (filter !== "all" && !PEOPLE[filter]) filter = "all";
+
+  var els = {}; // per step: {row, status, num, ticks: {owner: {label, input, by}}}
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function label(id) { return byId[id].gate ? "Gate " + id.slice(1) : "Step " + id; }
+  function tickKey(id, owner) { return id + "-" + owner; }
+  function isTicked(id, owner) { var t = ticks[tickKey(id, owner)]; return !!(t && t.done); }
+  function stepDone(s) { return s.owners.every(function (o) { return isTicked(s.id, o); }); }
+  function unmet(s) { return s.waits.filter(function (w) { return !stepDone(byId[w]); }); }
+
+  function ownerChip(o) {
+    var c = el("span", "own " + o);
+    var av = el("span", "av " + o, PEOPLE[o].init);
+    av.setAttribute("aria-hidden", "true");
+    c.appendChild(av);
+    c.appendChild(document.createTextNode(PEOPLE[o].name));
+    return c;
+  }
+
+  function copyText(btn, text, restore) {
+    function back() { setTimeout(function () { btn.textContent = restore; }, 1800); }
+    function fallback() { btn.textContent = "Select the text and copy it"; back(); }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { btn.textContent = "Copied"; back(); }, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  }
+
+  function build() {
+    var host = document.getElementById("steps");
+    PHASES.forEach(function (p) {
+      var block = el("div", "phase-block");
+      block.id = "phase-" + p.id;
+      var head = el("div", "phase-head");
+      head.appendChild(el("h3", null, p.name));
+      head.appendChild(el("span", null, p.days));
+      block.appendChild(head);
+      STEPS.filter(function (s) { return s.phase === p.id; }).forEach(function (s) {
+        var row = el("article", "step" + (s.gate ? " gate" : ""));
+        row.id = "s" + s.id;
+        var num = el("div", "num");
+        num.appendChild(el("span", null, s.gate ? "G" + s.id.slice(1) : s.id));
+        num.setAttribute("aria-hidden", "true");
+        row.appendChild(num);
+
+        var body = el("div", "step-body");
+        var title = el("div", "step-title");
+        var h = el("h4", null, (s.gate ? "" : s.id + ". ") + s.title);
+        title.appendChild(h);
+        body.appendChild(title);
+
+        var meta = el("div", "meta");
+        s.owners.forEach(function (o) { meta.appendChild(ownerChip(o)); });
+        meta.appendChild(el("span", "where", s.where));
+        meta.appendChild(el("span", "time", s.time));
+        var status = el("span", "status");
+        meta.appendChild(status);
+        body.appendChild(meta);
+
+        body.appendChild(el("p", "step-text", s.text));
+
+        if (s.tell) {
+          var tell = el("div", "tell");
+          var th = el("div", "tell-head");
+          th.appendChild(el("span", null, "Tell Claude"));
+          var cb = el("button", "copy-sm", "Copy");
+          cb.type = "button";
+          cb.id = "copy-step-" + s.id;
+          cb.addEventListener("click", function () { copyText(cb, s.tell, "Copy"); });
+          th.appendChild(cb);
+          tell.appendChild(th);
+          tell.appendChild(el("pre", null, s.tell));
+          body.appendChild(tell);
+        }
+
+        var dw = el("p", "donewhen");
+        dw.appendChild(el("b", null, "Done when: "));
+        dw.appendChild(document.createTextNode(s.done));
+        body.appendChild(dw);
+        if (s.why) body.appendChild(el("p", "donewhen why", "Why: " + s.why));
+
+        var tr = el("div", "tick-row");
+        var tickEls = {};
+        s.owners.forEach(function (o) {
+          var lab = el("label", "tick");
+          var input = document.createElement("input");
+          input.type = "checkbox";
+          input.id = "tick-" + s.id + "-" + o;
+          input.disabled = true;
+          input.addEventListener("change", function () { onTick(s, o, input); });
+          lab.appendChild(input);
+          var words = el("span");
+          words.appendChild(el("span", "who", s.owners.length > 1 ? PEOPLE[o].name + " done" : "Done"));
+          var by = el("span", "by");
+          words.appendChild(document.createTextNode(" "));
+          words.appendChild(by);
+          lab.appendChild(words);
+          tr.appendChild(lab);
+          tickEls[o] = { label: lab, input: input, by: by };
+        });
+        body.appendChild(tr);
+
+        row.appendChild(body);
+        block.appendChild(row);
+        els[s.id] = { row: row, status: status, ticks: tickEls };
+      });
+      host.appendChild(block);
+    });
+
+    var now = document.getElementById("now");
+    ORDER.forEach(function (o) {
+      var card = el("div", "now-card " + o);
+      var top = el("div", "now-top");
+      var av = el("span", "avatar", PEOPLE[o].init);
+      av.setAttribute("aria-hidden", "true");
+      top.appendChild(av);
+      var t = el("div");
+      t.appendChild(el("b", null, PEOPLE[o].name));
+      t.appendChild(el("span", null, PEOPLE[o].lane));
+      top.appendChild(t);
+      card.appendChild(top);
+      var stepLine = el("p", "now-step");
+      card.appendChild(stepLine);
+      var bar = el("div", "progress");
+      var fill = el("i");
+      bar.appendChild(fill);
+      card.appendChild(bar);
+      var count = el("p", "now-count");
+      card.appendChild(count);
+      now.appendChild(card);
+      els["now-" + o] = { line: stepLine, fill: fill, count: count };
+    });
+
+    document.querySelectorAll(".filter button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        filter = b.getAttribute("data-filter");
+        try { localStorage.setItem("hs-plan-filter", filter); } catch (e) {}
+        update();
+      });
+    });
+
+    document.querySelectorAll("button[data-copy]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var pre = document.getElementById(btn.getAttribute("data-copy"));
+        copyText(btn, pre.textContent, btn.getAttribute("data-label"));
+      });
+    });
+  }
+
+  function stepLink(id) {
+    var a = el("a", null, label(id) + (byId[id].gate ? "" : ": " + byId[id].title));
+    a.href = "#s" + id;
+    return a;
+  }
+
+  function nextFor(o) {
+    var mine = STEPS.filter(function (s) { return s.owners.indexOf(o) >= 0; });
+    var open = mine.filter(function (s) { return !isTicked(s.id, o); });
+    var doneCount = mine.length - open.length;
+    var ready = open.filter(function (s) { return unmet(s).length === 0; });
+    return { total: mine.length, doneCount: doneCount, ready: ready, open: open };
+  }
+
+  function update() {
+    STEPS.forEach(function (s) {
+      var e = els[s.id];
+      var done = stepDone(s);
+      var waits = unmet(s);
+      e.row.classList.toggle("done", done);
+      e.row.classList.toggle("ready", !done && waits.length === 0);
+      e.status.className = "status";
+      e.status.textContent = "";
+      if (done) { e.status.classList.add("done"); e.status.textContent = "Done"; }
+      else if (waits.length === 0) { e.status.classList.add("ready"); e.status.textContent = "Ready"; }
+      else {
+        e.status.classList.add("waiting");
+        e.status.appendChild(document.createTextNode("Waits for "));
+        waits.forEach(function (w, i) {
+          if (i) e.status.appendChild(document.createTextNode(", "));
+          var a = el("a", null, byId[w].gate ? "gate " + w.slice(1) : w);
+          a.href = "#s" + w;
+          e.status.appendChild(a);
+        });
+      }
+      s.owners.forEach(function (o) {
+        var t = e.ticks[o];
+        var on = isTicked(s.id, o);
+        t.input.checked = on;
+        t.label.classList.toggle("on", on);
+        t.input.disabled = !local && (!db || !writable);
+        var rec = ticks[tickKey(s.id, o)];
+        t.by.textContent = "";
+        if (rec && rec.done && rec.at) {
+          var when = "";
+          try { when = new Date(rec.at).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch (err) { when = ""; }
+          t.by.textContent = when;
+          t.by.setAttribute("data-uid", rec.by || "");
+        }
+      });
+      var show = filter === "all" || s.owners.indexOf(filter) >= 0;
+      e.row.hidden = !show;
+    });
+
+    PHASES.forEach(function (p) {
+      var gate = STEPS.filter(function (s) { return s.phase === p.id && s.gate; })[0];
+      var ph = document.getElementById("ph-" + p.id);
+      if (gate && ph) ph.classList.toggle("done", stepDone(gate));
+    });
+
+    ORDER.forEach(function (o) {
+      var n = nextFor(o), e = els["now-" + o];
+      e.line.textContent = "";
+      if (!n.open.length) {
+        e.line.appendChild(el("span", null, "All steps done."));
+      } else if (n.ready.length) {
+        e.line.appendChild(el("span", "status ready", "Now"));
+        e.line.appendChild(document.createTextNode(" "));
+        e.line.appendChild(stepLink(n.ready[0].id));
+        if (n.ready.length > 1) e.line.appendChild(document.createTextNode(" (+" + (n.ready.length - 1) + " more ready)"));
+      } else {
+        var first = n.open[0];
+        var w = unmet(first)[0];
+        e.line.appendChild(el("span", null, "Next: "));
+        e.line.appendChild(stepLink(first.id));
+        e.line.appendChild(document.createTextNode(". Waiting on " + label(w).toLowerCase() + " (" + byId[w].owners.map(function (x) { return PEOPLE[x].name; }).join(", ") + ")."));
+      }
+      e.fill.style.width = Math.round(100 * n.doneCount / n.total) + "%";
+      e.count.textContent = n.doneCount + " of " + n.total + " ticked";
+    });
+
+    document.querySelectorAll(".filter button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-filter") === filter));
+    });
+
+    resolveNames();
+  }
+
+  var nameToken = 0;
+  function resolveNames() {
+    if (!userNs) return;
+    var nodes = Array.prototype.slice.call(document.querySelectorAll(".tick .by[data-uid]")).filter(function (n) { return n.getAttribute("data-uid") && n.textContent; });
+    if (!nodes.length) return;
+    var ids = [];
+    nodes.forEach(function (n) { var u = n.getAttribute("data-uid"); if (ids.indexOf(u) < 0) ids.push(u); });
+    var token = ++nameToken;
+    userNs.profiles(ids).then(function (ps) {
+      if (token !== nameToken) return;
+      nodes.forEach(function (n) {
+        var p = ps[n.getAttribute("data-uid")];
+        var who = (p && p.name) || "";
+        if (who && n.textContent.indexOf(" · ") < 0) n.textContent = who + " · " + n.textContent;
+      });
+    }).catch(function () {});
+  }
+
+  function setStatus(kind, text) {
+    var s = document.getElementById("sync-status");
+    s.className = "sync-status" + (kind ? " " + kind : "");
+    s.querySelector("span").textContent = text;
+  }
+
+  function onTick(s, o, input) {
+    if (local) {
+      ticks[tickKey(s.id, o)] = { done: input.checked, at: new Date().toISOString() };
+      if (!saveLocal()) setStatus("off", "This browser blocks saving, so ticks are lost when the page closes.");
+      update();
+      return;
+    }
+    if (!db || !writable) { input.checked = !input.checked; return; }
+    var want = input.checked;
+    input.disabled = true;
+    db.collection("ticks").doc(tickKey(s.id, o)).set({ done: want, by: myId, at: new Date().toISOString() }).then(function () {
+      input.disabled = false;
+    }).catch(function (err) {
+      input.checked = !want;
+      input.disabled = false;
+      if (err && err.code === "invalid_argument") {
+        writable = false;
+        setStatus("off", "You can view this page but not tick it. Ask Cory for Contributor access.");
+        update();
+      } else {
+        setStatus("off", "That tick didn't save. Try again.");
+      }
+    });
+  }
+
+  function goLocal() {
+    local = true;
+    db = null;
+    ticks = loadLocal();
+    setStatus("", "Ticks save in this browser only. They are not shared with the others.");
+    update();
+  }
+
+  build();
+  update();
+
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("user").then(function (u) {
+      userNs = u;
+      if (!u) return null;
+      return Promise.all([u.id(), u.can("data.write")]).then(function (r) {
+        myId = r[0];
+        if (r[1] === false) writable = false;
+      });
+    }).catch(function () {}).then(function () {
+      return window.claude.use("db");
+    }).then(function (d) {
+      if (!d) { goLocal(); return; }
+      db = d;
+      if (!writable) setStatus("live", "Live, view only. Ask Cory for Contributor access to tick.");
+      else setStatus("live", "Shared ticks, live");
+      db.collection("ticks").onSnapshot(function (snap) {
+        var next = {};
+        snap.docs.forEach(function (doc) { if (doc.exists) next[doc.id] = doc.data(); });
+        ticks = next;
+        update();
+      }, function () {
+        setStatus("off", "Shared ticks stopped updating. Reload the page.");
+      });
+      update();
+    }).catch(function () { goLocal(); });
+  } else {
+    goLocal();
+  }
+})();
+</script>
+
+</body></html>
