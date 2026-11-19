@@ -859,9 +859,9 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       why: "Replaced on 18 Nov when HubSpot moved to Cory's login." },
     { id: "13", phase: "B", owners: ["cory", "daria"], where: "HubSpot and Salesforce, in the browser", time: "1 h", waits: ["6", "10", "11"],
       title: "Install HubSpot's Salesforce connector",
-      text: "Cory installs Salesforce from HubSpot's app marketplace, signing in as himself. Daria installs HubSpot's package in Salesforce when asked, for admins only. In the set-up, Cory chooses: leads and contacts on; practices sync to HubSpot companies, one way from Salesforce; HubSpot's own company creation and association by email domain off; opportunities, activities and timeline off; sync list (inclusion list) = the two test doctors only, until gate 2; field mappings from field-map.csv; HubSpot's share of Salesforce API calls capped. Claude cannot click through this; it checks afterwards.",
+      text: "Daria installed it on 19 Nov, signing in to Salesforce as herself. Cory switches the sign-in to himself (HubSpot: Settings, Integrations, Connected apps, Salesforce, Actions, connect a different user), so HubSpot connects as Cory as decided. In the set-up, Cory chooses: leads and contacts on; practices sync to HubSpot companies, one way from Salesforce; HubSpot's own company creation and association by email domain off; opportunities, activities and timeline off; sync list (inclusion list) = the two test doctors only, until gate 2; field mappings from field-map.csv; HubSpot's share of Salesforce API calls capped. Claude cannot click through this; it checks afterwards.",
       tell: "Compare the pilot doctors in Salesforce and HubSpot field by field and list every difference.",
-      done: "The pilot doctors appear in HubSpot with the right values. Cory ticks the set-up, Daria the package.",
+      done: "HubSpot's Salesforce sign-in is Cory, and the pilot doctors appear in HubSpot with the right values. Daria's install is ticked; Cory ticks the set-up.",
       why: "Salesforce allows 1.33 million API calls a day and we used 82,340 on 18 November. The cap stops HubSpot crowding out n8n and our other connections." },
     { id: "14", phase: "B", owners: ["cory"], where: "Claude Code", time: "1 h", waits: ["13"],
       title: "Unsubscribes and bounces: load them and prove the round trip",
@@ -973,6 +973,8 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
 
   // Steps recorded as done in the lead session. They show ticked and locked for everyone.
   var DONE = { "3": 1, "4": 1, "5": 1, "6": 1, "7": 1, "8": 1, "G1": 1, "9": 1, "10": 1, "12": 1 };
+  // One person's part of a shared step: "<step>-<owner>".
+  var DONE_PART = { "13-daria": 1 };
   // Email-sending preparation: due before steps 21 and 24, so a person's card names their other ready step first.
   var LATER = { "1": 1, "2": 1 };
 
@@ -998,7 +1000,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
   }
   function label(id) { return byId[id].gate ? "Gate " + id.slice(1) : "Step " + id; }
   function tickKey(id, owner) { return id + "-" + owner; }
-  function isTicked(id, owner) { if (DONE[id]) return true; var t = ticks[tickKey(id, owner)]; return !!(t && t.done); }
+  function isTicked(id, owner) { if (DONE[id] || DONE_PART[id + "-" + owner]) return true; var t = ticks[tickKey(id, owner)]; return !!(t && t.done); }
   function stepDone(s) { return s.owners.every(function (o) { return isTicked(s.id, o); }); }
   function unmet(s) { return s.waits.filter(function (w) { return !stepDone(byId[w]); }); }
 
@@ -1183,10 +1185,11 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
         var on = isTicked(s.id, o);
         t.input.checked = on;
         t.label.classList.toggle("on", on);
-        t.input.disabled = DONE[s.id] ? true : (!local && (!db || !writable));
+        var fixed = DONE[s.id] || DONE_PART[s.id + "-" + o];
+        t.input.disabled = fixed ? true : (!local && (!db || !writable));
         var rec = ticks[tickKey(s.id, o)];
         t.by.textContent = "";
-        if (DONE[s.id]) {
+        if (fixed) {
           t.by.textContent = "by 19 Nov";
         } else if (rec && rec.done && rec.at) {
           var when = "";
@@ -1258,7 +1261,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
   }
 
   function onTick(s, o, input) {
-    if (DONE[s.id]) { input.checked = true; return; }
+    if (DONE[s.id] || DONE_PART[s.id + "-" + o]) { input.checked = true; return; }
     if (local) {
       ticks[tickKey(s.id, o)] = { done: input.checked, at: new Date().toISOString() };
       if (!saveLocal()) setStatus("off", "This browser blocks saving, so ticks are lost when the page closes.");
