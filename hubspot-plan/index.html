@@ -323,10 +323,10 @@ footer { padding-block: 28px 48px; color: var(--muted); font-size: .88rem; }
   <div class="wrap">
     <p class="eyebrow">Marketing moves from Pardot to HubSpot, connected to Salesforce</p>
     <h1>HubSpot + Salesforce: two-week plan</h1>
-    <p class="byline"><span>Written 18 November 2026</span><span>Daria · Sergio · Cory</span></p>
+    <p class="byline"><span>Updated 19 November 2026</span><span>Daria · Sergio · Cory</span></p>
     <div class="next">
-      <span class="next-label">Start here, today</span>
-      <p>Sergio takes <a href="#s1">steps 1–3</a> and Cory <a href="#s4">step 4</a>. Then all three do <a href="#s5">step 5</a>. From there, each of you follows your next step in <a href="#walkthrough">the walkthrough</a>.</p>
+      <span class="next-label">Where we are</span>
+      <p>Gate 1 is passed. Next: Sergio creates the HubSpot properties (<a href="#s11">step 11</a>), then Cory installs HubSpot's connector (<a href="#s13">step 13</a>). Each of you follows your next step in <a href="#walkthrough">the walkthrough</a>.</p>
     </div>
     <p class="goal">By <strong>Tuesday 1 December (day 10)</strong>, HubSpot and Salesforce hold the same people with zero sync errors, Pardot's history sits in HubSpot, and reps see HubSpot engagement in Salesforce. Pardot keeps running throughout. Lead scoring and the release of leads to Salesforce go live in days 11 to 15.</p>
   </div>
@@ -440,7 +440,7 @@ footer { padding-block: 28px 48px; color: var(--muted); font-size: .88rem; }
           <span class="lane-tag">Lane 1 · Salesforce</span>
           <dl>
             <dt>Owns</dt>
-            <dd>Every Salesforce change: HubSpot's own login, new fields, sharing, page changes, the sales handoff, our engagement card</dd>
+            <dd>Every Salesforce change: HubSpot's permission set, new fields, page changes, the lead score and the sales handoff, our engagement card</dd>
             <dt>Asks its owner before touching</dt>
             <dd>HubSpot</dd>
           </dl>
@@ -495,9 +495,9 @@ footer { padding-block: 28px 48px; color: var(--muted); font-size: .88rem; }
         <li><span class="chip hot">Hot</span><span class="range">100+</span><span>Released automatically, within 15 minutes.</span><span class="where">Salesforce, as MQL</span></li>
       </ul>
       <ol class="steps">
-        <li><span><strong>HubSpot computes the score.</strong> <span class="why">Why HubSpot: clicks, visits and downloads happen there, and its scoring tool already has group limits, a 90-day window and Hot/Warm labels. Scoring in Salesforce would mean copying every event in.</span></span></li>
+        <li><span><strong>The score is split.</strong> Salesforce scores fit, events and requests; HubSpot scores email clicks, visits and downloads and sends one HubSpot Digital Score. Salesforce adds them into the total. <span class="why">Why: each system scores what it can see, and HubSpot cannot read campaign member status. HubSpot may take over the whole score later.</span></span></li>
         <li><span><strong>Salesforce shows three fields:</strong> Fit Score, Engagement Score and Total Score. Sales sees all three, as the model asks.</span></li>
-        <li><span><strong>The release gate is one HubSpot list.</strong> Only people on it sync to Salesforce: Hot automatically, Warm on Marketing's tick, campaign responders as unreleased leads, plus everyone Salesforce already holds. <span class="why">Why: this list is the connector's own filter, so release needs no custom code.</span></span></li>
+        <li><span><strong>Release happens in Salesforce.</strong> Every HubSpot person arrives as an unreleased lead (no alert, no rep queue). Hot releases automatically; Warm when Marketing ticks Release to Sales in HubSpot. HubSpot sees the score and the release status.</span></li>
         <li><span><strong>A released lead arrives as MQL.</strong> Within one business day Sales accepts it as SQL or returns it with a required reason. The queue will sit in Noodle's Today.</span></li>
         <li><span><strong>A returned or Closed Lost lead</strong> keeps its fit points, loses its engagement points and must qualify again.</span></li>
       </ol>
@@ -538,7 +538,7 @@ footer { padding-block: 28px 48px; color: var(--muted); font-size: .88rem; }
   <section id="it">
     <div class="wrap">
       <h2>IT and web set-up</h2>
-      <p class="prose">These are the only tasks that wait on people outside the three of us, so they are asked for on day 1 (steps 1, 2 and 21). Sergio owns the chasing.</p>
+      <p class="prose">These are the only tasks that wait on people outside the three of us. They only gate email sending (steps 21 and 24), so Sergio sends them as sending gets close and owns the chasing.</p>
       <div class="tbl-wrap">
         <table class="tbl">
           <thead><tr><th>What</th><th>Who does it</th><th>Needed by</th><th>Why</th></tr></thead>
@@ -582,8 +582,8 @@ footer { padding-block: 28px 48px; color: var(--muted); font-size: .88rem; }
       <h2>Why we build it this way</h2>
       <ol class="steps">
         <li><span><strong>HubSpot's own connector, not a sync we write.</strong> HubSpot maintains it, and it already handles retries, limits and matching people by email. A hand-built sync is the part that takes months.</span></li>
-        <li><span><strong>Salesforce wins on every shared field.</strong> Sync problems come from two systems editing the same field. So each field has one owner, and HubSpot writes only into its own Salesforce fields: the three scores, last marketing touch, bounced, release status.</span></li>
-        <li><span><strong>HubSpot gets its own Salesforce login, never Cory's.</strong> What that login can see is what HubSpot receives, so it doubles as our filter. Cory's login also skips our automation, and its changes could not be told apart from Cory's own.</span></li>
+        <li><span><strong>Salesforce wins on every shared field.</strong> Sync problems come from two systems editing the same field. So each field has one owner, and HubSpot writes only into its own Salesforce fields: its digital score, the Release to Sales tick, the request date, last marketing touch and bounced.</span></li>
+        <li><span><strong>HubSpot connects as Cory's Salesforce user.</strong> Cory's decision. His login sees every record, so the pilot is held by HubSpot's sync list and test practices are kept out by their flag. Only one rule skips his changes (the doctor name check); lead routing runs.</span></li>
         <li><span><strong>HubSpot email events never become interactions in Salesforce.</strong> That setting writes one entry per open and per click, with no de-duplication. Pardot did the same, and we now delete 2.4 million of those entries. They would also inflate Engagement and Overall activity.</span></li>
         <li><span><strong>While both tools run, unsubscribes travel through Salesforce.</strong> Pardot and HubSpot do not talk to each other. Both read and write the same opt-out box in Salesforce, so an unsubscribe in one stops email from the other.</span></li>
       </ol>
@@ -634,7 +634,9 @@ footer { padding-block: 28px 48px; color: var(--muted); font-size: .88rem; }
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>A clean sync comes first, scoring and release next, forms and automation after.</span></li>
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Daria owns Salesforce, Sergio owns HubSpot, Cory owns the connection. Fable 5.2 leads and checks; a lower model builds.</span></li>
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>HubSpot is on Enterprise: the connector, scoring, custom events and single sign-on are included.</span></li>
-            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>The pilot is 50 doctors and a test practice. Leads join on day 6: everyone in Salesforce can see leads, so they cannot be held to a pilot.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>The pilot is 50 doctors checked field by field, plus two test doctors (Corys Lawing, Matt Robertson) on Ortho Company Test (NAM) for every test send and unsubscribe.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>HubSpot connects as Cory's Salesforce user. Practices sync to HubSpot companies, one way.</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>The score is split: Salesforce scores fit, events and requests and holds the total and the release; HubSpot sends a digital score.</span></li>
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Leads are handed to Sales by the scoring model: Hot at once, Warm by Marketing, Nurture never.</span></li>
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Sales has no HubSpot access, so every campaign and its members exist in Salesforce, whichever tool created it.</span></li>
           </ul>
@@ -681,9 +683,9 @@ Ask the owner first: anything in HubSpot (Sergio); the connector's settings and 
 
 Your steps for days 1-5, in order:
 5. Confirm you can read Salesforce production, and HubSpot read-only with Lane 1's key.
-6. Create HubSpot's own Salesforce login: a dedicated user and a HubSpot Integration permission set with API access, read and edit on doctors (Contact), read on campaigns, edit on campaign members, and only the fields in field-map.csv. No View All. No access to leads yet. Show every permission before deploying, then read it back.
-10. Add the HubSpot fields from field-map.csv to Lead and Contact, every name starting with HubSpot. Reps can read them; only HubSpot's login can edit them. Deploy, then check as a rep.
-12. Add a HubSpot Pilot tick to the practice (Account), tick the practices in pilot.csv, and share ticked practices with HubSpot's login through a sharing rule. Then count the doctors and leads it can see: pilot doctors only, no leads.
+6. Done: HubSpot connects as Cory; the HubSpot Integration permission set is assigned to him.
+10. Add the 33 fields in salesforce-fields-for-daria.md, every name starting with HubSpot. Reps can read them; only administrators can edit them. Deploy, then check as a rep.
+12. Nothing to do: no sharing, because HubSpot uses Cory's login.
 13. When Cory's connector set-up asks, install HubSpot's package in Salesforce for admins only.
 
 Before each step, check in the plan that the steps it waits for are done. When a step is done and checked, tell Daria, who ticks it in the plan.
@@ -736,7 +738,7 @@ Your steps for days 1-5, in order:
 5. Confirm you can read Salesforce production, Pardot (read only) and HubSpot with Lane 3's key.
 7. Fill field-map.csv: every lead and doctor field Pardot syncs today, the Fit inputs (Ortho Case Starts per year, position, doctor role), Sales Area, Global Region, client type and owner. Shared fields: Always use Salesforce. HubSpot's own fields (scores, last marketing touch, bounced, release status): Two-way, read-only in Salesforce.
 8. Count Pardot form fills, email clicks and page visits by month for 24 months. List every email on two or more Salesforce people, with each practice. Save both in lane3-connection; never paste personal data into chat.
-9. Propose 50 pilot doctors across two or three Sales Areas (some unsubscribed, a hard bounce, a shared practice inbox, one with no email) plus one test practice with two test doctors on our own addresses. Save pilot.csv on Cory's yes.
+9. Done: 50 pilot doctors plus test doctors Corys Lawing and Matt Robertson (Ortho Company Test (NAM)), in private/pilot.csv.
 13. After Cory finishes the connector set-up: compare the pilot doctors in both systems field by field.
 14. Compare opt-outs and hard bounces for the pilot, load any missing, and run the two-way unsubscribe test on the two test doctors only.
 15. Check the test campaign: the member, its status, and Last Event Attended in HubSpot.
@@ -811,14 +813,14 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       tell: "Paste your kickoff brief from the bottom of this page.",
       done: "Your Claude reads your systems: one HubSpot contact count, and for Daria and Cory one Salesforce lead count. Each of you ticks your own box." },
     { id: "6", phase: "A", owners: ["daria"], where: "Salesforce", time: "1 h", waits: ["5"],
-      title: "Create HubSpot's own Salesforce login",
-      text: "A dedicated user and a HubSpot Integration permission set: API access, read and edit on doctors, read on campaigns, edit on campaign members, and only the fields in the field map. No View All, and no access to leads yet.",
-      tell: "Create the HubSpot integration user and permission set from step 6 of the plan. Show me every permission before deploying, then read it back.",
-      done: "The login works and sees no leads and no practices yet. Cory has its password through the password manager.",
-      why: "What this login can see is exactly what HubSpot receives. Leads are open to everyone in Salesforce, so lead access would send all 27,700 at once; it comes on day 6." },
+      title: "Give HubSpot its Salesforce access: Cory's login",
+      text: "HubSpot connects as Cory's Salesforce user (Cory's decision, 18 Nov). Daria's HubSpot Integration permission set is assigned to Cory; there is no separate HubSpot user.",
+      tell: "",
+      done: "Done on 18 Nov: HubSpot connects as Cory.",
+      why: "Cory's login sees every record, so the pilot is held by HubSpot's sync list instead (step 13). Of 132 automations, only the doctor name check skips Cory's changes." },
     { id: "7", phase: "A", owners: ["cory"], where: "Claude Code", time: "2 h", waits: ["5"],
       title: "Draft the field map",
-      text: "One row per synced field: Salesforce field, HubSpot property, direction and HubSpot's sync rule. Shared fields use “Always use Salesforce”. HubSpot's own fields (three scores, last marketing touch, bounced, release status) use “Two-way” and are read-only in Salesforce for everyone except HubSpot's login.",
+      text: "One row per synced field: Salesforce field, HubSpot property, direction and HubSpot's sync rule. Shared fields use “Always use Salesforce”. HubSpot's own fields (its digital score, last marketing touch, bounced) use “Two-way” and are read-only in Salesforce for people.",
       tell: "Fill field-map.csv: every lead and doctor field Pardot syncs today, the Fit inputs (Ortho Case Starts per year, position, doctor role), Sales Area, Global Region, client type and owner. One row each, with direction and sync rule.",
       done: "Daria and Sergio have read it, and their changes are in.",
       why: "HubSpot has no “HubSpot always wins” rule, so locking the Salesforce side is what makes HubSpot the only writer of its own fields." },
@@ -841,23 +843,23 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       why: "Tests that send or unsubscribe use our own test doctors, never a real doctor." },
     { id: "10", phase: "B", owners: ["daria"], where: "Salesforce", time: "3 h", waits: ["G1"],
       title: "Add HubSpot's fields to leads and doctors",
-      text: "Fit Score, Engagement Score, Total Score, Last Marketing Touch, Hard Bounced, Release Status, Last Event Attended and Event Points (last 90 days), the last two filled from campaign members. Every name starts with HubSpot. Reps can read them; only HubSpot's login can edit them.",
-      tell: "Add the HubSpot fields from field-map.csv to Lead and Contact with the access in step 10 of the plan. Deploy, then check as a rep that they show and cannot be edited.",
-      done: "A rep sees the fields and cannot edit them; HubSpot's login can." },
+      text: "The 33 new fields in Daria's list (salesforce-fields-for-daria.md): the scores and release status, the HubSpot digital score, the Release to Sales tick, request and requalify dates, event fields, and the practice's AE, IC, RSM and CX agent names and emails. Every name starts with HubSpot. Reps can read them; only administrators can edit them.",
+      tell: "Add the 33 fields in salesforce-fields-for-daria.md with the access it describes. Deploy, then check as a rep that they show and cannot be edited.",
+      done: "A rep sees the fields and cannot edit them." },
     { id: "11", phase: "B", owners: ["sergio"], where: "HubSpot", time: "2 h", waits: ["G1"],
       title: "Create the properties, unsubscribe types and the do-not-email list",
       text: "Every HubSpot property the field map names that does not exist yet, the subscription types Marketing agrees, and a list “Do not email: Pardot hard bounce” that every send excludes.",
       tell: "Create the HubSpot properties from field-map.csv that don't exist yet. Show me the list before creating anything.",
       done: "Every field-map row has its HubSpot property." },
     { id: "12", phase: "B", owners: ["daria"], where: "Salesforce", time: "30 min", waits: ["9", "10"],
-      title: "Share the pilot practices with HubSpot's login",
-      text: "A HubSpot Pilot tick on the practice, ticked for the practices in pilot.csv, and a sharing rule that gives HubSpot's login those practices. Their doctors follow.",
-      tell: "Add a HubSpot Pilot tick to Account, tick the practices in pilot.csv, share ticked practices with HubSpot's login, then count the doctors and leads it can see.",
-      done: "HubSpot's login sees the pilot doctors and the test doctors, and no leads.",
-      why: "Practices are private in Salesforce, so sharing them is how we hold HubSpot to the pilot." },
-    { id: "13", phase: "B", owners: ["cory", "daria"], where: "HubSpot and Salesforce, in the browser", time: "1 h", waits: ["6", "11", "12"],
+      title: "Nothing to do: no sharing needed",
+      text: "HubSpot connects as Cory, who sees every record, so there is no pilot sharing to set up. The pilot is held by HubSpot's sync list instead (step 13).",
+      tell: "",
+      done: "Tick it.",
+      why: "Replaced on 18 Nov when HubSpot moved to Cory's login." },
+    { id: "13", phase: "B", owners: ["cory", "daria"], where: "HubSpot and Salesforce, in the browser", time: "1 h", waits: ["6", "10", "11"],
       title: "Install HubSpot's Salesforce connector",
-      text: "Cory installs Salesforce from HubSpot's app marketplace, signing in as HubSpot's Salesforce login. Daria installs HubSpot's package in Salesforce when asked, for admins only. In the set-up, Cory chooses: leads and contacts on; companies, opportunities, activities and timeline off; selective sync on; inclusion list = the pilot; field mappings from field-map.csv; HubSpot's share of Salesforce API calls capped. Claude cannot click through this; it checks afterwards.",
+      text: "Cory installs Salesforce from HubSpot's app marketplace, signing in as himself. Daria installs HubSpot's package in Salesforce when asked, for admins only. In the set-up, Cory chooses: leads and contacts on; practices sync to HubSpot companies, one way from Salesforce; HubSpot's own company creation and association by email domain off; opportunities, activities and timeline off; sync list (inclusion list) = the two test doctors only, until gate 2; field mappings from field-map.csv; HubSpot's share of Salesforce API calls capped. Claude cannot click through this; it checks afterwards.",
       tell: "Compare the pilot doctors in Salesforce and HubSpot field by field and list every difference.",
       done: "The pilot doctors appear in HubSpot with the right values. Cory ticks the set-up, Daria the package.",
       why: "Salesforce allows 1.33 million API calls a day and we used 82,340 on 18 November. The cap stops HubSpot crowding out n8n and our other connections." },
@@ -884,21 +886,21 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       tell: "Gate 2 check: compare every pilot doctor field by field and list any mismatch.",
       done: "Cory ticks the gate. The lead session writes the next briefs." },
 
-    { id: "17", phase: "C", owners: ["daria"], where: "Salesforce", time: "1 h", waits: ["G2"],
-      title: "Open Salesforce to HubSpot: leads first, then doctors",
-      text: "Give HubSpot's login access to leads. Two hours later, if the sync is clean, share every practice that is not a test practice.",
-      tell: "Give HubSpot's login read and edit on Lead. After my go, share every practice that is not a test account with it, and count what it can see.",
-      done: "HubSpot's login sees every lead and every doctor at a real practice.",
-      why: "Leads could not be piloted, so they go first, alone, and are watched." },
+    { id: "17", phase: "C", owners: ["cory"], where: "HubSpot", time: "2 h", waits: ["G2"],
+      title: "Open the sync to everyone: leads first, then doctors",
+      text: "Widen HubSpot's sync list from the two test doctors to everyone and start HubSpot's first import of Salesforce leads. Two hours later, if the sync is clean, the doctors and practices. Test practices stay out through the test-practice flag.",
+      tell: "Count leads in Salesforce and HubSpot every 30 minutes for the first two hours and list any sync errors.",
+      done: "Leads, doctors and practices are all flowing, with no sync errors.",
+      why: "Leads were never piloted, so they go first, alone, and are watched." },
     { id: "18", phase: "C", owners: ["cory"], where: "HubSpot and Claude Code", time: "3 h, then daily", waits: ["17"],
       title: "Run the full sync and check counts every morning",
-      text: "Widen the inclusion list to everyone who has a Salesforce record, and start HubSpot's first import of Salesforce leads and doctors.",
+      text: "Once everyone is syncing, compare counts every morning until gate 3.",
       tell: "Morning count check: Salesforce leads and doctors with an email (test practices out) against HubSpot contacts with a Salesforce record; opt-outs; hard bounces. List every mismatch.",
       done: "The first full count matches." },
     { id: "19", phase: "C", owners: ["daria"], where: "Salesforce", time: "Days 6–8", waits: ["17"],
       title: "Watch Salesforce while the sync runs",
-      text: "API calls used, failed automation runs, and any automation that runs on HubSpot's updates and should not (assignment alerts, territory moves). Fix by leaving HubSpot's login out of that rule, never by switching the rule off.",
-      tell: "Every two hours: API calls used today, failed automation runs, and automation that ran on records HubSpot's login changed.",
+      text: "API calls used, failed automation runs, and any automation that runs on HubSpot's updates and should not (assignment alerts, territory moves). HubSpot's changes show as Cory's, so look at rules that react to his changes. Fix by narrowing the rule, never by switching it off.",
+      tell: "Every two hours: API calls used today, failed automation runs, and automation that ran on records HubSpot changed (shown as Cory's changes).",
       done: "Three days with no surprise." },
     { id: "20", phase: "C", owners: ["cory"], where: "Claude Code", time: "1 day", waits: ["16", "18"],
       title: "Load Pardot's history (24 months)",
@@ -943,25 +945,25 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       done: "Each of you ticks your own box." },
 
     { id: "26", phase: "E", owners: ["sergio"], where: "HubSpot", time: "1 day", waits: ["G4"],
-      title: "Build the lead score from the model",
-      text: "HubSpot's lead scoring: Fit up to 60, Engagement up to 100 over the last 90 days with its group limits, Warm at 70, Hot at 100.",
-      tell: "From the scoring deck, list each rule with its points and group limit, in the order HubSpot's scoring tool asks for them.",
-      done: "Every test doctor shows a Fit, an Engagement and a Total score." },
+      title: "Build HubSpot's digital score",
+      text: "HubSpot's scoring tool scores only what happens in HubSpot over the last 90 days: email clicks (5, max 20), engaged visits (5, max 15), downloads (15), social DM (20) and comment (10). It syncs to Salesforce as HubSpot Digital Score, and Salesforce adds it to the total (lead-scoring-spec.md).",
+      tell: "From lead-scoring-spec.md, list the digital rules with their points and group limits, in the order HubSpot's scoring tool asks for them.",
+      done: "Both test doctors show a HubSpot Digital Score in Salesforce." },
     { id: "27", phase: "E", owners: ["daria"], where: "Salesforce", time: "2 days", waits: ["G4"],
       title: "Build the sales handoff",
-      text: "A released lead arrives as MQL. Sales accepts it as SQL or returns it with a required reason within one business day, from a queue on Noodle's Today. An unreleased lead gets no alert and no rep queue.",
-      tell: "Build the MQL handoff from step 27 of the plan. Show me a picture of the Today queue before building it.",
+      text: "Build the score in Salesforce from lead-scoring-spec.md, behind an on/off switch that stays off. Every HubSpot person arrives as an unreleased lead (marketing queue, no alert). A released lead becomes MQL and goes to the rep, who accepts it as SQL or returns it with a required reason within one business day, in a custom accept / return window.",
+      tell: "Build the score and the MQL handoff from lead-scoring-spec.md. Show Cory a picture of the scores and the accept / return window before building any screen.",
       done: "One test lead goes MQL to accepted; another is returned with a reason." },
     { id: "28", phase: "E", owners: ["cory"], where: "Claude Code", time: "1 day", waits: ["26"],
       title: "Back-test the score on the last 90 days",
       text: "Who the model would have released, against what Sales did with them.",
       tell: "Score everyone active in the last 90 days with the model. Show how many would be Hot, Warm and Nurture, and how each group converted.",
       done: "Marketing and Sales have the back-test." },
-    { id: "29", phase: "E", owners: ["cory"], where: "HubSpot", time: "1 h", waits: ["27", "28"],
+    { id: "29", phase: "E", owners: ["cory"], where: "Salesforce", time: "1 h", waits: ["27", "28"],
       title: "Switch the release on",
-      text: "Map the three score properties to Salesforce's score fields. The inclusion list becomes the release list: already in Salesforce, or Hot, or Warm with Marketing's tick, or a campaign responder (as an unreleased lead).",
+      text: "Turn the scoring switch on in Salesforce. Release happens in Salesforce: Hot automatically, Warm when Marketing ticks Release to Sales in HubSpot. HubSpot sees every score and release status.",
       tell: "",
-      done: "The release list is live." },
+      done: "Scoring is on, and a Hot test lead reaches its rep." },
     { id: "G5", gate: true, phase: "E", owners: ["cory"], where: "Lead session", time: "30 min", waits: ["29"],
       title: "Gate 5: release works",
       text: "Marketing and Sales agree the back-test, and a Hot test lead reaches a rep within 15 minutes.",
