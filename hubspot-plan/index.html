@@ -762,7 +762,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
 </main>
 
 <footer>
-  <div class="wrap">Written 18 November 2026 for Daria, Sergio and Cory. On the claude.ai page, ticks are shared live; opened as a file, they save in that browser only.</div>
+  <div class="wrap">Updated 19 November 2026 for Daria, Sergio and Cory. Steps already done show as done for everyone; your own ticks save in your browser only.</div>
 </footer>
 
 <script>
@@ -786,16 +786,16 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
 
   var STEPS = [
     { id: "1", phase: "A", owners: ["sergio"], where: "HubSpot settings", time: "30 min", waits: [],
-      title: "Start both domains in HubSpot and collect their DNS records",
+      title: "Start both domains in HubSpot and collect their DNS records (before email sending)",
       text: "In HubSpot's domain settings, start a new email sending subdomain and a new page subdomain. Not go., which Pardot keeps until switch-off. HubSpot then shows the DNS records each one needs.",
       tell: "Read dental-monitoring.com's public DNS and check that these HubSpot records fit with our SPF, DMARC and mail records. List anything IT must change.",
       done: "You hold the DNS records for both subdomains.",
       why: "Our domain rejects any email that fails its checks, so HubSpot cannot send until IT adds these." },
     { id: "2", phase: "A", owners: ["sergio"], where: "Email", time: "20 min", waits: ["1"],
-      title: "Send the day-1 requests to IT, the web team and Legal",
+      title: "Send the requests to IT, the web team and Legal (before email sending)",
       text: "IT: the DNS records from step 1, and named HubSpot sign-ins with two-step sign-in and single sign-on. Web team: HubSpot's tracking code behind the cookie banner. Legal: HubSpot named in the privacy notice and the cookie banner.",
       tell: "Draft the three requests from the plan's IT section, each with its date.",
-      done: "All three are sent with their dates: web team 24 Nov (day 5), IT 27 Nov (day 8), Legal before the first outside send." },
+      done: "All three are sent before HubSpot sends any email (steps 21 and 24). They hold up nothing else." },
     { id: "3", phase: "A", owners: ["sergio"], where: "HubSpot settings", time: "30 min", waits: [],
       title: "Create one HubSpot key per lane",
       text: "One HubSpot private app per lane. Lane 1 only reads; Lane 2 writes properties, lists and emails; Lane 3 writes contacts, imports and custom events. Send each token to its owner through the password manager.",
@@ -829,7 +829,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       text: "Pardot form fills, email clicks and page visits by month for 24 months, and every email address that sits on two or more people in Salesforce.",
       tell: "Count Pardot form fills, email clicks and page visits by month for the last 24 months. Then list every email on two or more Salesforce people, with each person's practice. Save both in lane3-connection; never paste personal data into chat.",
       done: "Both files are saved. The totals are what step 20 must match." },
-    { id: "G1", gate: true, phase: "A", owners: ["cory"], where: "Lead session", time: "30 min", waits: ["2", "6", "7", "8"],
+    { id: "G1", gate: true, phase: "A", owners: ["cory"], where: "Lead session", time: "30 min", waits: ["6", "7", "8"],
       title: "Gate 1: everyone connected, field map agreed",
       text: "Every lane's Claude reads its systems. Every field-map row has a direction and a sync rule, and Daria and Sergio agree it.",
       tell: "Gate 1 check: confirm each lane can read its systems, and every field-map row has a direction and a sync rule.",
@@ -971,6 +971,11 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       done: "Cory ticks the gate." }
   ];
 
+  // Steps recorded as done in the lead session. They show ticked and locked for everyone.
+  var DONE = { "3": 1, "4": 1, "5": 1, "6": 1, "7": 1, "8": 1, "G1": 1, "9": 1, "10": 1, "12": 1 };
+  // Email-sending preparation: due before steps 21 and 24, so a person's card names their other ready step first.
+  var LATER = { "1": 1, "2": 1 };
+
   var byId = {};
   STEPS.forEach(function (s) { byId[s.id] = s; });
 
@@ -993,7 +998,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
   }
   function label(id) { return byId[id].gate ? "Gate " + id.slice(1) : "Step " + id; }
   function tickKey(id, owner) { return id + "-" + owner; }
-  function isTicked(id, owner) { var t = ticks[tickKey(id, owner)]; return !!(t && t.done); }
+  function isTicked(id, owner) { if (DONE[id]) return true; var t = ticks[tickKey(id, owner)]; return !!(t && t.done); }
   function stepDone(s) { return s.owners.every(function (o) { return isTicked(s.id, o); }); }
   function unmet(s) { return s.waits.filter(function (w) { return !stepDone(byId[w]); }); }
 
@@ -1148,6 +1153,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
     var open = mine.filter(function (s) { return !isTicked(s.id, o); });
     var doneCount = mine.length - open.length;
     var ready = open.filter(function (s) { return unmet(s).length === 0; });
+    ready.sort(function (a, b) { return (LATER[a.id] ? 1 : 0) - (LATER[b.id] ? 1 : 0); });
     return { total: mine.length, doneCount: doneCount, ready: ready, open: open };
   }
 
@@ -1177,10 +1183,12 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
         var on = isTicked(s.id, o);
         t.input.checked = on;
         t.label.classList.toggle("on", on);
-        t.input.disabled = !local && (!db || !writable);
+        t.input.disabled = DONE[s.id] ? true : (!local && (!db || !writable));
         var rec = ticks[tickKey(s.id, o)];
         t.by.textContent = "";
-        if (rec && rec.done && rec.at) {
+        if (DONE[s.id]) {
+          t.by.textContent = "by 19 Nov";
+        } else if (rec && rec.done && rec.at) {
           var when = "";
           try { when = new Date(rec.at).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch (err) { when = ""; }
           t.by.textContent = when;
@@ -1250,6 +1258,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
   }
 
   function onTick(s, o, input) {
+    if (DONE[s.id]) { input.checked = true; return; }
     if (local) {
       ticks[tickKey(s.id, o)] = { done: input.checked, at: new Date().toISOString() };
       if (!saveLocal()) setStatus("off", "This browser blocks saving, so ticks are lost when the page closes.");
