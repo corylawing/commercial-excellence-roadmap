@@ -904,7 +904,7 @@ Rules: follow this folder's CLAUDE.md. Every load and setting runs on the pilot 
       done: "Three days with no surprise." },
     { id: "20", phase: "C", owners: ["cory"], where: "Claude Code", time: "1 day", waits: ["16", "18"],
       title: "Load Pardot's history (24 months)",
-      text: "Export from Pardot, match each person to HubSpot by email, and send the three custom events in batches. Sends and opens stay out, and so do website visits: Pardot records a visit only as a number of pages, with no page names (Cory, 19 Nov).",
+      text: "Export from Pardot, match each person to HubSpot by email, and send the three custom events in batches. Sends and opens stay out, and so do website visits: Pardot only ever tracked its own landing pages (go.dental-monitoring.com), which the page visit event already carries by name, never dentalmonitoring.com (Cory, 19 Nov).",
       tell: "Export 24 months of Pardot form fills, email clicks and page visits, match by email, and show me the count and 10 sample rows. On my yes, load them as custom events and read back the totals.",
       done: "Loaded totals equal the step 8 counts, less the people with no HubSpot match, who are listed." },
     { id: "21", phase: "C", owners: ["sergio"], where: "HubSpot and IT", time: "By 27 Nov", waits: ["2"],
