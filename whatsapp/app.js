@@ -13,6 +13,7 @@ import {
     parseChat, chatNameFromFile, looksLikePhone, transcriptLine, keysInDescription, fingerprint
 } from './parser.js';
 import { listZip, isZip } from './zip.js';
+import { groupConversations } from './conversations.js';
 import { nameTokens, scoreCandidate, confidentPick, employeeTypeFor, guessMe } from './match.js';
 import * as sf from './sf.js';
 
@@ -20,9 +21,8 @@ const root = document.getElementById('app');
 const LOCALE = navigator.language || 'en-GB';
 const CONSENT_KEY = 'c2s.consent';
 const ME_NAMES_KEY = 'c2s.myWhatsAppNames';
-const HOWTO_SEEN_KEY = 'c2s.howtoSeen';
 const INSTALL_DISMISSED_KEY = 'c2s.installDismissed';
-const PAGE = 400;
+const CONV_PAGE = 30;
 /* An iPhone shows a Photo Library / Take Photo menu before Files whenever pictures are accepted.
  * Its export is always one .zip (photos inside), so on iPhone the button opens Files straight away. */
 const IPHONE_ACCEPT = '.zip,.txt,application/zip,text/plain';
@@ -41,7 +41,7 @@ const S = {
     selection: new Set(),
     lastClicked: null,
     step: 'pick',
-    shown: PAGE,
+    shownConvs: CONV_PAGE,
     person: null,
     practices: [],
     practice: null,
@@ -82,6 +82,7 @@ const ICONS = {
     video: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
+    minus: '<path d="M6 12h12"/>',
     download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
 };
 function icon(name, cls = '') {
@@ -157,8 +158,9 @@ async function guard(promise) {
 function topbar({ back = false, title = '', sub = '' } = {}) {
     const me = S.me;
     const left = back
-        ? `<button class="icon-btn" data-act="home" aria-label="Back to start">${icon('back')}</button>
-           <div class="title"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`
+        ? `<button class="icon-btn" data-act="back" aria-label="Back">${icon('back')}</button>
+           <div class="title title-pick"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>
+           <div class="title title-save"><b>Save to Salesforce</b><small class="save-summary">${esc(S.chat ? saveSummary() : '')}</small></div>`
         : `<div class="brand"><img src="icons/icon.svg" alt="" width="30" height="30"><span>Chat to Salesforce</span></div><span class="spacer"></span>`;
     const right = me
         ? `<div class="menu-wrap"><button class="avatar" data-act="menu" aria-haspopup="true" aria-expanded="${S.menuOpen}" aria-label="Your account">${esc(initials(me.Name))}</button>
@@ -223,52 +225,38 @@ function renderWelcome() {
 
 /* ---------------------------------------------------------------- home */
 
-function howtoHtml(which) {
-    const steps = {
-        iphone: [
-            'In WhatsApp, open the chat and tap the <b>person’s name</b> at the top.',
-            'Tap <b>Export Chat</b>, then <b>Attach Media</b> to bring photos, or <b>Without Media</b>.',
-            'Tap <b>Save to Files</b>. Come back here and press <b>Open exported chat</b>.',
-            'Only a few messages? <b>Select</b> them in WhatsApp, <b>Copy</b>, and press <b>Paste messages</b>.'
-        ],
-        android: [
-            'In WhatsApp, open the chat, tap <b>⋮</b> › <b>More</b> › <b>Export chat</b>.',
-            'Choose <b>Include media</b> to bring photos, or <b>Without media</b>.',
-            'Pick <b>Chat to Salesforce</b> in the list. Not there? Add this app to your home screen, or save the file and press <b>Open exported chat</b>.',
-            'Only a few messages? Select them in WhatsApp, tap <b>Copy</b>, and press <b>Paste messages</b>.'
-        ],
-        computer: [
-            'Open WhatsApp on your computer (the app or web.whatsapp.com) and the chat.',
-            'Drag across the messages you need so the times and names are included, and copy them (<b>Ctrl+C</b> or <b>⌘C</b>).',
-            'Press <b>Paste messages</b>. An exported chat file can also be dropped on this page.'
-        ]
-    }[which];
-    return `<ol>${steps.map((s) => `<li><span>${s}</span></li>`).join('')}</ol>`;
+/* The three WhatsApp steps for the phone in the rep's hand, shown on the home screen itself. */
+function stepsFor(d) {
+    if (d === 'iphone') return ['Tap the person’s name', 'Export Chat › Without Media', 'Save to Files'];
+    if (d === 'android') return ['⋮ › More › Export chat', 'Without media', isStandalone() ? 'Pick Chat to SF' : 'Pick Chat to SF, or save it'];
+    return ['Open the chat in WhatsApp', 'Drag across the messages, copy', 'Paste them here'];
 }
 
 function renderHome() {
     S.view = 'home';
     const d = device();
-    const seen = readLocal(HOWTO_SEEN_KEY);
+    const phone = d !== 'computer';
     const flash = S.flash ? `<div class="notice ${S.flash.kind || 'amber'}">${icon('alert')}<span>${esc(S.flash.text)}</span></div>` : '';
     const install = S.installEvent && !isStandalone() && !readLocal(INSTALL_DISMISSED_KEY)
         ? `<section class="card notice green" aria-label="Add to home screen">
              ${icon('download')}<span class="spacer">Add Chat to Salesforce to your home screen so it shows when you share a chat from WhatsApp.</span>
              <span class="chips"><button class="btn primary" data-act="install">Add</button><button class="icon-btn" data-act="install-no" aria-label="Not now">${icon('close')}</button></span>
            </section>` : '';
+    const steps = stepsFor(d).map((s, i) => `<li><b>${i + 1}</b>${esc(s)}</li>`).join('');
+    const primary = phone
+        ? `<button class="btn primary big block" data-act="file">${icon('open')}Open the exported chat</button>
+           <button class="btn link" data-act="paste-open">Or paste a few messages</button>`
+        : `<button class="btn primary big block" data-act="paste-open">${icon('paste')}Paste messages</button>
+           <button class="btn link" data-act="file">Or open an exported chat</button>`;
     root.innerHTML = `
       ${topbar()}
       <main class="page">
         ${flash}
         ${install}
         <section class="card add-card" id="add-card">
-          <p class="eyebrow">Save a WhatsApp chat</p>
-          <h1>Which conversation?</h1>
-          <p class="muted">Bring the messages in, tick the ones to keep, and save them on the doctor.</p>
-          <div class="btn-row">
-            <button class="btn primary big" data-act="paste-open">${icon('paste')}Paste messages</button>
-            <button class="btn big" data-act="file">${icon('open')}Open exported chat</button>
-          </div>
+          <h1>Save a WhatsApp chat</h1>
+          <ol class="steps3" aria-label="In WhatsApp">${steps}</ol>
+          ${primary}
           <input type="file" id="file-input" class="sr-only" multiple accept="${d === 'iphone' ? IPHONE_ACCEPT : FILE_ACCEPT}" tabindex="-1">
           ${S.pasteOpen ? `
             <div class="paste-box">
@@ -279,23 +267,13 @@ function renderHome() {
                 <button class="btn primary" data-act="paste-go">Continue</button>
               </div>
             </div>` : ''}
-          ${d === 'computer' ? '<p class="faint drop-hint">or drop an exported chat (.txt or .zip) anywhere on this page</p>' : ''}
+          ${phone ? '' : '<p class="faint drop-hint">or drop an exported chat (.txt or .zip) anywhere on this page</p>'}
         </section>
-        <section class="card">
-          <details class="howto-wrap" ${seen ? '' : 'open'}>
-            <summary class="eyebrow">How to get a chat out of WhatsApp</summary>
-            <div class="howto-tabs" role="tablist">
-              ${['iphone', 'android', 'computer'].map((k) => `<button role="tab" data-act="howto" data-k="${k}" aria-selected="${k === d}">${{ iphone: 'iPhone', android: 'Android', computer: 'Computer' }[k]}</button>`).join('')}
-            </div>
-            <div class="howto" id="howto">${howtoHtml(d)}</div>
-          </details>
-        </section>
-        <section class="card">
+        <section>
           <p class="eyebrow">Saved recently</p>
-          <div class="recent" id="recent">${recentHtml()}</div>
+          <div class="recent card" id="recent">${recentHtml()}</div>
         </section>
       </main>`;
-    if (!seen) writeLocal(HOWTO_SEEN_KEY, true);
     S.flash = null;
     if (S.pasteOpen) root.querySelector('#paste-text')?.focus();
     if (S.recent === null) loadRecent();
@@ -372,9 +350,19 @@ function openText(text, fileName, media = new Map(), { fromPaste = false } = {})
         remembered: parsed.senders.map((s) => s.name).find((n) => remembered.includes(n)) || ''
     });
     S.chat = { ...parsed, name: chatName, fileName, media, meName, plain, savedKeys: new Set(), savedInfo: new Map(), fromPaste };
+    S.chat.convs = groupConversations(parsed.messages);
     S.selection = new Set();
-    if (fromPaste) parsed.messages.forEach((m) => { if (selectable(m)) S.selection.add(m.index); });
-    S.shown = PAGE;
+    S.userTouched = false;
+    S.expanded = new Set();
+    S.shownConvs = CONV_PAGE;
+    S.noteOpen = false;
+    if (fromPaste) {
+        // the rep already chose these messages in WhatsApp
+        parsed.messages.forEach((m) => { if (selectable(m)) S.selection.add(m.index); });
+        if (parsed.messages.length <= 12) S.chat.convs.forEach((cv) => S.expanded.add(cv.id));
+    } else {
+        autoTickNewest();
+    }
     S.step = 'pick';
     S.person = null;
     S.practices = [];
@@ -390,18 +378,20 @@ function openText(text, fileName, media = new Map(), { fromPaste = false } = {})
     S.pasteOpen = false;
     S.view = 'chat';
     render();
-    scrollToNewest();
+    window.scrollTo(0, 0);
     matchPerson();
 }
 
-/* A chat opens on its newest message, as WhatsApp does. */
-function scrollToNewest() {
-    const go = () => {
-        const last = root.querySelector('#thread > :last-child');
-        if (last) last.scrollIntoView({ block: 'end' });
-    };
-    requestAnimationFrame(() => requestAnimationFrame(go));
-    setTimeout(go, 400);
+/* An exported chat opens with its newest conversation not yet in Salesforce ticked: usually the one
+ * the rep came for. Only until the rep ticks or unticks anything themselves. */
+function autoTickNewest() {
+    if (S.userTouched || !S.chat) return;
+    S.selection = new Set();
+    const convs = S.chat.convs;
+    for (let i = convs.length - 1; i >= 0; i--) {
+        const open = convs[i].indexes.filter((n) => canPick(S.chat.messages[n]));
+        if (open.length) { open.forEach((n) => S.selection.add(n)); return; }
+    }
 }
 
 /* Android "Share" from WhatsApp lands in the service worker, which keeps the files until opened here. */
@@ -476,6 +466,7 @@ async function choosePerson(contact, { auto = false, candidates = [] } = {}) {
             S.practice = mine || practices.find((p) => p.Id === contact.AccountId) || practices[0];
         }
         markEarlierSaves(earlier);
+        if (!S.chat.fromPaste) autoTickNewest();
     } catch (e) {
         if (e instanceof sf.SignedOut) return;
     }
@@ -524,14 +515,16 @@ function canPick(m) {
 function renderChat() {
     const c = S.chat;
     const sel = c.messages.filter(selectable);
-    const sub = sel.length ? `${plural(sel.length, 'message', 'messages')} · ${rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey)}` : '';
+    const convs = c.convs.length;
+    const sub = sel.length ? `${plural(convs, 'conversation', 'conversations')} · ${rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey)}` : '';
+    root.dataset.step = S.step;
     root.innerHTML = `
       ${topbar({ back: true, title: c.name || (otherSenders()[0] || {}).name || 'WhatsApp chat', sub })}
       <div class="chat-layout" data-step="${S.step}">
-        <section class="messages-pane" aria-label="Messages">
+        <section class="messages-pane" aria-label="Conversations">
           <div class="toolbar" id="toolbar"></div>
           <div id="notices"></div>
-          <div class="thread" id="thread" role="group" aria-label="Tap the messages to save"></div>
+          <div class="thread" id="thread"></div>
           <div class="pickbar mobile-only" id="pickbar"></div>
         </section>
         <aside class="save-pane" id="save-pane" aria-label="Save to Salesforce"></aside>
@@ -549,10 +542,9 @@ function renderToolbar() {
     if (!el) return;
     el.innerHTML = `
       ${lastSaved && newer.length ? `<button class="chip" data-act="sel-new">New since last save (${newer.length})</button>` : ''}
-      <button class="chip" data-act="sel-all" ${pickable.length ? '' : 'disabled'}>All${pickable.length > 1 ? ` (${pickable.length.toLocaleString(LOCALE)})` : ''}</button>
-      <button class="chip" data-act="sel-none" ${S.selection.size ? '' : 'disabled'}>None</button>
+      <button class="chip" data-act="sel-none" ${S.selection.size ? '' : 'disabled'}>Untick all</button>
       <span class="spacer"></span>
-      <span class="faint desktop-only">${S.selection.size ? `${plural(S.selection.size, 'message', 'messages')} ticked` : 'Tap the messages to save'}</span>`;
+      <span class="faint desktop-only">Tap a conversation to tick it</span>`;
 }
 
 function renderNotices() {
@@ -569,8 +561,6 @@ function renderNotices() {
     if (cutCount) {
         parts.push(`<div class="notice amber">${icon('alert')}<span>WhatsApp cut ${plural(cutCount, 'long message', 'long messages')} short when copying (“Read more”). To keep every word, open ${cutCount === 1 ? 'it' : 'them'} in full in WhatsApp and copy again, or export the chat.</span></div>`);
     }
-    const savedCount = c.messages.filter(isSaved).length;
-    if (savedCount) parts.push(`<div class="notice green">${icon('check')}<span>${plural(savedCount, 'message is', 'messages are')} already in Salesforce and greyed out.</span></div>`);
     el.innerHTML = parts.join('');
 }
 
@@ -608,24 +598,84 @@ function messageHtml(m) {
     </div>`;
 }
 
+/* ---------------------------------------------------------------- conversations */
+
+function convState(cv) {
+    const msgs = cv.indexes.map((i) => S.chat.messages[i]).filter(selectable);
+    const open = msgs.filter((m) => !isSaved(m));
+    const ticked = open.filter((m) => S.selection.has(m.index)).length;
+    return {
+        msgs, open, ticked,
+        state: !open.length ? (msgs.length ? 'done' : 'empty') : ticked === 0 ? 'off' : ticked === open.length ? 'on' : 'mixed'
+    };
+}
+
+function convWhen(cv) {
+    if (cv.firstDay !== cv.lastDay) return rangeLabel(cv.firstDay, cv.lastDay);
+    const a = fmtTime.format(cv.start), b = fmtTime.format(cv.end);
+    return `${dayLabel(cv.firstDay)} ${a === b ? a : `${a} – ${b}`}`;
+}
+
+function shortLine(m) {
+    const who = m.sender === S.chat.meName ? 'You' : (nameTokens(m.sender)[0] || m.sender);
+    let what = m.text || ({ photo: 'Photo', video: 'Video', voice: 'Voice message', audio: 'Audio', document: 'Document', sticker: 'Sticker' }[m.mediaKind] || 'Media');
+    what = what.replace(/\s+/g, ' ');
+    if (what.length > 110) what = what.slice(0, 107) + '…';
+    return `<p class="line"><span>${esc(who)}:</span> ${esc(what)}</p>`;
+}
+
+/* "See all" only when the two preview lines do not already show the whole conversation. */
+function hasMore(st) {
+    return st.msgs.length > 2 || st.msgs.some((m) => m.kind === 'media' || (m.text || '').replace(/\s+/g, ' ').length > 110);
+}
+
+function convCountLabel(st) {
+    if (st.state === 'done') return `<em class="ok">${icon('check')}In Salesforce</em>`;
+    if (st.open.length < st.msgs.length) return `${st.open.length} new`;
+    return plural(st.msgs.length, 'message', 'messages');
+}
+
+function convHtml(cv) {
+    const st = convState(cv);
+    if (st.state === 'empty') return '';
+    const expanded = S.expanded.has(cv.id);
+    let inner = '';
+    if (expanded) {
+        let day = cv.firstDay !== cv.lastDay ? null : cv.firstDay;
+        for (const i of cv.indexes) {
+            const m = S.chat.messages[i];
+            if (m.dayKey !== day) { day = m.dayKey; inner += `<div class="day"><span>${esc(dayLabel(day))}</span></div>`; }
+            inner += messageHtml(m);
+        }
+    } else {
+        inner = st.msgs.slice(0, 2).map(shortLine).join('');
+    }
+    const more = expanded ? 'Show less' : hasMore(st)
+        ? `See all ${st.msgs.length}${st.state === 'on' || st.state === 'mixed' ? ' · untick some' : ''}` : '';
+    const aria = st.state === 'mixed' ? 'mixed' : String(st.state === 'on');
+    return `<section class="conv ${st.state} ${expanded ? 'open' : ''}" data-conv="${cv.id}">
+      <button class="conv-tick" data-act="conv" data-conv="${cv.id}" role="checkbox" aria-checked="${aria}" ${st.state === 'done' ? 'disabled' : ''}
+        aria-label="Tick the conversation of ${esc(convWhen(cv))}">${icon(st.state === 'mixed' ? 'minus' : 'check')}</button>
+      <div class="conv-body">
+        <button class="conv-head" data-act="conv" data-conv="${cv.id}" ${st.state === 'done' ? 'disabled' : ''}>
+          <span class="when">${esc(convWhen(cv))}</span><span class="count">${convCountLabel(st)}</span>
+        </button>
+        <div class="conv-lines">${inner}</div>
+        ${more ? `<button class="btn link conv-more" data-act="expand" data-conv="${cv.id}">${esc(more)}</button>` : ''}
+      </div>
+    </section>`;
+}
+
 function renderThread() {
     if (S.view !== 'chat') return;
     const c = S.chat;
     const el = root.querySelector('#thread');
     if (!el) return;
-    const start = Math.max(0, c.messages.length - S.shown);
-    const visible = c.messages.slice(start);
-    let html = start > 0 ? `<button class="btn more-earlier" data-act="earlier">Show earlier messages (${start.toLocaleString(LOCALE)} more)</button>` : '';
-    let day = null;
-    for (const m of visible) {
-        if (m.dayKey !== day) {
-            day = m.dayKey;
-            html += `<div class="day" data-day="${day}"><span>${esc(dayLabel(day))}</span><button data-act="day" data-day="${day}"></button></div>`;
-        }
-        html += messageHtml(m);
-    }
-    el.innerHTML = html;
-    renderToolbar();
+    const newestFirst = [...c.convs].reverse();
+    const shown = newestFirst.slice(0, S.shownConvs);
+    const left = newestFirst.length - shown.length;
+    el.innerHTML = shown.map(convHtml).join('') +
+        (left > 0 ? `<button class="btn more-earlier" data-act="earlier">Show earlier conversations (${left.toLocaleString(LOCALE)} more)</button>` : '');
     renderNotices();
     refreshSelection();
     loadVisibleMedia();
@@ -664,17 +714,26 @@ function refreshSelection() {
     root.querySelectorAll('.msg[data-i]').forEach((node) => {
         node.setAttribute('aria-checked', String(S.selection.has(Number(node.dataset.i))));
     });
-    root.querySelectorAll('.day button[data-day]').forEach((b) => {
-        const msgs = c.messages.filter((m) => m.dayKey === b.dataset.day && canPick(m));
-        const all = msgs.length && msgs.every((m) => S.selection.has(m.index));
-        b.textContent = all ? 'Untick day' : 'Tick day';
-        b.hidden = !msgs.length;
+    root.querySelectorAll('section.conv[data-conv]').forEach((node) => {
+        const cv = c.convs[Number(node.dataset.conv)];
+        const st = convState(cv);
+        node.classList.remove('on', 'off', 'mixed', 'done');
+        node.classList.add(st.state);
+        const tick = node.querySelector('.conv-tick');
+        tick.setAttribute('aria-checked', st.state === 'mixed' ? 'mixed' : String(st.state === 'on'));
+        tick.innerHTML = icon(st.state === 'mixed' ? 'minus' : 'check');
+        node.querySelector('.count').innerHTML = convCountLabel(st);
+        const more = node.querySelector('.conv-more');
+        if (more && !S.expanded.has(cv.id) && hasMore(st)) {
+            more.textContent = `See all ${st.msgs.length}${st.state === 'on' || st.state === 'mixed' ? ' · untick some' : ''}`;
+        }
     });
     const sel = selectedMessages();
+    const touched = c.convs.filter((cv) => cv.indexes.some((i) => S.selection.has(i))).length;
     const bar = root.querySelector('#pickbar');
     if (bar) {
-        bar.innerHTML = `<div class="count">${sel.length ? plural(sel.length, 'message', 'messages') : 'Tap the messages to save'}
-            ${sel.length ? `<small>${esc(rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey))}</small>` : ''}</div>
+        bar.innerHTML = `<div class="count">${touched ? plural(touched, 'conversation', 'conversations') : 'Tap a conversation'}
+            ${sel.length ? `<small>${plural(sel.length, 'message', 'messages')} · ${esc(rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey))}</small>` : ''}</div>
           <button class="btn primary" data-act="next" ${sel.length ? '' : 'disabled'}>Next</button>`;
     }
     renderToolbar();
@@ -742,8 +801,24 @@ function practiceHtml() {
             <button class="btn link" data-act="practice-other">Another practice</button>`;
 }
 
-function chipsHtml(list, current, act) {
-    return `<div class="choices" role="radiogroup">${list.map((o) => `<button class="chip ${current === o.value ? 'on' : ''}" role="radio" aria-checked="${current === o.value}" data-act="${act}" data-v="${esc(o.value)}">${esc(o.label)}</button>`).join('')}</div>`;
+function selectHtml(id, list, current) {
+    return `<select id="${id}" class="picker ${current ? '' : 'empty'}">
+        <option value="" ${current ? '' : 'selected'} disabled>Choose…</option>
+        ${list.map((o) => `<option value="${esc(o.value)}" ${current === o.value ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}
+      </select>`;
+}
+
+/* The practice is asked only when there is a choice to make: the person card already names it. */
+function needsPracticeField() {
+    const p = S.person;
+    if (!p || p.status !== 'chosen' || p.searchOpen) return false;
+    return S.practiceSearch || !p.contact || S.practices.length !== 1 ||
+        (S.practice && p.contact.AccountId && S.practice.Id !== p.contact.AccountId);
+}
+
+function saveSummary() {
+    const sel = selectedMessages();
+    return sel.length ? `${plural(sel.length, 'message', 'messages')} · ${rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey)}` : 'No messages ticked yet';
 }
 
 function renderSavePane() {
@@ -751,25 +826,29 @@ function renderSavePane() {
     const el = root.querySelector('#save-pane');
     if (!el) return;
     const choices = S.choices || { purposes: [], outcomes: [] };
-    const sel = selectedMessages();
     const active = document.activeElement && el.contains(document.activeElement) ? document.activeElement : null;
     const keep = active && active.id ? { id: active.id, value: active.value, start: active.selectionStart, end: active.selectionEnd } : null;
     el.innerHTML = `
-      <button class="btn link mobile-only" data-act="back-pick">${icon('back')}Back to the messages</button>
-      <div>
-        <p class="eyebrow">Save to Salesforce</p>
-        <h2 id="save-summary">${sel.length ? `${plural(sel.length, 'message', 'messages')} · ${esc(rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey))}` : 'No messages ticked yet'}</h2>
+      <div class="save-fields">
+        <div class="save-head desktop-only">
+          <p class="eyebrow">Save to Salesforce</p>
+          <h2 class="save-summary">${esc(saveSummary())}</h2>
+        </div>
+        <div class="field"><span class="label">Who</span>${whoHtml()}</div>
+        ${needsPracticeField() ? `<div class="field"><span class="label">Practice</span>${practiceHtml()}</div>` : ''}
+        <div class="field"><label for="purpose">Purpose</label>${selectHtml('purpose', choices.purposes, S.purpose)}</div>
+        <div class="field"><label for="outcome">Outcome</label>${selectHtml('outcome', choices.outcomes, S.outcome)}</div>
+        ${S.noteOpen ? `
+          <div class="field"><label for="note">Note</label><textarea id="note" rows="3" placeholder="What was agreed?">${esc(S.note)}</textarea></div>
+          <div class="field"><label for="subject">Subject</label><input type="text" id="subject" maxlength="255" value="${esc(S.subject)}"></div>
+          <details class="preview"><summary>What Salesforce will keep</summary><pre id="preview"></pre></details>`
+        : `<button class="btn link note-link" data-act="note-open">${icon('plus')}Add a note</button>`}
       </div>
-      <div class="field"><span class="label">Who</span>${whoHtml()}</div>
-      <div class="field"><span class="label">Practice</span>${practiceHtml()}</div>
-      <div class="field"><span class="label">Purpose</span>${chipsHtml(choices.purposes, S.purpose, 'purpose')}</div>
-      <div class="field"><span class="label">Outcome</span>${chipsHtml(choices.outcomes, S.outcome, 'outcome')}</div>
-      <div class="field"><label for="subject">Subject</label><input type="text" id="subject" maxlength="255" value="${esc(S.subject)}"></div>
-      <div class="field"><label for="note">Note</label><textarea id="note" rows="3" placeholder="What was agreed? (optional)">${esc(S.note)}</textarea></div>
-      <details class="preview"><summary>What Salesforce will keep</summary><pre id="preview"></pre></details>
-      <div id="save-error">${S.error ? `<div class="error" role="alert">${icon('alert')}<span>${esc(S.error)}</span></div>` : ''}</div>
-      <p class="hint" id="save-hint"></p>
-      <button class="btn primary big block" data-act="save" id="save-btn">${S.saving ? `<span class="spinner"></span>${esc(S.saving)}` : 'Save to Salesforce'}</button>`;
+      <div class="savebar">
+        <div id="save-error">${S.error ? `<div class="error" role="alert">${icon('alert')}<span>${esc(S.error)}</span></div>` : ''}</div>
+        <p class="hint" id="save-hint"></p>
+        <button class="btn primary big block" data-act="save" id="save-btn">${S.saving ? `<span class="spinner"></span>${esc(S.saving)}` : 'Save to Salesforce'}</button>
+      </div>`;
     if (keep) {
         const again = el.querySelector(`#${keep.id}`);
         if (again) {
@@ -783,7 +862,7 @@ function renderSavePane() {
 
 function missing() {
     const out = [];
-    if (!S.selection.size) out.push('tick the messages to save');
+    if (!S.selection.size) out.push('tick a conversation');
     if (!S.person || S.person.status !== 'chosen' || S.person.searchOpen) out.push('choose who it was with');
     else if (!S.practice && !S.person.contact) out.push('choose the practice');
     if (!S.purpose) out.push('pick a purpose');
@@ -797,8 +876,7 @@ function updateSaveState() {
     const gaps = missing();
     const hint = root.querySelector('#save-hint');
     const sel = selectedMessages();
-    const summary = root.querySelector('#save-summary');
-    if (summary) summary.textContent = sel.length ? `${plural(sel.length, 'message', 'messages')} · ${rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey)}` : 'No messages ticked yet';
+    root.querySelectorAll('.save-summary').forEach((n) => { n.textContent = saveSummary(); });
     if (hint) hint.textContent = gaps.length && !S.saving ? `To save: ${gaps.join(', ')}.` : '';
     btn.disabled = !!S.saving || gaps.length > 0;
     const pre = root.querySelector('#preview');
@@ -1022,26 +1100,27 @@ function onClick(e) {
             break;
         }
         case 'file': root.querySelector('#file-input').click(); break;
-        case 'howto':
-            root.querySelectorAll('[data-act="howto"]').forEach((b) => b.setAttribute('aria-selected', String(b === target)));
-            root.querySelector('#howto').innerHTML = howtoHtml(target.dataset.k);
-            break;
-        case 'earlier': S.shown += PAGE; renderThread(); break;
-        case 'day': {
-            const msgs = S.chat.messages.filter((m) => m.dayKey === target.dataset.day && canPick(m));
-            const all = msgs.every((m) => S.selection.has(m.index));
-            msgs.forEach((m) => (all ? S.selection.delete(m.index) : S.selection.add(m.index)));
+        case 'earlier': S.shownConvs += CONV_PAGE; renderThread(); break;
+        case 'conv': {
+            const cv = S.chat.convs[Number(target.dataset.conv)];
+            const st = convState(cv);
+            const on = st.state !== 'on';
+            st.open.forEach((m) => (on ? S.selection.add(m.index) : S.selection.delete(m.index)));
+            S.userTouched = true;
             refreshSelection();
             break;
         }
-        case 'sel-all':
-            S.chat.messages.filter(canPick).forEach((m) => S.selection.add(m.index));
-            refreshSelection();
+        case 'expand': {
+            const id = Number(target.dataset.conv);
+            S.expanded.has(id) ? S.expanded.delete(id) : S.expanded.add(id);
+            renderThread();
             break;
-        case 'sel-none': S.selection.clear(); refreshSelection(); break;
+        }
+        case 'sel-none': S.selection.clear(); S.userTouched = true; refreshSelection(); break;
         case 'sel-new': {
             const lastSaved = [...S.chat.messages].reverse().find(isSaved);
             S.chat.messages.filter((m) => canPick(m) && m.index > lastSaved.index).forEach((m) => S.selection.add(m.index));
+            S.userTouched = true;
             refreshSelection();
             break;
         }
@@ -1056,12 +1135,24 @@ function onClick(e) {
         }
         case 'next':
             S.step = 'save';
+            root.dataset.step = 'save';
             root.querySelector('.chat-layout').dataset.step = 'save';
             window.scrollTo(0, 0);
             break;
-        case 'back-pick':
-            S.step = 'pick';
-            root.querySelector('.chat-layout').dataset.step = 'pick';
+        case 'back':
+            if (S.step === 'save' && window.matchMedia('(max-width: 899.98px)').matches) {
+                S.step = 'pick';
+                root.dataset.step = 'pick';
+                root.querySelector('.chat-layout').dataset.step = 'pick';
+            } else {
+                S.view = 'home'; S.chat = null; S.menuOpen = false;
+                render();
+            }
+            break;
+        case 'note-open':
+            S.noteOpen = true;
+            renderSavePane();
+            root.querySelector('#note')?.focus();
             break;
         case 'pick-person': {
             const all = [...((S.person && S.person.candidates) || []), ...((S._results && S._results.contacts) || [])];
@@ -1093,13 +1184,11 @@ function onClick(e) {
             renderSavePane();
             root.querySelector('#practice-search')?.focus();
             break;
-        case 'purpose': S.purpose = target.dataset.v; renderSavePane(); break;
-        case 'outcome': S.outcome = target.dataset.v; renderSavePane(); break;
         case 'save': save(); break;
         case 'more':
             S.view = 'chat'; S.step = 'pick';
             render();
-            scrollToNewest();
+            window.scrollTo(0, 0);
             break;
         default: break;
     }
@@ -1120,6 +1209,7 @@ function toggleMessage(node, shift) {
         S.selection.has(i) ? S.selection.delete(i) : S.selection.add(i);
     }
     S.lastClicked = i;
+    S.userTouched = true;
     refreshSelection();
 }
 
@@ -1143,6 +1233,12 @@ function onInput(e) {
 }
 
 function onChange(e) {
+    if (e.target.id === 'purpose' || e.target.id === 'outcome') {
+        S[e.target.id] = e.target.value || null;
+        e.target.classList.toggle('empty', !e.target.value);
+        updateSaveState();
+        return;
+    }
     if (e.target.id === 'file-input' && e.target.files.length) {
         openFiles(e.target.files);
         e.target.value = '';
