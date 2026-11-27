@@ -561,6 +561,10 @@ function renderNotices() {
           <span class="chips">${c.senders.slice(0, 6).map((s) => `<button class="chip" data-act="me" data-name="${esc(s.name)}">${esc(s.name)}</button>`).join('')}</span></div>`);
     }
     if (c.plain) parts.push(`<div class="notice">${icon('alert')}<span>No WhatsApp times were in what you pasted, so it is saved as one message dated now.</span></div>`);
+    const cutCount = c.messages.filter((m) => m.cut).length;
+    if (cutCount) {
+        parts.push(`<div class="notice amber">${icon('alert')}<span>WhatsApp cut ${plural(cutCount, 'long message', 'long messages')} short when copying (“Read more”). To keep every word, open ${cutCount === 1 ? 'it' : 'them'} in full in WhatsApp and copy again, or export the chat.</span></div>`);
+    }
     const savedCount = c.messages.filter(isSaved).length;
     if (savedCount) parts.push(`<div class="notice green">${icon('check')}<span>${plural(savedCount, 'message is', 'messages are')} already in Salesforce and greyed out.</span></div>`);
     el.innerHTML = parts.join('');
@@ -595,7 +599,7 @@ function messageHtml(m) {
         ${me ? '' : `<div class="from">${esc(m.sender)}</div>`}
         ${m.kind === 'media' ? mediaHtml(m) : ''}
         ${m.text ? `<div class="text">${esc(m.text)}</div>` : ''}
-        <div class="meta">${saved ? `<span class="saved-tag" title="${esc(savedTitle)}">${icon('check')}In Salesforce</span>` : ''}${m.edited ? '<span>edited</span>' : ''}<time>${esc(fmtTime.format(m.at))}</time></div>
+        <div class="meta">${m.cut ? '<span class="tag amber">Cut short</span>' : ''}${saved ? `<span class="saved-tag" title="${esc(savedTitle)}">${icon('check')}In Salesforce</span>` : ''}${m.edited ? '<span>edited</span>' : ''}<time>${esc(fmtTime.format(m.at))}</time></div>
       </div>
     </div>`;
 }

@@ -11,8 +11,8 @@
  * Nothing here touches the network: the chat is read in the person's own browser.
  */
 
-const DIRECTION_MARKS = /[‎‏‪-‮⁦-⁩﻿]/g;
-const ODD_SPACES = /[    ]/g;
+const DIRECTION_MARKS = /[\u200e\u200f\u202a-\u202e\u2060\u2066-\u2069\ufeff]/g;
+const ODD_SPACES = /[\u00a0\u202f\u2007\u2009]/g;
 
 const DATE = String.raw`(\d{1,4})[./-](\d{1,2})(?:[./-](\d{1,4}))?\.?`;
 const TIME = String.raw`(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?(?:\s?([AaPp]\.?\s?[Mm]\.?|上午|下午|午前|午後))?`;
@@ -39,6 +39,8 @@ const DELETED_PATTERNS = [
     /^Vous avez supprimé ce message\.?$/i, /^Diese Nachricht wurde gelöscht\.?$/i, /^Se eliminó este mensaje\.?$/i,
     /^Questo messaggio è stato eliminato\.?$/i, /^Mensagem apagada\.?$/i
 ];
+/* WhatsApp on a computer shows a long message cut, with "Read more"; copying it takes only what is shown. */
+const READ_MORE = /\n[ \t]*(Read more|Lire la suite|Mehr lesen|Leer más|Ler mais|Leggi altro|Meer lezen|Läs mer|Les mer|Læs mere)[ \t]*$/i;
 const EDITED_SUFFIX = /\s*<(This message was edited|Ce message a été modifié|Diese Nachricht wurde bearbeitet|Se editó este mensaje|Questo messaggio è stato modificato|Mensagem editada)>\s*$/i;
 
 /* "image omitted", "<Media omitted>", "<Médias omis>", "(file attached)" … */
@@ -192,7 +194,7 @@ export function parseChat(raw, opts = {}) {
     let shape = null;
     let skipped = 0;
     for (const original of lines) {
-        const ledByMark = /^[\s‎‏]*‎/.test(original) || /:\s‎/.test(original);
+        const ledByMark = /^[\s\u200e\u200f]*\u200e/.test(original) || /:\s\u200e/.test(original);
         const line = clean(original);
         const h = matchHeader(line);
         if (h) {
@@ -217,6 +219,8 @@ export function parseChat(raw, opts = {}) {
         let text = p.text.replace(/\s+$/, '');
         const edited = EDITED_SUFFIX.test(text);
         if (edited) text = text.replace(EDITED_SUFFIX, '');
+        const cut = READ_MORE.test(text);
+        if (cut) text = text.replace(READ_MORE, '');
         const c = p.sender === null ? { kind: 'system' } : classify(text, p.ledByMark);
         const dayKey = `${y}-${pad(mo)}-${pad(d)}`;
         const stamp = `${dayKey} ${pad(hour)}:${pad(minute)}`;
@@ -233,6 +237,7 @@ export function parseChat(raw, opts = {}) {
             attachment: c.attachment || null,
             mediaKind: c.attachment ? mediaKindOf(c.attachment) : (c.kind === 'media' ? 'omitted' : null),
             edited,
+            cut,
             key: fingerprint(stamp, c.kind === 'media' ? (c.attachment || '[media]') : text)
         };
     });
@@ -271,6 +276,7 @@ export function transcriptLine(msg, senderLabel) {
         const where = msg.uploaded ? ' (attached)' : (msg.attachment ? '' : ' (not in the export)');
         body = `[${what}${name}${where}]` + (body ? ' ' + body : '');
     }
+    if (msg.cut) body += ' […]';
     return `[${msg.stamp}] ${senderLabel}: ${body}`;
 }
 
@@ -283,7 +289,7 @@ export function keysInDescription(description) {
     let cur = null;
     const flush = () => {
         if (!cur) return;
-        cur.text = cur.text.trim();
+        cur.text = cur.text.trim().replace(/ \[…\]$/, '');
         const media = /^\[(Photo|Video|Voice message|Audio|Document|Sticker|Contact card|Media)( ([^\]\s(][^\]]*?))?( \((attached|not in the export)\))?\]( (.*))?$/s.exec(cur.text);
         if (media) keys.add(fingerprint(cur.stamp, media[3] || '[media]'));
         else keys.add(fingerprint(cur.stamp, cur.text));

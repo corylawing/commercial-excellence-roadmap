@@ -9,13 +9,13 @@ const TITLES = /^(dr|dra|drs|dr\.|dra\.|doctor|docteur|doc|prof|pr|mr|mrs|ms|mme
 const SOSL_RESERVED = /[?&|!{}[\]()^~*:\\"'+\-]/g;
 
 export function stripAccents(s) {
-    return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 /* "Dr Sophie Martin 🦷 (Smile Ortho)" → ["Sophie", "Martin"] */
 export function nameTokens(name) {
     let s = String(name || '')
-        .replace(/\p{Extended_Pictographic}|\p{Emoji_Presentation}|️/gu, ' ')
+        .replace(/\p{Extended_Pictographic}|\p{Emoji_Presentation}|\ufe0f/gu, ' ')
         .replace(/\([^)]*\)|\[[^\]]*\]/g, ' ')
         .split(/\s[-–|/@]\s|\s·\s|,/)[0];               // "Sophie Martin - Smile Ortho" → "Sophie Martin"
     return s.split(/\s+/)
