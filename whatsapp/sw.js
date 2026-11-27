@@ -3,9 +3,9 @@
  * on Android (the manifest's share_target posts them here). Shared files wait in a cache only
  * until the page opens them, then they are deleted. Salesforce calls never go through this cache.
  */
-const VERSION = 'c2s-shell-v2';
+const VERSION = 'c2s-shell-v3';
 const SHARE = 'c2s-share-v1';
-const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'parser.js', 'zip.js', 'match.js', 'sf.js', 'conversations.js',
+const SHELL = ['./', 'index.html', 'styles.css', 'app.js', 'parser.js', 'zip.js', 'match.js', 'sf.js', 'conversations.js', 'autofill.js',
     'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {

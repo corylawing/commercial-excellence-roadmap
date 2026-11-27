@@ -5,9 +5,14 @@
  *   Connect   sign in with Salesforce (its own "Allow access?" screen), then allow WhatsApp chats
  *   Home      bring a chat in: paste copied messages, open an exported chat, or share from WhatsApp
  *   Pick      tap the messages to keep; earlier saves are marked and never offered twice
- *   Save      who (matched by phone, then name), practice, purpose, outcome → one interaction
+ *   Save      who (matched by phone, then name), practice, then an interaction (purpose, outcome)
+ *             or a case (CX sees Case first); what is already known is filled in (autofill.js)
  *
  * The chat is read in this browser only. What leaves it is what the rep saves, to Salesforce.
+ *
+ * Two homes, one app: the site (export, share or paste a chat) and the Chrome add-on beside
+ * WhatsApp Web (extension/panel.js), which reads the chat open on screen. The add-on sets
+ * globalThis.C2S_HOST before this file loads; every place the two differ asks HOST.
  */
 import {
     parseChat, chatNameFromFile, looksLikePhone, transcriptLine, keysInDescription, fingerprint
@@ -15,9 +20,24 @@ import {
 import { listZip, isZip } from './zip.js';
 import { groupConversations } from './conversations.js';
 import { nameTokens, scoreCandidate, confidentPick, employeeTypeFor, guessMe } from './match.js';
+import { suggestInteraction, caseSource, caseSubject } from './autofill.js';
 import * as sf from './sf.js';
 
 const root = document.getElementById('app');
+const HOST = { kind: 'web', ...(globalThis.C2S_HOST || {}) };
+const WELCOME = {
+    question: 'Allow Chat to Salesforce to open the WhatsApp chats you send it?',
+    points: [
+        ['hand', 'You choose a chat in WhatsApp and send it here. Nothing else on your phone is read.'],
+        ['eye', 'You pick the messages to keep. Only those are saved to Salesforce, on the doctor you confirm.'],
+        ['shield', 'The chat is opened on this device only and is not stored anywhere else.']
+    ],
+    box: 'I allow Chat to Salesforce to open the WhatsApp chats I send it',
+    button: 'Allow WhatsApp chats',
+    done: 'WhatsApp chats allowed',
+    locked: 'Next, allow the chats you send from WhatsApp.',
+    ...(HOST.welcome || {})
+};
 const LOCALE = navigator.language || 'en-GB';
 const CONSENT_KEY = 'c2s.consent';
 const ME_NAMES_KEY = 'c2s.myWhatsAppNames';
@@ -48,6 +68,14 @@ const S = {
     practiceSearch: false,
     purpose: null,
     outcome: null,
+    kind: 'interaction',
+    auto: {},
+    touched: {},
+    topic: null,
+    caseType: null,
+    caseSubject: '',
+    caseSubjectTouched: false,
+    openPicker: null,
     subject: '',
     subjectTouched: false,
     note: '',
@@ -83,7 +111,10 @@ const ICONS = {
     search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
     minus: '<path d="M6 12h12"/>',
-    download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
+    download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+    person: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+    chev: '<path d="M6 9l6 6 6-6"/>',
+    arrow: '<path d="M4 12h14M13 6l6 6-6 6"/>'
 };
 function icon(name, cls = '') {
     return `<svg viewBox="0 0 24 24" width="24" height="24" class="${cls}" aria-hidden="true">${ICONS[name] || ''}</svg>`;
@@ -114,6 +145,7 @@ function rangeLabel(firstKey, lastKey) {
     if (firstKey === lastKey) return fmtShort.format(a);
     try { return fmtShort.formatRange(a, b); } catch { return `${fmtShort.format(a)} – ${fmtShort.format(b)}`; }
 }
+function possessive(name) { return /s$/i.test(name) ? `${name}’` : `${name}’s`; }
 function plural(n, one, many) { return `${n.toLocaleString(LOCALE)} ${n === 1 ? one : many}`; }
 
 let toastTimer;
@@ -158,7 +190,7 @@ async function guard(promise) {
 function topbar({ back = false, title = '', sub = '' } = {}) {
     const me = S.me;
     const left = back
-        ? `<button class="icon-btn" data-act="back" aria-label="Back">${icon('back')}</button>
+        ? `<button class="icon-btn back-btn" data-act="back" aria-label="Back">${icon('back')}</button>
            <div class="title title-pick"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>
            <div class="title title-save"><b>Save to Salesforce</b><small class="save-summary">${esc(S.chat ? saveSummary() : '')}</small></div>`
         : `<div class="brand"><img src="icons/icon.svg" alt="" width="30" height="30"><span>Chat to Salesforce</span></div><span class="spacer"></span>`;
@@ -203,16 +235,14 @@ function renderWelcome() {
             <span class="num">${consent && signedIn ? icon('check') : '2'}</span>
             <div class="body">
               <h2>Connect WhatsApp</h2>
-              ${!signedIn ? '<p class="muted">Next, allow the chats you send from WhatsApp.</p>' : consent ? `<p class="ok-line">${icon('check')}WhatsApp chats allowed</p>` : `
+              ${!signedIn ? `<p class="muted">${esc(WELCOME.locked)}</p>` : consent ? `<p class="ok-line">${icon('check')}${esc(WELCOME.done)}</p>` : `
                 <div class="consent">
-                  <p><b>Allow Chat to Salesforce to open the WhatsApp chats you send it?</b></p>
+                  <p><b>${esc(WELCOME.question)}</b></p>
                   <ul>
-                    <li>${icon('hand')}<span>You choose a chat in WhatsApp and send it here. Nothing else on your phone is read.</span></li>
-                    <li>${icon('eye')}<span>You pick the messages to keep. Only those are saved to Salesforce, on the doctor you confirm.</span></li>
-                    <li>${icon('shield')}<span>The chat is opened on this device only and is not stored anywhere else.</span></li>
+                    ${WELCOME.points.map(([ic, text]) => `<li>${icon(ic)}<span>${esc(text)}</span></li>`).join('')}
                   </ul>
-                  <label class="check"><input type="checkbox" id="consent-box"> I allow Chat to Salesforce to open the WhatsApp chats I send it</label>
-                  <button class="btn primary big" data-act="consent" disabled>Allow WhatsApp chats</button>
+                  <label class="check"><input type="checkbox" id="consent-box"> ${esc(WELCOME.box)}</label>
+                  <button class="btn primary big" data-act="consent" disabled>${esc(WELCOME.button)}</button>
                 </div>`}
             </div>
           </div>
@@ -242,6 +272,15 @@ function renderHome() {
              ${icon('download')}<span class="spacer">Add Chat to Salesforce to your home screen so it shows when you share a chat from WhatsApp.</span>
              <span class="chips"><button class="btn primary" data-act="install">Add</button><button class="icon-btn" data-act="install-no" aria-label="Not now">${icon('close')}</button></span>
            </section>` : '';
+    const pasteBox = S.pasteOpen ? `
+            <div class="paste-box">
+              <label for="paste-text" class="eyebrow">Paste the messages copied from WhatsApp</label>
+              <textarea id="paste-text" rows="6" placeholder="[27/11/2026, 10:32] Sophie Martin: Bonjour…"></textarea>
+              <div class="btn-row">
+                ${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn" data-act="clipboard">${icon('paste')}Paste from clipboard</button>` : ''}
+                <button class="btn primary" data-act="paste-go">Continue</button>
+              </div>
+            </div>` : '';
     const steps = stepsFor(d).map((s, i) => `<li><b>${i + 1}</b>${esc(s)}</li>`).join('');
     const primary = phone
         ? `<button class="btn primary big block" data-act="file">${icon('open')}Open the exported chat</button>
@@ -253,22 +292,15 @@ function renderHome() {
       <main class="page">
         ${flash}
         ${install}
+        ${HOST.homeCard ? `<section class="card add-card" id="add-card">${HOST.homeCard({ pasteBox, icon, esc })}</section>` : `
         <section class="card add-card" id="add-card">
           <h1>Save a WhatsApp chat</h1>
           <ol class="steps3" aria-label="In WhatsApp">${steps}</ol>
           ${primary}
           <input type="file" id="file-input" class="sr-only" multiple accept="${d === 'iphone' ? IPHONE_ACCEPT : FILE_ACCEPT}" tabindex="-1">
-          ${S.pasteOpen ? `
-            <div class="paste-box">
-              <label for="paste-text" class="eyebrow">Paste the messages copied from WhatsApp</label>
-              <textarea id="paste-text" rows="6" placeholder="[27/11/2026, 10:32] Sophie Martin: Bonjour…"></textarea>
-              <div class="btn-row">
-                ${navigator.clipboard && navigator.clipboard.readText ? `<button class="btn" data-act="clipboard">${icon('paste')}Paste from clipboard</button>` : ''}
-                <button class="btn primary" data-act="paste-go">Continue</button>
-              </div>
-            </div>` : ''}
+          ${pasteBox}
           ${phone ? '' : '<p class="faint drop-hint">or drop an exported chat (.txt or .zip) anywhere on this page</p>'}
-        </section>
+        </section>`}
         <section>
           <p class="eyebrow">Saved recently</p>
           <div class="recent card" id="recent">${recentHtml()}</div>
@@ -283,12 +315,15 @@ function recentHtml() {
     if (S.recent === null) return '<p class="faint"><span class="spinner"></span></p>';
     if (S.recent === 'error') return '<p class="empty">Could not load your recent saves.</p>';
     if (!S.recent.length) return '<p class="empty">Nothing yet. WhatsApp chats you save show here.</p>';
-    return S.recent.map((t) => `
-      <a href="${esc(sf.recordUrl(t.Id))}" target="_blank" rel="noopener">
-        <b>${esc(t.Subject)}</b>
+    return S.recent.map((t) => {
+        const day = t.ActivityDate || (t.CreatedDate ? String(t.CreatedDate).slice(0, 10) : '');
+        return `
+      <a href="${esc(sf.recordUrl(t.Id, t.isCase ? 'Case' : 'Task'))}" target="_blank" rel="noopener">
+        <b>${t.isCase ? `<span class="tag">Case${t.CaseNumber ? ` ${esc(t.CaseNumber)}` : ''}</span> ` : ''}${esc(t.Subject)}</b>
         <small>${esc([t.Who && t.Who.Name, t.What && t.What.Name].filter(Boolean).join(' · ') || '—')}</small>
-        <time datetime="${esc(t.ActivityDate || '')}">${t.ActivityDate ? esc(fmtShort.format(dayDate(t.ActivityDate))) : ''}</time>
-      </a>`).join('');
+        <time datetime="${esc(day)}">${day ? esc(fmtShort.format(dayDate(day))) : ''}</time>
+      </a>`;
+    }).join('');
 }
 
 async function loadRecent() {
@@ -326,8 +361,8 @@ async function openFiles(files) {
     }
 }
 
-function openText(text, fileName, media = new Map(), { fromPaste = false } = {}) {
-    const parsed = parseChat(text, { localeHint: LOCALE });
+function openText(text, fileName, media = new Map(), { fromPaste = false, chatName: knownName, phone = null, meName: knownMe = null, localeHint = null, missingNote = null } = {}) {
+    const parsed = parseChat(text, { localeHint: localeHint || LOCALE });
     let plain = false;
     if (!parsed.messages.length) {
         if (!String(text || '').trim()) { toast('There is nothing to save in what you pasted.'); return; }
@@ -343,13 +378,13 @@ function openText(text, fileName, media = new Map(), { fromPaste = false } = {})
         plain = true;
     }
     const remembered = readLocal(ME_NAMES_KEY) || [];
-    const chatName = chatNameFromFile(fileName);
-    const meName = plain ? null : guessMe(parsed.senders, {
+    const chatName = knownName || chatNameFromFile(fileName);
+    const meName = plain ? null : knownMe && parsed.senders.some((s) => s.name === knownMe) ? knownMe : guessMe(parsed.senders, {
         myName: S.me ? S.me.Name : '',
         chatName,
         remembered: parsed.senders.map((s) => s.name).find((n) => remembered.includes(n)) || ''
     });
-    S.chat = { ...parsed, name: chatName, fileName, media, meName, plain, savedKeys: new Set(), savedInfo: new Map(), fromPaste };
+    S.chat = { ...parsed, name: chatName, fileName, media, meName, plain, savedKeys: new Set(), savedInfo: new Map(), fromPaste, phone, missingNote };
     S.chat.convs = groupConversations(parsed.messages);
     S.selection = new Set();
     S.userTouched = false;
@@ -370,6 +405,14 @@ function openText(text, fileName, media = new Map(), { fromPaste = false } = {})
     S.practiceSearch = false;
     S.purpose = null;
     S.outcome = null;
+    S.kind = defaultKind();
+    S.auto = {};
+    S.touched = {};
+    S.topic = null;
+    S.caseType = null;
+    S.caseSubject = '';
+    S.caseSubjectTouched = false;
+    S.openPicker = null;
     S.subject = '';
     S.subjectTouched = false;
     S.note = '';
@@ -380,6 +423,32 @@ function openText(text, fileName, media = new Map(), { fromPaste = false } = {})
     render();
     window.scrollTo(0, 0);
     matchPerson();
+}
+
+/*
+ * The same chat read again (a new message arrived, or earlier messages were read in the add-on):
+ * the rep's ticks, open conversations, person, purpose and outcome all stay.
+ */
+function refreshChat(text, { meName: knownMe = null, localeHint = null } = {}) {
+    const c = S.chat;
+    if (!c) return;
+    const parsed = parseChat(text, { localeHint: localeHint || LOCALE });
+    if (!parsed.messages.length) return;
+    const keyOf = (i) => (c.messages[i] ? c.messages[i].key : null);
+    const picked = new Set([...S.selection].map(keyOf));
+    const opened = new Set([...S.expanded].map((id) => (c.convs[id] ? keyOf(c.convs[id].indexes[0]) : null)));
+    Object.assign(c, { messages: parsed.messages, senders: parsed.senders, shape: parsed.shape, dateOrder: parsed.dateOrder, skipped: parsed.skipped });
+    if (knownMe && parsed.senders.some((s) => s.name === knownMe)) c.meName = knownMe;
+    c.convs = groupConversations(parsed.messages);
+    S.selection = new Set(parsed.messages.filter((m) => picked.has(m.key) && canPick(m)).map((m) => m.index));
+    S.expanded = new Set(c.convs.filter((cv) => opened.has(parsed.messages[cv.indexes[0]].key)).map((cv) => cv.id));
+    S.lastClicked = null;
+    if (!S.userTouched && !c.fromPaste) autoTickNewest();
+    if (S.view !== 'chat') return;
+    const sub = root.querySelector('.title-pick small');
+    if (sub) sub.textContent = chatSub();
+    renderThread();
+    renderToolbar();
 }
 
 /* An exported chat opens with its newest conversation not yet in Salesforce ticked: usually the one
@@ -428,9 +497,9 @@ async function matchPerson() {
     if (c.plain) { S.person = { status: 'none', query: '' }; renderSavePane(); return; }
     const others = otherSenders();
     const target = c.name || (others[0] && others[0].name) || '';
-    const phone = looksLikePhone(target) ? target : (others.find((o) => looksLikePhone(o.name)) || {}).name;
+    const phone = c.phone || (looksLikePhone(target) ? target : (others.find((o) => looksLikePhone(o.name)) || {}).name);
     const tokens = looksLikePhone(target) ? [] : nameTokens(target);
-    if (!target || (!phone && !tokens.length)) { S.person = { status: 'none', query: target }; renderSavePane(); return; }
+    if (!phone && !tokens.length) { S.person = { status: 'none', query: target }; renderSavePane(); return; }
     S.person = { status: 'searching', query: target };
     renderSavePane();
     try {
@@ -455,6 +524,7 @@ async function choosePerson(contact, { auto = false, candidates = [] } = {}) {
     S.practice = S.practices[0] || null;
     S.practiceSearch = false;
     if (!S.subjectTouched) S.subject = `WhatsApp with ${contact.Name}`;
+    autoFill();
     renderSavePane();
     try {
         const [practices, earlier] = await Promise.all([guard(sf.practicesOf(contact.Id)), guard(sf.earlierSaves(contact.Id))]);
@@ -470,6 +540,7 @@ async function choosePerson(contact, { auto = false, candidates = [] } = {}) {
     } catch (e) {
         if (e instanceof sf.SignedOut) return;
     }
+    autoFill();
     renderSavePane();
     renderThread();
 }
@@ -480,6 +551,7 @@ function choosePracticeOnly(account) {
     S.practice = account;
     S.practiceSearch = false;
     if (!S.subjectTouched) S.subject = `WhatsApp with ${account.Name}`;
+    autoFill();
     renderSavePane();
 }
 
@@ -487,11 +559,12 @@ function markEarlierSaves(rows) {
     const c = S.chat;
     c.savedKeys = new Set();
     c.savedInfo = new Map();
+    c.earlier = rows;
     for (const row of rows) {
         for (const k of keysInDescription(row.Description)) {
             if (!c.savedKeys.has(k)) {
                 c.savedKeys.add(k);
-                c.savedInfo.set(k, { by: row.Owner && row.Owner.Name, at: row.CreatedDate });
+                c.savedInfo.set(k, { by: row.Owner && row.Owner.Name, at: row.CreatedDate, isCase: !!row.isCase });
             }
         }
     }
@@ -512,11 +585,15 @@ function canPick(m) {
     return selectable(m) && !isSaved(m);
 }
 
-function renderChat() {
+function chatSub() {
     const c = S.chat;
     const sel = c.messages.filter(selectable);
-    const convs = c.convs.length;
-    const sub = sel.length ? `${plural(convs, 'conversation', 'conversations')} · ${rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey)}` : '';
+    return sel.length ? `${plural(c.convs.length, 'conversation', 'conversations')} · ${rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey)}` : '';
+}
+
+function renderChat() {
+    const c = S.chat;
+    const sub = chatSub();
     root.dataset.step = S.step;
     root.innerHTML = `
       ${topbar({ back: true, title: c.name || (otherSenders()[0] || {}).name || 'WhatsApp chat', sub })}
@@ -559,7 +636,9 @@ function renderNotices() {
     if (c.plain) parts.push(`<div class="notice">${icon('alert')}<span>No WhatsApp times were in what you pasted, so it is saved as one message dated now.</span></div>`);
     const cutCount = c.messages.filter((m) => m.cut).length;
     if (cutCount) {
-        parts.push(`<div class="notice amber">${icon('alert')}<span>WhatsApp cut ${plural(cutCount, 'long message', 'long messages')} short when copying (“Read more”). To keep every word, open ${cutCount === 1 ? 'it' : 'them'} in full in WhatsApp and copy again, or export the chat.</span></div>`);
+        const words = HOST.cutNotice ? HOST.cutNotice(cutCount, plural)
+            : `WhatsApp cut ${plural(cutCount, 'long message', 'long messages')} short when copying (“Read more”). To keep every word, open ${cutCount === 1 ? 'it' : 'them'} in full in WhatsApp and copy again, or export the chat.`;
+        parts.push(`<div class="notice amber">${icon('alert')}<span>${esc(words)}</span></div>`);
     }
     el.innerHTML = parts.join('');
 }
@@ -569,7 +648,7 @@ function mediaHtml(m) {
     const have = m.attachment && S.chat.media.has(m.attachment);
     const label = { photo: 'Photo', video: 'Video', voice: 'Voice message', audio: 'Audio', document: 'Document', sticker: 'Sticker', contact: 'Contact card' }[kind] || 'Media';
     if (!have) {
-        const why = m.attachment ? 'not in what was shared' : 'not in the export';
+        const why = m.attachment ? 'not in what was shared' : (S.chat.missingNote || 'not in the export');
         return `<div class="media"><span class="missing">${icon(kind === 'voice' ? 'mic' : kind === 'video' ? 'video' : kind === 'document' ? 'file' : 'photo')}${esc(label)} (${why})</span></div>`;
     }
     if (kind === 'photo' || kind === 'sticker') return `<div class="media"><img alt="${esc(label)}" data-media="${esc(m.attachment)}" width="240" height="160" decoding="async"></div>`;
@@ -586,7 +665,7 @@ function messageHtml(m) {
     const saved = isSaved(m);
     const checked = S.selection.has(m.index);
     const info = saved ? c.savedInfo.get(m.key) : null;
-    const savedTitle = info && info.by ? `Saved to Salesforce by ${info.by}` : 'Already in Salesforce';
+    const savedTitle = info && info.isCase ? 'In a WhatsApp case' : info && info.by ? `Saved to Salesforce by ${info.by}` : 'Already in Salesforce';
     return `<div class="msg ${me ? 'me' : ''} ${saved ? 'saved' : ''}" role="checkbox" aria-checked="${checked}" aria-disabled="${saved}" tabindex="${saved ? -1 : 0}" data-i="${m.index}">
       <span class="tick">${icon('check')}</span>
       <div class="bubble">
@@ -675,7 +754,8 @@ function renderThread() {
     const shown = newestFirst.slice(0, S.shownConvs);
     const left = newestFirst.length - shown.length;
     el.innerHTML = shown.map(convHtml).join('') +
-        (left > 0 ? `<button class="btn more-earlier" data-act="earlier">Show earlier conversations (${left.toLocaleString(LOCALE)} more)</button>` : '');
+        (left > 0 ? `<button class="btn more-earlier" data-act="earlier">Show earlier conversations (${left.toLocaleString(LOCALE)} more)</button>`
+            : HOST.threadFooter ? HOST.threadFooter({ icon, esc }) : '');
     renderNotices();
     refreshSelection();
     loadVisibleMedia();
@@ -737,7 +817,44 @@ function refreshSelection() {
           <button class="btn primary" data-act="next" ${sel.length ? '' : 'disabled'}>Next</button>`;
     }
     renderToolbar();
-    updateSaveState();
+    if (autoFill()) renderSavePane(); else updateSaveState();
+}
+
+/* ---------------------------------------------------------------- filled in for you */
+
+function caseAvailable() {
+    return !!(S.choices && S.choices.case && S.choices.case.recordTypeId);
+}
+function defaultKind() {
+    return S.me && S.me.isCx && caseAvailable() ? 'case' : 'interaction';
+}
+
+/* Fills what is known into every choice the rep has not made themselves. True when anything changed. */
+function autoFill() {
+    if (!S.chat || !S.choices) return false;
+    const before = JSON.stringify([S.purpose, S.outcome, S.caseSubject, S.auto]);
+    const sel = selectedMessages();
+    const contact = S.person && S.person.status === 'chosen' ? S.person.contact : null;
+    const known = S.person && S.person.status === 'chosen' && !S.person.searchOpen;
+    const s = suggestInteraction({
+        earlier: S.chat.earlier || [],
+        meId: S.me && S.me.Id,
+        practice: known ? S.practice : null,
+        personName: contact ? contact.Name : '',
+        choices: S.choices,
+        onlyMine: !!S.chat.meName && sel.length > 0 && sel.every((m) => m.sender === S.chat.meName)
+    });
+    for (const f of ['purpose', 'outcome']) {
+        if (S.touched[f]) continue;
+        S[f] = s[f];
+        S.auto[f] = s[f] ? s.why[f] : null;
+    }
+    if (!S.caseSubjectTouched) {
+        const cs = caseSubject(sel, S.chat.meName, contact ? contact.Name : S.practice ? S.practice.Name : '');
+        S.caseSubject = cs.subject.slice(0, 255);
+        S.auto.caseSubject = sel.length ? cs.why : null;
+    }
+    return JSON.stringify([S.purpose, S.outcome, S.caseSubject, S.auto]) !== before;
 }
 
 /* ---------------------------------------------------------------- the save pane */
@@ -801,9 +918,93 @@ function practiceHtml() {
             <button class="btn link" data-act="practice-other">Another practice</button>`;
 }
 
-function selectHtml(id, list, current) {
+function filledHtml(why) {
+    return why ? `<p class="filled">${icon('check')}${esc(why)}</p>` : '';
+}
+
+function kindHtml() {
+    if (!caseAvailable()) return '';
+    const order = S.me && S.me.isCx ? ['case', 'interaction'] : ['interaction', 'case'];
+    const label = { interaction: 'Interaction', case: 'Case' };
+    return `<div class="seg" role="radiogroup" aria-label="Save as">${order.map((k) =>
+        `<button role="radio" aria-checked="${S.kind === k}" class="${S.kind === k ? 'on' : ''}" data-act="kind" data-kind="${k}">${label[k]}</button>`).join('')}</div>`;
+}
+
+function caseFieldsHtml() {
+    const ci = (S.choices && S.choices.case) || { topics: [], types: [] };
+    const cx = !!(S.me && S.me.isCx);
+    const src = caseSource(S.practice);
+    const practiceName = S.practice ? S.practice.Name : 'the practice';
+    return `
+        <div class="field"><label for="case-subject">Subject</label><input type="text" id="case-subject" maxlength="255" value="${esc(S.caseSubject)}">${filledHtml(S.auto.caseSubject)}</div>
+        ${cx ? `
+          <div class="field"><label for="topic">Topic <small>optional</small></label>${pickerHtml('topic')}</div>
+          <div class="field"><label for="case-type">Type <small>optional</small></label>${pickerHtml('case-type')}</div>
+          ${src.source ? filledHtml(`Source: ${src.source} (${src.why}) · Origin: WhatsApp`) : ''}` : ''}
+        <div class="route">${icon(cx ? 'person' : 'arrow')}<span>${cx
+            ? '<b>Comes to you in Omni-Channel</b>Accept it there, as with any case you create.'
+            : `<b>Goes to CX</b>${esc(possessive(practiceName))} CX agent picks it up, or the CX team for its region.`}</span></div>`;
+}
+
+/*
+ * PICKERS. Every list on the save screen is the app's own picker, not the browser's: the whole label
+ * shows (never "Practice will follow up & task has been crea…"), the options open in the page under
+ * it with the chosen one ticked, and a long list (a case's Type) has a search box and puts first the
+ * types that fit the Topic chosen.
+ */
+const TOPIC_TYPES = {
+    Hardware: /hardware|adapter|scanbox/i,
+    Billing: /billing|invoic|payment|collection|dispute/i,
+    Monitoring: /clinical|pawn|scan report|investigation|smart stl/i,
+    'Mobile app': /mobile app/i,
+    DentalMind: /dentalmind/i,
+    Privacy: /privacy|security/i,
+    Insights: /web platform|insight/i,
+    Engage: /sales|dso|dm\+/i
+};
+const PICKERS = {
+    purpose: { label: 'Purpose', list: () => S.choices.purposes, get: () => S.purpose,
+        set: (v) => { S.purpose = v; S.touched.purpose = true; S.auto.purpose = null; } },
+    outcome: { label: 'Outcome', list: () => S.choices.outcomes, get: () => S.outcome,
+        set: (v) => { S.outcome = v; S.touched.outcome = true; S.auto.outcome = null; } },
+    topic: { label: 'Topic', optional: true, list: () => S.choices.case.topics, get: () => S.topic, set: (v) => { S.topic = v; } },
+    'case-type': { label: 'Type', optional: true, list: () => S.choices.case.types, get: () => S.caseType, set: (v) => { S.caseType = v; },
+        suggest: () => (S.topic && TOPIC_TYPES[S.topic]) || null }
+};
+
+function pickerHtml(id) {
+    const p = PICKERS[id];
+    const list = p.list() || [];
+    const current = p.get();
+    const chosen = list.find((o) => o.value === current);
+    const open = S.openPicker === id;
+    let body = '';
+    if (open) {
+        const fits = p.suggest ? p.suggest() : null;
+        const top = fits ? list.filter((o) => fits.test(o.label)) : [];
+        const rest = list.filter((o) => !top.includes(o));
+        const row = (o) => `<button type="button" role="option" class="pick-opt" aria-selected="${o.value === current}" data-act="pick-opt" data-id="${id}" data-value="${esc(o.value)}">${icon('check')}<span>${esc(o.label)}</span></button>`;
+        body = `<div class="pick-list" role="listbox" aria-label="${esc(p.label)}">
+            ${list.length > 12 ? `<input type="search" class="pick-q" id="${id}-q" placeholder="Search ${list.length} ${esc(p.label.toLowerCase())}s" autocomplete="off" enterkeyhint="search">` : ''}
+            ${top.length ? `<p class="group">For ${esc(S.topic)}</p>${top.map(row).join('')}<p class="group">All</p>` : ''}
+            ${rest.map(row).join('')}
+            ${p.optional && current ? `<button type="button" class="pick-opt clear" data-act="pick-opt" data-id="${id}" data-value="">Clear</button>` : ''}
+          </div>`;
+    }
+    return `<button type="button" id="${id}" class="pick-btn ${chosen ? '' : 'empty'} ${open ? 'open' : ''}" data-act="picker" data-id="${id}"
+        data-value="${esc(current || '')}" aria-haspopup="listbox" aria-expanded="${open}"><span>${esc(chosen ? chosen.label : 'Choose…')}</span>${icon('chev')}</button>${body}`;
+}
+
+function filterPicker(input) {
+    const q = input.value.trim().toLowerCase();
+    const listEl = input.closest('.pick-list');
+    listEl.querySelectorAll('.pick-opt:not(.clear)').forEach((b) => { b.hidden = !!q && !b.textContent.toLowerCase().includes(q); });
+    listEl.querySelectorAll('.group').forEach((g) => { g.hidden = !!q; });
+}
+
+function selectHtml(id, list, current, { optional = false } = {}) {
     return `<select id="${id}" class="picker ${current ? '' : 'empty'}">
-        <option value="" ${current ? '' : 'selected'} disabled>Choose…</option>
+        <option value="" ${current ? '' : 'selected'} ${optional ? '' : 'disabled'}>Choose…</option>
         ${list.map((o) => `<option value="${esc(o.value)}" ${current === o.value ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}
       </select>`;
 }
@@ -834,25 +1035,29 @@ function renderSavePane() {
           <p class="eyebrow">Save to Salesforce</p>
           <h2 class="save-summary">${esc(saveSummary())}</h2>
         </div>
+        ${kindHtml()}
         <div class="field"><span class="label">Who</span>${whoHtml()}</div>
-        ${needsPracticeField() ? `<div class="field"><span class="label">Practice</span>${practiceHtml()}</div>` : ''}
-        <div class="field"><label for="purpose">Purpose</label>${selectHtml('purpose', choices.purposes, S.purpose)}</div>
-        <div class="field"><label for="outcome">Outcome</label>${selectHtml('outcome', choices.outcomes, S.outcome)}</div>
+        ${needsPracticeField() || (S.kind === 'case' && !S.practice && S.person && S.person.status === 'chosen' && !S.person.searchOpen)
+            ? `<div class="field"><span class="label">Practice</span>${practiceHtml()}</div>` : ''}
+        ${S.kind === 'case' ? caseFieldsHtml() : `
+        <div class="field"><label for="purpose">Purpose</label>${pickerHtml('purpose')}${filledHtml(S.auto.purpose)}</div>
+        <div class="field"><label for="outcome">Outcome</label>${pickerHtml('outcome')}${filledHtml(S.auto.outcome)}</div>`}
         ${S.noteOpen ? `
-          <div class="field"><label for="note">Note</label><textarea id="note" rows="3" placeholder="What was agreed?">${esc(S.note)}</textarea></div>
-          <div class="field"><label for="subject">Subject</label><input type="text" id="subject" maxlength="255" value="${esc(S.subject)}"></div>
+          <div class="field"><label for="note">Note</label><textarea id="note" rows="3" placeholder="${S.kind === 'case' ? 'What does the practice need?' : 'What was agreed?'}">${esc(S.note)}</textarea></div>
+          ${S.kind === 'case' ? '' : `<div class="field"><label for="subject">Subject</label><input type="text" id="subject" maxlength="255" value="${esc(S.subject)}"></div>`}
           <details class="preview"><summary>What Salesforce will keep</summary><pre id="preview"></pre></details>`
         : `<button class="btn link note-link" data-act="note-open">${icon('plus')}Add a note</button>`}
       </div>
       <div class="savebar">
         <div id="save-error">${S.error ? `<div class="error" role="alert">${icon('alert')}<span>${esc(S.error)}</span></div>` : ''}</div>
         <p class="hint" id="save-hint"></p>
-        <button class="btn primary big block" data-act="save" id="save-btn">${S.saving ? `<span class="spinner"></span>${esc(S.saving)}` : 'Save to Salesforce'}</button>
+        <button class="btn primary big block" data-act="save" id="save-btn">${S.saving ? `<span class="spinner"></span>${esc(S.saving)}` : S.kind === 'case' ? 'Create the case' : 'Save to Salesforce'}</button>
       </div>`;
     if (keep) {
         const again = el.querySelector(`#${keep.id}`);
         if (again) {
-            if (/search/.test(keep.id)) again.value = keep.value;
+            if (/search|-q$/.test(keep.id)) again.value = keep.value;
+            if (again.classList.contains('pick-q')) filterPicker(again);
             again.focus();
             try { again.setSelectionRange(keep.start, keep.end); } catch { /* not a text box */ }
         }
@@ -864,7 +1069,11 @@ function missing() {
     const out = [];
     if (!S.selection.size) out.push('tick a conversation');
     if (!S.person || S.person.status !== 'chosen' || S.person.searchOpen) out.push('choose who it was with');
-    else if (!S.practice && !S.person.contact) out.push('choose the practice');
+    else if (!S.practice && (S.kind === 'case' || !S.person.contact)) out.push('choose the practice');
+    if (S.kind === 'case') {
+        if (!S.caseSubject.trim()) out.push('write a subject');
+        return out;
+    }
     if (!S.purpose) out.push('pick a purpose');
     if (!S.outcome) out.push('pick an outcome');
     return out;
@@ -906,7 +1115,7 @@ function buildDescription(sel, { forPreview = false } = {}) {
     lines.push(`WhatsApp, ${plural(sel.length, 'message', 'messages')}, ${rangeLabel(sel[0].dayKey, sel[sel.length - 1].dayKey)}:`);
     for (const m of sel) {
         const willUpload = m.attachment && S.chat.media.has(m.attachment) && (S.chat.media.get(m.attachment).size || 0) <= sf.MAX_FILE_BYTES;
-        lines.push(transcriptLine({ ...m, uploaded: forPreview ? willUpload : m.uploaded }, senderLabel(m)));
+        lines.push(transcriptLine({ ...m, uploaded: forPreview ? willUpload : m.uploaded, missingNote: S.chat.missingNote }, senderLabel(m)));
     }
     lines.push('', '—', 'Saved from WhatsApp with Chat to Salesforce.');
     return lines.join('\n');
@@ -929,6 +1138,7 @@ async function save() {
     }
     const contact = S.person.contact;
     const practice = S.practice;
+    if (S.kind === 'case') return saveAsCase({ sel, description, contact, practice, uploadable, tooBig, media });
     const fields = {
         Subject: (S.subject.trim() || `WhatsApp with ${contact ? contact.Name : practice.Name}`).slice(0, 255),
         Description: description,
@@ -983,6 +1193,8 @@ async function save() {
     S.note = '';
     S.purpose = null;
     S.outcome = null;
+    S.touched = {};
+    S.auto = {};
     S.recent = null;
     S.lastSaved = {
         id, count: sel.length, contact, practice,
@@ -992,8 +1204,66 @@ async function save() {
     render();
 }
 
+async function saveAsCase({ sel, description, contact, practice, uploadable, tooBig, media }) {
+    const ci = S.choices.case;
+    const src = caseSource(practice);
+    const fields = {
+        RecordTypeId: ci.recordTypeId,
+        Origin: 'Whatsapp',
+        Status: 'New',
+        Subject: S.caseSubject.trim().slice(0, 255),
+        Description: description,
+        ContactId: contact ? contact.Id : null,
+        AccountId: practice.Id
+    };
+    if (src.source) fields.Source__c = src.source;
+    if (S.topic) fields.Topic__c = S.topic;
+    if (S.caseType) fields.Type__c = S.caseType;
+    S.error = null;
+    S.saving = 'Creating the case…';
+    renderSavePane();
+    let made;
+    try {
+        made = await guard(sf.saveCase(fields));
+    } catch (e) {
+        S.saving = null;
+        if (e instanceof sf.SignedOut) return;
+        S.error = e.message;
+        renderSavePane();
+        return;
+    }
+    const failed = tooBig.map((m) => ({ name: m.attachment, why: 'larger than 25 MB' }));
+    let n = 0;
+    for (const m of uploadable) {
+        n++;
+        S.saving = `Attaching ${n} of ${uploadable.length}…`;
+        renderSavePane();
+        try {
+            await guard(sf.attachFile(made.id, m.attachment, await media.get(m.attachment).read()));
+        } catch (e) {
+            if (e instanceof sf.SignedOut) return;
+            failed.push({ name: m.attachment, why: e.message });
+        }
+    }
+    for (const m of sel) S.chat.savedKeys.add(m.key);
+    S.selection = new Set();
+    S.saving = null;
+    S.note = '';
+    S.topic = null;
+    S.caseType = null;
+    S.caseSubjectTouched = false;
+    S.recent = null;
+    S.lastSaved = {
+        kind: 'case', id: made.id, number: made.number, toMe: !!(S.me && S.me.isCx), count: sel.length, contact, practice,
+        files: uploadable.length - failed.filter((f) => f.why !== 'larger than 25 MB').length, failed
+    };
+    S.view = 'saved';
+    render();
+}
+
 function renderSaved() {
     const s = S.lastSaved;
+    if (s.kind === 'case') return renderSavedCase(s);
     const where = [s.contact && s.contact.Name, s.practice && s.practice.Name].filter(Boolean).join(' · ');
     const left = S.chat ? S.chat.messages.filter(canPick).length : 0;
     root.innerHTML = `
@@ -1006,6 +1276,27 @@ function renderSaved() {
           ${s.failed.length ? `<div class="error">${icon('alert')}<span>Not attached: ${s.failed.map((f) => `${esc(f.name)} (${esc(f.why)})`).join('; ')}</span></div>` : ''}
           <div class="btn-row">
             <a class="btn primary big" href="${esc(sf.recordUrl(s.id))}" target="_blank" rel="noopener">${icon('external')}Open in Salesforce</a>
+            ${left ? '<button class="btn big" data-act="more">Save more from this chat</button>' : ''}
+            <button class="btn big" data-act="home">Done</button>
+          </div>
+        </section>
+      </main>`;
+}
+
+function renderSavedCase(s) {
+    const where = [s.contact && s.contact.Name, s.practice && s.practice.Name].filter(Boolean).join(' · ');
+    const left = S.chat ? S.chat.messages.filter(canPick).length : 0;
+    root.innerHTML = `
+      ${topbar()}
+      <main class="page">
+        <section class="card saved-card" role="status">
+          <span class="big-tick">${icon('check')}</span>
+          <h1>${s.number ? `Case ${esc(s.number)} created` : 'Case created'}</h1>
+          <p class="muted">${plural(s.count, 'message', 'messages')} on ${esc(where)}${s.files ? `, with ${plural(s.files, 'file', 'files')} attached` : ''}.</p>
+          <p class="muted">${s.toMe ? 'It comes to you in Omni-Channel.' : `CX picks it up: ${esc(possessive(s.practice ? s.practice.Name : 'the practice'))} CX agent, or the CX team for its region.`}</p>
+          ${s.failed.length ? `<div class="error">${icon('alert')}<span>Not attached: ${s.failed.map((f) => `${esc(f.name)} (${esc(f.why)})`).join('; ')}</span></div>` : ''}
+          <div class="btn-row">
+            <a class="btn primary big" href="${esc(sf.recordUrl(s.id, 'Case'))}" target="_blank" rel="noopener">${icon('external')}Open the case</a>
             ${left ? '<button class="btn big" data-act="more">Save more from this chat</button>' : ''}
             <button class="btn big" data-act="home">Done</button>
           </div>
@@ -1050,6 +1341,7 @@ async function runSearch(input) {
 
 function onClick(e) {
     if (e.target.closest('audio, a[href]')) return;
+    if (S.openPicker && !e.target.closest('.pick-list, .pick-btn')) { S.openPicker = null; renderSavePane(); }
     const target = e.target.closest('[data-act], .msg[data-i]');
     if (!target) {
         if (S.menuOpen && !e.target.closest('.menu')) { S.menuOpen = false; render(); }
@@ -1058,7 +1350,7 @@ function onClick(e) {
     if (target.matches('.msg[data-i]') && !target.dataset.act) return toggleMessage(target, e.shiftKey);
     const act = target.dataset.act;
     switch (act) {
-        case 'signin': sf.startSignIn(); break;
+        case 'signin': signIn(); break;
         case 'consent':
             writeLocal(CONSENT_KEY, { at: new Date().toISOString(), version: 1 });
             proceedAfterWelcome();
@@ -1066,21 +1358,20 @@ function onClick(e) {
         case 'menu': S.menuOpen = !S.menuOpen; render(); break;
         case 'signout':
             S.menuOpen = false;
+            stopHost();
             sf.signOut();
             S.me = null; S.chat = null; S.recent = null; S.view = 'welcome';
             render();
             break;
         case 'withdraw':
             S.menuOpen = false;
+            stopHost();
             writeLocal(CONSENT_KEY, null);
             S.chat = null; S.view = 'welcome';
             S.flash = { kind: 'green', text: 'WhatsApp access stopped. Nothing from your chats is kept here.' };
             render();
             break;
-        case 'home':
-            S.view = 'home'; S.chat = null; S.menuOpen = false;
-            render();
-            break;
+        case 'home': goHome(); break;
         case 'install':
             S.installEvent && S.installEvent.prompt();
             S.installEvent = null; render();
@@ -1145,8 +1436,7 @@ function onClick(e) {
                 root.dataset.step = 'pick';
                 root.querySelector('.chat-layout').dataset.step = 'pick';
             } else {
-                S.view = 'home'; S.chat = null; S.menuOpen = false;
-                render();
+                goHome();
             }
             break;
         case 'note-open':
@@ -1185,13 +1475,85 @@ function onClick(e) {
             root.querySelector('#practice-search')?.focus();
             break;
         case 'save': save(); break;
+        case 'kind':
+            S.kind = target.dataset.kind === 'case' ? 'case' : 'interaction';
+            S.error = null;
+            S.openPicker = null;
+            renderSavePane();
+            break;
+        case 'picker': {
+            const id = target.dataset.id;
+            S.openPicker = S.openPicker === id ? null : id;
+            renderSavePane();
+            const pane = root.querySelector('#save-pane');
+            const next = pane && (pane.querySelector(`#${id}-q`) || pane.querySelector(`.pick-list [aria-selected="true"]`) || pane.querySelector('.pick-list .pick-opt'));
+            if (S.openPicker && next) next.focus({ preventScroll: true }); else pane?.querySelector(`#${id}`)?.focus();
+            pane?.querySelector('.pick-list')?.scrollIntoView({ block: 'nearest' });
+            break;
+        }
+        case 'pick-opt': {
+            const id = target.dataset.id;
+            PICKERS[id].set(target.dataset.value || null);
+            S.openPicker = null;
+            renderSavePane();
+            root.querySelector(`#save-pane #${id}`)?.focus();
+            break;
+        }
         case 'more':
             S.view = 'chat'; S.step = 'pick';
             render();
             window.scrollTo(0, 0);
             break;
-        default: break;
+        default:
+            if (act.startsWith('host-') && HOST.onAct) HOST.onAct(act, target);
+            break;
     }
+}
+
+function goHome() {
+    S.view = 'home'; S.chat = null; S.menuOpen = false;
+    render();
+    if (hostStarted && HOST.onHome) HOST.onHome();
+}
+
+async function signIn() {
+    const r = await sf.startSignIn();
+    if (r == null) return; // the site: on its way to Salesforce's login page
+    if (r !== true) { S.flash = { kind: 'amber', text: r }; S.view = 'welcome'; render(); return; }
+    try {
+        await loadSession();
+    } catch (e) {
+        S.me = null;
+        S.flash = { kind: 'amber', text: e.message };
+    }
+    proceedAfterWelcome();
+}
+
+/* ---------------------------------------------------------------- the add-on's hooks */
+
+let hostStarted = false;
+const HOST_API = {
+    openChat: (chat) => openText(chat.text, '', new Map(), {
+        chatName: chat.name, phone: chat.phone, meName: chat.meName, localeHint: chat.localeHint, missingNote: chat.missingNote
+    }),
+    updateChat: (chat) => refreshChat(chat.text, { meName: chat.meName, localeHint: chat.localeHint }),
+    showHome: () => { S.view = 'home'; S.chat = null; render(); },
+    refreshHome: () => { if (S.view === 'home') render(); },
+    refreshThread: () => { if (S.view === 'chat') renderThread(); },
+    toast,
+    isBusy: () => !!S.saving,
+    view: () => S.view,
+    chatName: () => (S.chat ? S.chat.name : null)
+};
+function startHost() {
+    if (!HOST.ready || hostStarted) return;
+    hostStarted = true;
+    HOST.ready(HOST_API);
+}
+function stopHost() {
+    if (!hostStarted) return;
+    hostStarted = false;
+    if (HOST.onStop) HOST.onStop();
 }
 
 function toggleMessage(node, shift) {
@@ -1215,6 +1577,13 @@ function toggleMessage(node, shift) {
 
 function onKey(e) {
     if (e.key === 'Escape' && S.menuOpen) { S.menuOpen = false; render(); return; }
+    if (e.key === 'Escape' && S.openPicker) {
+        const id = S.openPicker;
+        S.openPicker = null;
+        renderSavePane();
+        root.querySelector(`#save-pane #${id}`)?.focus();
+        return;
+    }
     const node = e.target.closest && e.target.closest('.msg[data-i]');
     if (node && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); toggleMessage(node, e.shiftKey); }
     if (e.target.id === 'paste-text' && e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -1225,6 +1594,12 @@ function onKey(e) {
 function onInput(e) {
     const t = e.target;
     if (t.id === 'subject') { S.subject = t.value; S.subjectTouched = true; }
+    else if (t.classList.contains('pick-q')) filterPicker(t);
+    else if (t.id === 'case-subject') {
+        S.caseSubject = t.value; S.caseSubjectTouched = true; S.auto.caseSubject = null;
+        t.parentElement.querySelector('.filled')?.remove();
+        updateSaveState();
+    }
     else if (t.id === 'note') { S.note = t.value; updateSaveState(); }
     else if (t.id === 'who-search' || t.id === 'practice-search') {
         clearTimeout(searchTimer);
@@ -1235,8 +1610,16 @@ function onInput(e) {
 function onChange(e) {
     if (e.target.id === 'purpose' || e.target.id === 'outcome') {
         S[e.target.id] = e.target.value || null;
+        S.touched[e.target.id] = true;
+        S.auto[e.target.id] = null;
         e.target.classList.toggle('empty', !e.target.value);
+        e.target.parentElement.querySelector('.filled')?.remove();
         updateSaveState();
+        return;
+    }
+    if (e.target.id === 'topic' || e.target.id === 'case-type') {
+        S[e.target.id === 'topic' ? 'topic' : 'caseType'] = e.target.value || null;
+        e.target.classList.toggle('empty', !e.target.value);
         return;
     }
     if (e.target.id === 'file-input' && e.target.files.length) {
@@ -1301,6 +1684,7 @@ function proceedAfterWelcome() {
     }
     S.view = 'home';
     render();
+    startHost();
 }
 
 async function loadSession() {
@@ -1322,7 +1706,8 @@ async function start() {
         S.installEvent = e;
         if (S.view === 'home') render();
     });
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (HOST.kind !== 'web') root.classList.add(`in-${HOST.kind}`);
+    else if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
     const finished = await sf.finishSignIn();
     if (typeof finished === 'string') S.flash = { kind: 'amber', text: finished };

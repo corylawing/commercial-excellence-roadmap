@@ -70,6 +70,18 @@ export function mediaKindOf(fileName) {
     return MEDIA_KIND_BY_EXT[ext] || 'document';
 }
 
+/* "image omitted" → photo, "audio omitted" (an iPhone voice note) → voice; "<Media omitted>" says nothing. */
+function omittedKind(t) {
+    const w = t.toLowerCase();
+    if (/^(image|imagen|bild|photo|gif)\b/.test(w)) return 'photo';
+    if (/^(video|vidéo)\b/.test(w)) return 'video';
+    if (/^(audio|voice message)\b/.test(w)) return 'voice';
+    if (/^(sticker|autocollant)\b/.test(w)) return 'sticker';
+    if (/^(document|dokument|documento)\b/.test(w)) return 'document';
+    if (/^(contact card|fiche contact|kontaktkarte|tarjeta de contacto)\b/.test(w)) return 'contact';
+    return 'omitted';
+}
+
 function clean(line) {
     return line.replace(ODD_SPACES, ' ').replace(DIRECTION_MARKS, '');
 }
@@ -128,6 +140,11 @@ export function decideDateOrder(dateParts, localeHint) {
     }
     if (dayFirstProof && !monthFirstProof) return 'DMY';
     if (monthFirstProof && !dayFirstProof) return 'MDY';
+    // a chat cannot hold a message from the future: a reading that needs one loses
+    const tomorrow = new Date(); tomorrow.setHours(0, 0, 0, 0); tomorrow.setDate(tomorrow.getDate() + 2);
+    const future = (order) => dateParts.filter((p) => { const [y, m, d] = ymd(p, order); return new Date(y, m - 1, d) >= tomorrow; }).length;
+    const fDmy = future('DMY'), fMdy = future('MDY');
+    if (fDmy !== fMdy) return fDmy < fMdy ? 'DMY' : 'MDY';
     const backwards = (order) => {
         let prev = -Infinity, n = 0;
         for (const p of dateParts) {
@@ -172,7 +189,7 @@ function classify(text, ledByMark) {
         const caption = t.split('\n').slice(1).join('\n').trim();
         return { kind: 'media', attachment: m[1], caption };
     }
-    if (OMITTED_PATTERNS.some((p) => p.test(t))) return { kind: 'media', attachment: null, caption: '' };
+    if (OMITTED_PATTERNS.some((p) => p.test(t))) return { kind: 'media', attachment: null, caption: '', omitted: omittedKind(t) };
     if (DELETED_PATTERNS.some((p) => p.test(t))) return { kind: 'deleted' };
     if (SYSTEM_PATTERNS.some((p) => p.test(t))) return { kind: 'system' };
     if (ledByMark && t.length < 120 && !/[.?!]\s\S/.test(t)) {
@@ -235,7 +252,7 @@ export function parseChat(raw, opts = {}) {
             text: shownText,
             kind: c.kind,
             attachment: c.attachment || null,
-            mediaKind: c.attachment ? mediaKindOf(c.attachment) : (c.kind === 'media' ? 'omitted' : null),
+            mediaKind: c.attachment ? mediaKindOf(c.attachment) : (c.kind === 'media' ? c.omitted || 'omitted' : null),
             edited,
             cut,
             key: fingerprint(stamp, c.kind === 'media' ? (c.attachment || '[media]') : text)
@@ -273,7 +290,7 @@ export function transcriptLine(msg, senderLabel) {
         const what = { photo: 'Photo', video: 'Video', voice: 'Voice message', audio: 'Audio',
             document: 'Document', sticker: 'Sticker', contact: 'Contact card', omitted: 'Media' }[msg.mediaKind] || 'Media';
         const name = msg.attachment ? ` ${msg.attachment}` : '';
-        const where = msg.uploaded ? ' (attached)' : (msg.attachment ? '' : ' (not in the export)');
+        const where = msg.uploaded ? ' (attached)' : (msg.attachment ? '' : ` (${msg.missingNote || 'not in the export'})`);
         body = `[${what}${name}${where}]` + (body ? ' ' + body : '');
     }
     if (msg.cut) body += ' […]';
@@ -290,7 +307,7 @@ export function keysInDescription(description) {
     const flush = () => {
         if (!cur) return;
         cur.text = cur.text.trim().replace(/ \[…\]$/, '');
-        const media = /^\[(Photo|Video|Voice message|Audio|Document|Sticker|Contact card|Media)( ([^\]\s(][^\]]*?))?( \((attached|not in the export)\))?\]( (.*))?$/s.exec(cur.text);
+        const media = /^\[(Photo|Video|Voice message|Audio|Document|Sticker|Contact card|Media)( ([^\]\s(][^\]]*?))?( \((attached|not in the export|stays in WhatsApp)\))?\]( (.*))?$/s.exec(cur.text);
         if (media) keys.add(fingerprint(cur.stamp, media[3] || '[media]'));
         else keys.add(fingerprint(cur.stamp, cur.text));
     };
