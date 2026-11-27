@@ -23,6 +23,10 @@ const ME_NAMES_KEY = 'c2s.myWhatsAppNames';
 const HOWTO_SEEN_KEY = 'c2s.howtoSeen';
 const INSTALL_DISMISSED_KEY = 'c2s.installDismissed';
 const PAGE = 400;
+/* An iPhone shows a Photo Library / Take Photo menu before Files whenever pictures are accepted.
+ * Its export is always one .zip (photos inside), so on iPhone the button opens Files straight away. */
+const IPHONE_ACCEPT = '.zip,.txt,application/zip,text/plain';
+const FILE_ACCEPT = '.txt,.zip,text/plain,application/zip,image/*,audio/*,video/*,application/pdf';
 const DESCRIPTION_MAX = 32000;
 
 const S = {
@@ -265,7 +269,7 @@ function renderHome() {
             <button class="btn primary big" data-act="paste-open">${icon('paste')}Paste messages</button>
             <button class="btn big" data-act="file">${icon('open')}Open exported chat</button>
           </div>
-          <input type="file" id="file-input" class="sr-only" multiple accept=".txt,.zip,text/plain,application/zip,image/*,audio/*,video/*,application/pdf" tabindex="-1">
+          <input type="file" id="file-input" class="sr-only" multiple accept="${d === 'iphone' ? IPHONE_ACCEPT : FILE_ACCEPT}" tabindex="-1">
           ${S.pasteOpen ? `
             <div class="paste-box">
               <label for="paste-text" class="eyebrow">Paste the messages copied from WhatsApp</label>
