@@ -417,3 +417,17 @@ p.more-earlier { text-align: center; }
 .pick-opt.clear { grid-template-columns: 1fr; color: var(--ink-3); font-weight: 600; }
 .pick-opt[hidden], .pick-list .group[hidden] { display: none; }
 .field > label small { font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 4px; }
+
+/* The add-on's install page (add-on.html) */
+.install-hero h1 { margin: 0 0 6px; font-size: 1.5rem; }
+.install-steps { margin: 0; padding: 0; list-style: none; counter-reset: st; display: grid; gap: 18px; }
+.install-steps li { counter-increment: st; display: grid; gap: 8px; padding-left: 40px; position: relative; }
+.install-steps li::before { content: counter(st); position: absolute; left: 0; top: -2px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 800; display: grid; place-items: center; }
+.install-steps p { margin: 0; }
+.install-steps .btn.primary { justify-self: start; }
+.copy-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.copy-row code, .install code { background: var(--line-2); border-radius: 8px; padding: 6px 10px; font-size: .95rem; }
+.install .shot { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.install .card-shot { max-width: 360px; }
+.addon-link { text-decoration: none; color: var(--ink); }
+.addon-link:hover { border-color: var(--accent-line); }

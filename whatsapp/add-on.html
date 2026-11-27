@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat to Salesforce for Chrome</title>
+<meta name="description" content="Install the Chat to Salesforce add-on in Chrome: save WhatsApp Web chats to Salesforce from the panel beside them.">
+<meta name="theme-color" content="#5b5bd6">
+<meta name="color-scheme" content="light dark">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; base-uri 'self'">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="add-on.js" defer></script>
+</head>
+<body>
+<div class="app">
+  <header class="topbar"><div class="brand"><img src="icons/icon.svg" alt="" width="30" height="30"><span>Chat to Salesforce</span></div><span class="spacer"></span></header>
+  <main class="page install">
+    <section class="card install-hero">
+      <h1>Chat to Salesforce for Chrome</h1>
+      <p class="muted">Save WhatsApp Web chats to Salesforce as cases or interactions, from a panel beside the chat: it reads the chat for you. Set up once, about a minute.</p>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Set up once</p>
+      <ol class="install-steps">
+        <li>
+          <b>Download the add-on</b>
+          <a class="btn primary big" href="add-on/chat-to-salesforce-add-on.zip" download>Download</a>
+          <p class="muted">Open the download: it becomes a folder called <b>Chat to Salesforce add-on</b>. Move that folder to your
+            <b>Documents</b> and keep it there: Chrome runs the add-on from it. (Windows: right-click the download › Extract All first.)</p>
+        </li>
+        <li>
+          <b>Open Chrome's add-ons page</b>
+          <span class="copy-row"><code id="ext-url">chrome://extensions</code><button class="btn" id="copy-ext" type="button">Copy</button></span>
+          <p class="muted">Paste it in Chrome's address bar and press Enter (a link cannot open this page).</p>
+        </li>
+        <li>
+          <b>Switch on Developer mode, top right, then click Load unpacked</b>
+          <img class="shot" src="add-on/developer-mode.png" width="1100" height="112" alt="Chrome's add-ons page: Developer mode switched on at the top right, and the Load unpacked button below the title">
+        </li>
+        <li>
+          <b>Pick the Chat to Salesforce add-on folder</b>
+          <p class="muted">It is in Documents. Click Select.</p>
+        </li>
+        <li>
+          <b>Pin it</b>
+          <p class="muted">Click the puzzle piece next to Chrome's address bar, then the pin beside Chat to Salesforce. Its purple icon now stays in the toolbar.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">Use it</p>
+      <ol class="install-steps">
+        <li><b>Open <a href="https://web.whatsapp.com/" target="_blank" rel="noopener">web.whatsapp.com</a> and open a chat</b>
+          <p class="muted">The first time, WhatsApp shows a code: on your phone, WhatsApp › Settings › Linked devices › Link a device.</p></li>
+        <li><b>Click the purple icon</b>
+          <p class="muted">The panel opens beside the chat. The first time: Connect Salesforce, then Allow.</p></li>
+        <li><b>Tick the conversation, check what is filled in, save</b>
+          <p class="muted">CX sees Case first, everyone else Interaction; the other is one tap away.</p></li>
+      </ol>
+    </section>
+
+    <section class="card">
+      <p class="eyebrow">When there is a new version</p>
+      <p>Download it again, replace the folder in Documents with the new one, then on <code>chrome://extensions</code> press the round arrow on Chat to Salesforce. You stay signed in.</p>
+      <img class="shot card-shot" src="add-on/reload.png" width="414" height="222" alt="The Chat to Salesforce card on Chrome's add-ons page, with the round reload arrow at the bottom right">
+    </section>
+
+    <p class="faint">Google Chrome on a computer. On a phone, use <a href="./">the app</a> with WhatsApp's Export chat.</p>
+  </main>
+</div>
+</body>
+</html>

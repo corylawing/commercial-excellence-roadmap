@@ -49,7 +49,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith((async () => {
         try {
             const fresh = await fetch(req, { cache: 'no-cache' });
-            if (fresh.ok && !url.search) {
+            if (fresh.ok && !url.search && !url.pathname.endsWith('.zip')) {
                 const copy = fresh.clone();
                 caches.open(VERSION).then((c) => c.put(req, copy)).catch(() => {});
             }

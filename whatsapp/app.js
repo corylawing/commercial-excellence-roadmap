@@ -300,7 +300,8 @@ function renderHome() {
           <input type="file" id="file-input" class="sr-only" multiple accept="${d === 'iphone' ? IPHONE_ACCEPT : FILE_ACCEPT}" tabindex="-1">
           ${pasteBox}
           ${phone ? '' : '<p class="faint drop-hint">or drop an exported chat (.txt or .zip) anywhere on this page</p>'}
-        </section>`}
+        </section>
+        ${phone ? '' : `<a class="card notice addon-link" href="add-on.html">${icon('download')}<span><b>Using Chrome? Get the add-on.</b> It reads the chat open in WhatsApp Web: nothing to copy.</span></a>`}`}
         <section>
           <p class="eyebrow">Saved recently</p>
           <div class="recent card" id="recent">${recentHtml()}</div>
